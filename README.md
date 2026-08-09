@@ -1,5 +1,11 @@
 # Métodos Numéricos - 2026-2
 
+<p align="center">
+  <img src="assets/universidad-del-pacifico.png"
+       alt="Universidad del Pacífico"
+       width="540">
+</p>
+
 Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 **Facultad de Economía de la Universidad del Pacífico**.
 
@@ -50,4 +56,3 @@ celdas en orden.
 Este repositorio contiene las versiones vigentes para el periodo 2026-2. Las
 notas históricas, evaluaciones y archivos internos de preparación no forman
 parte de esta publicación.
-
