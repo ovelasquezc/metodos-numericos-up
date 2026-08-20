@@ -19,10 +19,12 @@ Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 - [Métodos Numéricos - notas 2026-2](notas/Metodos_Numericos_2026-2.pdf)
 
 Las notas reúnen el material central del curso. Esta edición fue recompilada el
-19 de agosto de 2026 y se encuentra en revisión y modernización progresiva. El
-capítulo 2 contiene la formulación revisada de convergencia para sucesiones
-escalares y vectoriales, convergencia lineal, superlineal y cuadrática, y
-criterios de parada.
+20 de agosto de 2026 y se encuentra en revisión y modernización progresiva. El
+capítulo 1 incorpora grafos computacionales como representación visual de la
+composición de funciones elementales y de la propagación de errores de entrada
+y redondeo. El capítulo 2 contiene la formulación revisada de convergencia para
+sucesiones escalares y vectoriales, convergencia lineal, superlineal y
+cuadrática, y criterios de parada.
 
 ### Presentaciones
 
