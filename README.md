@@ -30,6 +30,7 @@ cuadrática, y criterios de parada.
 
 - [Unidad 1: Fundamentos del análisis numérico](presentaciones/Unidad_1_Fundamentos_Analisis_Numerico.pdf)
 - [Unidad 2: Métodos iterativos y velocidad de convergencia](presentaciones/Unidad_2_Metodos_Iterativos_Convergencia.pdf)
+- [Unidad 3A: Sistemas lineales, sustitución, Gauss y Gauss--Jordan](presentaciones/Unidad_3A_Sistemas_Gauss.pdf)
 
 La presentación de la Unidad 1 desarrolla representación en punto flotante,
 errores, análisis diferencial, condicionamiento, estabilidad y costo
@@ -39,6 +40,13 @@ La presentación de la Unidad 2 desarrolla el capítulo introductorio sobre
 métodos iterativos mediante las tres nociones específicas de velocidad de
 convergencia utilizadas en el curso, sin recurrir a una definición general de
 orden.
+
+La presentación de la Unidad 3A introduce los sistemas lineales, los sistemas
+diagonales y triangulares, las sustituciones hacia adelante y hacia atrás, la
+eliminación de Gauss con pivoteo parcial, Gauss--Jordan, el costo computacional
+y la verificación mediante el residuo. Su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_3A_Sistemas_Gauss.tex)
+se publica junto con el estilo y el logo necesarios para recompilarla.
 
 ### Laboratorios
 
