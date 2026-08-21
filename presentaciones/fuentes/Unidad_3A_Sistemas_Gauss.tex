@@ -1,0 +1,395 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+
+\title{Sistemas de ecuaciones lineales}
+\subtitle{Sustitución, eliminación de Gauss y Gauss--Jordan}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\paso}[1]{\textcolor{upazul}{\textbf{#1}}}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Resolver no es calcular la inversa}
+Un sistema lineal con $n$ ecuaciones y $n$ incógnitas tiene la forma
+\[
+\begin{aligned}
+a_{11}x_1+a_{12}x_2+\cdots+a_{1n}x_n&=b_1,\\
+a_{21}x_1+a_{22}x_2+\cdots+a_{2n}x_n&=b_2,\\[-2mm]
+&\vdots\\[-2mm]
+a_{n1}x_1+a_{n2}x_2+\cdots+a_{nn}x_n&=b_n.
+\end{aligned}
+\]
+\begin{block}{Problema computacional}
+Dados los coeficientes $a_{ij}$ y $b_i$, buscamos $x_1,\ldots,x_n$ sin
+formar explícitamente $A^{-1}$.
+\end{block}
+\end{frame}
+
+\begin{frame}{La notación matricial revela la estructura}
+\[
+Ax=b,
+\qquad
+A=\mat{a_{11}&\cdots&a_{1n}\\ \vdots&\ddots&\vdots\\a_{n1}&\cdots&a_{nn}},
+\quad
+x=\mat{x_1\\\vdots\\x_n},
+\quad
+b=\mat{b_1\\\vdots\\b_n}.
+\]
+\begin{itemize}
+  \item Trabajaremos principalmente con $A\in\R^{n\times n}$ y $b\in\R^n$.
+  \item Si $A$ es no singular, el sistema tiene una única solución.
+  \item El método debe aprovechar la estructura de $A$ y controlar el efecto del redondeo.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La estrategia es reducir el problema general}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.30\textwidth}
+\begin{block}{Diagonal}
+Cada ecuación contiene una sola incógnita.
+\end{block}
+\end{column}
+\begin{column}{0.30\textwidth}
+\begin{block}{Triangular}
+Las incógnitas se recuperan en un orden definido.
+\end{block}
+\end{column}
+\begin{column}{0.34\textwidth}
+\begin{block}{General}
+Gauss transforma el sistema en uno triangular equivalente.
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.55cm}
+\centering
+$Ax=b$ \quad $\longrightarrow$ \quad $Ux=c$ \quad $\longrightarrow$ \quad $x$
+\end{frame}
+
+\begin{frame}{Sistema diagonal: solución directa}
+Si
+\[
+A=\operatorname{diag}(a_{11},\ldots,a_{nn}),
+\qquad a_{ii}\neq0,
+\]
+entonces
+\[
+a_{ii}x_i=b_i
+\qquad\Longrightarrow\qquad
+x_i=\frac{b_i}{a_{ii}},\quad i=1,\ldots,n.
+\]
+\begin{block}{Costo}
+La solución requiere $n$ divisiones: el trabajo crece linealmente con $n$.
+\end{block}
+\end{frame}
+
+\begin{frame}{La sustitución hacia atrás resuelve $Ux=b$}
+Para una matriz triangular superior $U=(u_{ij})$, con $u_{ii}\neq0$,
+\[
+x_n=\frac{b_n}{u_{nn}},
+\qquad
+x_j=\frac{b_j-\displaystyle\sum_{k=j+1}^{n}u_{jk}x_k}{u_{jj}},
+\quad j=n-1,\ldots,1.
+\]
+\begin{block}{Orden indispensable}
+Primero se calcula $x_n$; cada fila anterior utiliza componentes ya conocidas.
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo de sustitución hacia atrás}
+\[
+\mat{2&-1&1\\0&3&-2\\0&0&4}
+\mat{x_1\\x_2\\x_3}
+=
+\mat{4\\-1\\8}.
+\]
+\begin{align*}
+x_3&=8/4=2,\\
+x_2&=(-1+2x_3)/3=1,\\
+x_1&=(4+x_2-x_3)/2=\tfrac32.
+\end{align*}
+\centering
+El orden inverso convierte un sistema acoplado en tres cálculos escalares.
+\end{frame}
+
+\begin{frame}{Sustitución hacia adelante para $Lx=b$}
+Para una matriz triangular inferior $L=(\ell_{ij})$, con $\ell_{ii}\neq0$,
+\[
+x_1=\frac{b_1}{\ell_{11}},
+\qquad
+x_j=\frac{b_j-\displaystyle\sum_{k=1}^{j-1}\ell_{jk}x_k}{\ell_{jj}},
+\quad j=2,\ldots,n.
+\]
+\begin{block}{Corrección del material heredado}
+El índice final es $j=n$: la última incógnita también debe calcularse.
+\end{block}
+\end{frame}
+
+\begin{frame}{El algoritmo triangular cuesta del orden de $n^2$}
+\begin{block}{Sustitución hacia atrás}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}l}
+Entrada: & $U$ triangular superior y $b$; $u_{ii}\neq0$.\\[1mm]
+1. & Para $j=n,n-1,\ldots,1$: \\
+2. & \quad $s\leftarrow b_j$ \\
+3. & \quad Para $k=j+1,\ldots,n$: $s\leftarrow s-u_{jk}x_k$ \\
+4. & \quad $x_j\leftarrow s/u_{jj}$ \\
+Salida: & $x$ tal que $Ux=b$.
+\end{tabular}
+\end{block}
+Se realizan aproximadamente $n^2/2$ multiplicaciones y una cantidad similar de sumas.
+\end{frame}
+
+\begin{frame}{Operaciones que preservan las soluciones}
+Sobre la matriz aumentada $(A\mid b)$ podemos:
+\begin{enumerate}
+  \item intercambiar dos filas: $F_i\leftrightarrow F_j$;
+  \item multiplicar una fila por $\lambda\neq0$: $F_i\leftarrow\lambda F_i$;
+  \item sumar a una fila un múltiplo de otra:
+        $F_j\leftarrow F_j+\lambda F_i$.
+\end{enumerate}
+\begin{block}{Principio de equivalencia}
+Cada operación es reversible; por eso el sistema transformado tiene exactamente
+las mismas soluciones que el original.
+\end{block}
+\end{frame}
+
+\begin{frame}{Gauss crea ceros columna por columna}
+En la etapa $k$ se usa el pivote $a_{kk}^{(k-1)}$ para anular los elementos
+debajo de él. Para $i=k+1,\ldots,n$:
+\[
+m_{ik}=\frac{a_{ik}^{(k-1)}}{a_{kk}^{(k-1)}},
+\]
+\[
+a_{ij}^{(k)}=a_{ij}^{(k-1)}-m_{ik}a_{kj}^{(k-1)},
+\qquad
+b_i^{(k)}=b_i^{(k-1)}-m_{ik}b_k^{(k-1)}.
+\]
+Al terminar $n-1$ etapas obtenemos un sistema triangular superior $Ux=c$.
+\end{frame}
+
+\begin{frame}{Un pivote pequeño amplifica el redondeo}
+Considere la primera columna de la matriz aumentada. El \concepto{pivoteo parcial}\ 
+elige
+\[
+r=\operatorname*{arg\,max}_{i=k,\ldots,n}|a_{ik}|
+\]
+y luego intercambia $F_k\leftrightarrow F_r$.
+\begin{itemize}
+  \item Evita dividir por cero cuando existe un candidato no nulo.
+  \item Mantiene $|m_{ik}|\leq1$ durante esa etapa.
+  \item Reduce, aunque no elimina, el crecimiento de errores de redondeo.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gauss con pivoteo parcial}
+\small
+\begin{block}{Algoritmo}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.78\textwidth}}
+Entrada: & matriz aumentada $W=(A\mid b)$.\\[1mm]
+1. & Para $k=1,\ldots,n-1$: \\
+2. & \quad elegir $r$ que maximiza $|w_{ik}|$, $i=k,\ldots,n$;\\
+3. & \quad si $w_{rk}=0$, detener: no hay solución única;\\
+4. & \quad intercambiar las filas $k$ y $r$;\\
+5. & \quad para $i=k+1,\ldots,n$:\\
+6. & \qquad $m\leftarrow w_{ik}/w_{kk}$;\\
+7. & \qquad para $j=k+1,\ldots,n+1$:
+               $w_{ij}\leftarrow w_{ij}-m w_{kj}$;\\
+8. & \qquad $w_{ik}\leftarrow0$.\\
+Salida: & sistema triangular superior equivalente.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{El primer pivote es el mayor disponible}
+\[
+(A\mid b)=
+\left[
+\begin{array}{rrrr|r}
+2&-1& 3&4& 9\\
+1& 0&-2&7&11\\
+\textcolor{upverde}{3}&-3&1&5&8\\
+2&1&4&4&10
+\end{array}
+\right].
+\]
+Como $|3|$ es el máximo de la primera columna, intercambiamos
+$F_1\leftrightarrow F_3$ antes de eliminar.
+\begin{block}{Multiplicadores de la primera etapa}
+$m_{21}=1/3$, $m_{31}=2/3$ y $m_{41}=2/3$.
+\end{block}
+\end{frame}
+
+\begin{frame}{La primera etapa deja tres ceros exactos}
+Después del intercambio y de actualizar $F_i\leftarrow F_i-m_{i1}F_1$:
+\[
+\left[
+\begin{array}{rrrr|r}
+3&-3&1&5&8\\
+0&1&-7/3&16/3&25/3\\
+0&1&7/3&2/3&11/3\\
+0&3&10/3&2/3&14/3
+\end{array}
+\right].
+\]
+En la segunda columna, el mayor candidato es $3$; por ello se intercambian
+las filas 2 y 4.
+\end{frame}
+
+\begin{frame}{La eliminación produce un sistema triangular}
+Tras las etapas restantes se obtiene, aproximadamente,
+\[
+\left[
+\begin{array}{rrrr|r}
+3&-3&1&5&8\\
+0&3&3.3333&0.6667&4.6667\\
+0&0&-3.4444&5.1111&6.7778\\
+0&0&0&2.2581&4.5161
+\end{array}
+\right].
+\]
+La sustitución hacia atrás da
+\[
+\textcolor{upverde}{\boldsymbol{x=(-1,\,0,\,1,\,2)^t}}.
+\]
+\end{frame}
+
+\begin{frame}{Residuo: verificación, no error}
+Para una aproximación $\widehat x$, definimos
+\[
+r=b-A\widehat x.
+\]
+En el ejemplo,
+\[
+A\mat{-1\\0\\1\\2}=\mat{9\\11\\8\\10}=b,
+\qquad r=0.
+\]
+\begin{block}{Buena práctica}
+Calcule el residuo con los datos originales, no con la matriz ya transformada.
+Un residuo pequeño confirma que las ecuaciones casi se satisfacen; la relación
+con el error se estudiará mediante condicionamiento.
+\end{block}
+\end{frame}
+
+\begin{frame}{Gauss--Jordan reduce hasta la identidad}
+Gauss detiene la eliminación al llegar a $Ux=c$. Gauss--Jordan además:
+\begin{enumerate}
+  \item normaliza cada fila para que el pivote sea $1$;
+  \item elimina los elementos situados encima de cada pivote.
+\end{enumerate}
+\[
+(A\mid b)\ \sim\ (U\mid c)\ \sim\ (I\mid x).
+\]
+\begin{block}{Diferencia práctica}
+Gauss necesita sustitución hacia atrás; Gauss--Jordan entrega la solución
+directamente, pero realiza más operaciones.
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo breve de Gauss--Jordan}
+Partimos de la forma triangular
+\[
+\left[
+\begin{array}{rrr|r}
+1&2&-1&2\\
+0&1&3&5\\
+0&0&2&4
+\end{array}
+\right].
+\]
+Normalizamos $F_3\leftarrow F_3/2$ y eliminamos hacia arriba:
+\[
+\left[
+\begin{array}{rrr|r}
+1&2&0&4\\
+0&1&0&-1\\
+0&0&1&2
+\end{array}
+\right]
+\sim
+\left[
+\begin{array}{rrr|r}
+1&0&0&6\\
+0&1&0&-1\\
+0&0&1&2
+\end{array}
+\right].
+\]
+Por tanto, $x=(6,-1,2)^t$.
+\end{frame}
+
+\begin{frame}{Algoritmo de Gauss--Jordan}
+\small
+\begin{block}{Algoritmo con pivoteo parcial}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.78\textwidth}}
+Entrada: & $W=(A\mid b)$.\\[1mm]
+1. & Para $k=1,\ldots,n$: elegir e intercambiar la fila pivote.\\
+2. & \quad normalizar $F_k\leftarrow F_k/w_{kk}$.\\
+3. & \quad para cada $i\neq k$: \\
+4. & \qquad $m\leftarrow w_{ik}$;\\
+5. & \qquad $F_i\leftarrow F_i-mF_k$.\\
+Salida: & $(I\mid x)$ si $A$ es no singular.
+\end{tabular}
+\end{block}
+Para varios lados derechos, se añaden columnas a $W$ y se aplican las mismas
+operaciones simultáneamente.
+\end{frame}
+
+\begin{frame}{El costo distingue los métodos directos}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Etapa & Multiplicaciones/divisiones dominantes & Orden \\
+\midrule
+Sustitución triangular & $\approx n^2/2$ & $O(n^2)$ \\
+Eliminación de Gauss & $\approx n^3/3$ & $O(n^3)$ \\
+Gauss + sustitución & $n^3/3+O(n^2)$ & $O(n^3)$ \\
+Gauss--Jordan & $\approx n^3/2$ & $O(n^3)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{block}{Interpretación}
+Duplicar $n$ multiplica aproximadamente por ocho el trabajo cúbico.
+Gauss suele preferirse para resolver un sistema; Gauss--Jordan es útil para
+mostrar la reducción completa y para algunos cálculos matriciales.
+\end{block}
+\end{frame}
+
+\begin{frame}{Resolver también exige verificar}
+Al resolver $Ax=b$:
+\begin{enumerate}
+  \item identifique si $A$ tiene estructura diagonal o triangular;
+  \item use pivoteo parcial en la eliminación general;
+  \item evite redondear resultados intermedios innecesariamente;
+  \item verifique con el residuo $r=b-A\widehat x$;
+  \item reporte método, precisión y criterio usado.
+\end{enumerate}
+\begin{block}{Siguiente paso}
+La eliminación almacena una factorización $PA=LU$. Esa relación permitirá
+resolver eficientemente varios sistemas con la misma matriz.
+\end{block}
+\end{frame}
+
+\end{document}
