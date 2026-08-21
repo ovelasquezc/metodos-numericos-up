@@ -1,0 +1,668 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+
+\title{Sistemas de ecuaciones lineales}
+\subtitle{Factorización LU, estructuras especiales y condicionamiento}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\DeclareMathOperator{\cond}{cond}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Factorizar evita repetir la eliminación}
+Suponga que debemos resolver
+\[
+Ax=b^{(1)},\quad Ax=b^{(2)},\quad\ldots,\quad Ax=b^{(m)}.
+\]
+Aplicar Gauss desde cero para cada lado derecho repite el trabajo más costoso.
+\begin{block}{Idea central}
+Factorizamos una vez la matriz $A$ y reutilizamos esa información para cada
+nuevo vector $b^{(j)}$.
+\end{block}
+\centering
+$A$ \quad $\longrightarrow$ \quad factores triangulares \quad
+$\longrightarrow$ \quad muchas soluciones
+\end{frame}
+
+\begin{frame}{La factorización separa el problema en dos}
+Buscamos matrices triangulares
+\[
+L=\mat{\ell_{11}&0&\cdots&0\\
+\ell_{21}&\ell_{22}&\ddots&\vdots\\
+\vdots&\ddots&\ddots&0\\
+\ell_{n1}&\cdots&\ell_{n,n-1}&\ell_{nn}},
+\quad
+U=\mat{u_{11}&u_{12}&\cdots&u_{1n}\\
+0&u_{22}&\ddots&\vdots\\
+\vdots&\ddots&\ddots&u_{n-1,n}\\
+0&\cdots&0&u_{nn}}
+\]
+tales que $A=LU$.
+\end{frame}
+
+\begin{frame}{Resolver con $LU$ requiere dos sustituciones}
+Si $A=LU$, entonces
+\[
+Ax=b \quad\Longleftrightarrow\quad L(Ux)=b.
+\]
+Introducimos $y=Ux$ y resolvemos:
+\[
+\boxed{Ly=b}\quad\text{por sustitución hacia adelante},
+\]
+\[
+\boxed{Ux=y}\quad\text{por sustitución hacia atrás}.
+\]
+Si $A$ es no singular, las diagonales de $L$ y $U$ no contienen ceros.
+\end{frame}
+
+\begin{frame}{Algoritmo para resolver después de factorizar}
+\small
+\begin{block}{Dos sistemas triangulares}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.77\textwidth}}
+Entrada: & $L$, $U$ y $b$, con $A=LU$.\\[1mm]
+1. & Para $j=1,\ldots,n$:\\
+2. & \quad $y_j\leftarrow
+\bigl(b_j-\sum_{i=1}^{j-1}\ell_{ji}y_i\bigr)/\ell_{jj}$.\\
+3. & Para $j=n,n-1,\ldots,1$:\\
+4. & \quad $x_j\leftarrow
+\bigl(y_j-\sum_{i=j+1}^{n}u_{ji}x_i\bigr)/u_{jj}$.\\
+Salida: & $x$ tal que $Ax=b$.
+\end{tabular}
+\end{block}
+Una vez disponibles los factores, cada nuevo lado derecho cuesta $O(n^2)$.
+\end{frame}
+
+\begin{frame}{Ejemplo: dos sustituciones recuperan $x$}
+Sea
+\[
+L=\mat{1&0&0\\2&1&0\\-1&-1&1},\qquad
+U=\mat{2&1&1\\0&-8&-2\\0&0&1},\qquad
+b=\mat{5\\-2\\9}.
+\]
+De $Ly=b$ obtenemos $y=(5,-12,2)^t$. Luego, de $Ux=y$,
+\[
+\textcolor{upverde}{\boldsymbol{x=(1,1,2)^t}}.
+\]
+\begin{block}{Comprobación}
+$LU=\mat{2&1&1\\4&-6&0\\-2&7&2}=A$ y $Ax=b$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Los multiplicadores de Gauss forman $L$}
+Sin intercambios de filas, la etapa $k$ usa
+\[
+m_{ik}=\frac{a_{ik}^{(k-1)}}{a_{kk}^{(k-1)}},
+\qquad i=k+1,\ldots,n.
+\]
+La matriz final de la eliminación es $U$ y los multiplicadores se almacenan
+debajo de la diagonal de $L$:
+\[
+L=\mat{1&0&\cdots&0\\
+m_{21}&1&\ddots&\vdots\\
+\vdots&\ddots&\ddots&0\\
+m_{n1}&\cdots&m_{n,n-1}&1}.
+\]
+\end{frame}
+
+\begin{frame}{Ejemplo: Gauss produce $LU$}
+Para
+\[
+A=\mat{2&1&1\\4&-6&0\\-2&7&2},
+\]
+los multiplicadores son
+\[
+m_{21}=2,\qquad m_{31}=-1,\qquad m_{32}=-1.
+\]
+Por ello,
+\[
+A=
+\underbrace{\mat{1&0&0\\2&1&0\\-1&-1&1}}_{L}
+\underbrace{\mat{2&1&1\\0&-8&-2\\0&0&1}}_{U}.
+\]
+\end{frame}
+
+\begin{frame}{Doolittle fija una diagonal de unos}
+En la forma de Doolittle se impone $\ell_{ii}=1$. Para $k=1,\ldots,n$:
+\[
+u_{kj}=a_{kj}-\sum_{s=1}^{k-1}\ell_{ks}u_{sj},
+\qquad j=k,\ldots,n,
+\]
+\[
+\ell_{ik}=\frac{a_{ik}-\displaystyle\sum_{s=1}^{k-1}\ell_{is}u_{sk}}
+{u_{kk}},
+\qquad i=k+1,\ldots,n.
+\]
+\begin{block}{Condición de continuación}
+El pivote $u_{kk}$ debe ser distinto de cero; de lo contrario se requiere
+intercambiar filas.
+\end{block}
+\end{frame}
+
+\begin{frame}{A veces se necesitan intercambios}
+Considere
+\[
+A=\mat{0&1\\1&0},\qquad \det(A)=-1.
+\]
+La matriz es invertible, pero el primer pivote es cero: Gauss no puede comenzar
+sin intercambiar filas.
+\begin{block}{Consecuencia}
+No toda matriz no singular admite una factorización $A=LU$ sin permutaciones.
+La dificultad no es la existencia de la solución, sino el orden de las filas.
+\end{block}
+\end{frame}
+
+\begin{frame}{Una permutación registra los intercambios}
+Una matriz de permutación se obtiene intercambiando filas de la identidad.
+En el ejemplo,
+\[
+P=\mat{0&1\\1&0},\qquad
+PA=\mat{1&0\\0&1}.
+\]
+En general, el pivoteo parcial produce
+\[
+\boxed{PA=LU}.
+\]
+Así, para resolver $Ax=b$ se calculan primero $Pb$, luego
+$Ly=Pb$ y finalmente $Ux=y$.
+\end{frame}
+
+\begin{frame}{Algoritmo práctico: $PA=LU$}
+\small
+\begin{block}{Factorización con pivoteo parcial}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.77\textwidth}}
+Entrada: & $A\in\R^{n\times n}$ no singular.\\[1mm]
+1. & Iniciar $P\leftarrow I$ y $L\leftarrow I$.\\
+2. & Para $k=1,\ldots,n-1$: elegir $r$ que maximiza $|a_{ik}|$.\\
+3. & \quad intercambiar filas $k,r$ en $A$ y $P$, y en las columnas
+      $1,\ldots,k-1$ de $L$.\\
+4. & \quad para $i=k+1,\ldots,n$: guardar $\ell_{ik}=a_{ik}/a_{kk}$
+      y actualizar la fila $i$.\\
+5. & Al terminar, definir $U\leftarrow A$ transformada.\\
+Salida: & $P,L,U$ tales que $PA=LU$.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Factorizar domina el costo total}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Trabajo & Costo dominante & Orden \\
+\midrule
+Factorizar $PA=LU$ & $\approx n^3/3$ & $O(n^3)$ \\
+Resolver $Ly=Pb$ & $\approx n^2/2$ & $O(n^2)$ \\
+Resolver $Ux=y$ & $\approx n^2/2$ & $O(n^2)$ \\
+Cada nuevo $b$ & $\approx n^2$ & $O(n^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{block}{Ganancia}
+Con muchos lados derechos, se paga una sola factorización cúbica y luego una
+solución cuadrática por cada vector adicional.
+\end{block}
+\end{frame}
+
+\begin{frame}{La estructura puede reducir aún más el costo}
+La factorización general $PA=LU$ no aprovecha propiedades adicionales de $A$.
+Dos casos importantes de las notas son:
+\begin{itemize}
+  \item matrices simétricas definidas positivas: factorización de Cholesky;
+  \item matrices tridiagonales: factorización y solución con almacenamiento lineal.
+\end{itemize}
+\begin{block}{Principio}
+Conservar la estructura evita calcular y almacenar ceros conocidos de antemano.
+\end{block}
+\end{frame}
+
+\begin{frame}{Una matriz definida positiva admite Cholesky}
+Una matriz real simétrica $A=A^t$ es \concepto{definida positiva} si
+\[
+x^tAx>0\qquad\text{para todo }x\neq0.
+\]
+Para toda matriz de este tipo existe una única matriz triangular inferior $L$,
+con diagonal positiva, tal que
+\[
+\boxed{A=LL^t}.
+\]
+Esta es la factorización de Cholesky.
+\end{frame}
+
+\begin{frame}{Cholesky calcula solamente la mitad necesaria}
+De $A=LL^t$ se obtienen, para $j=1,\ldots,n$,
+\[
+\ell_{jj}=\left(a_{jj}-\sum_{k=1}^{j-1}\ell_{jk}^2\right)^{1/2},
+\]
+y para $i=j+1,\ldots,n$,
+\[
+\ell_{ij}=\frac{a_{ij}-\displaystyle\sum_{k=1}^{j-1}
+\ell_{ik}\ell_{jk}}{\ell_{jj}}.
+\]
+\begin{block}{Diagnóstico incorporado}
+Si el radicando deja de ser positivo, la matriz no satisface las condiciones
+para continuar con Cholesky en aritmética exacta.
+\end{block}
+\end{frame}
+
+\begin{frame}{Algoritmo de Cholesky}
+\small
+\begin{block}{Construcción por columnas}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.77\textwidth}}
+Entrada: & $A=A^t\in\R^{n\times n}$ definida positiva.\\[1mm]
+1. & Para $j=1,\ldots,n$:\\
+2. & \quad $s\leftarrow a_{jj}-\sum_{k=1}^{j-1}\ell_{jk}^2$.\\
+3. & \quad $\ell_{jj}\leftarrow\sqrt{s}$.\\
+4. & \quad Para $i=j+1,\ldots,n$:\\
+5. & \qquad $\ell_{ij}\leftarrow
+\bigl(a_{ij}-\sum_{k=1}^{j-1}\ell_{ik}\ell_{jk}\bigr)/\ell_{jj}$.\\
+Salida: & $L$ triangular inferior tal que $A=LL^t$.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo clásico de Cholesky}
+Considere
+\[
+A=\mat{4&12&-16\\12&37&-43\\-16&-43&98}.
+\]
+Las fórmulas producen
+\[
+L=\mat{2&0&0\\6&1&0\\-8&5&3},
+\qquad
+L^t=\mat{2&6&-8\\0&1&5\\0&0&3}.
+\]
+La comprobación directa da
+\[
+LL^t=A.
+\]
+\end{frame}
+
+\begin{frame}{Resolver con Cholesky}
+Si $A=LL^t$, entonces
+\[
+Ax=b
+\quad\Longleftrightarrow\quad
+L(L^tx)=b.
+\]
+Se resuelve primero $Ly=b$ y luego $L^tx=y$.
+\begin{block}{Costo}
+La factorización requiere aproximadamente $n^3/6$ multiplicaciones y
+divisiones: cerca de la mitad del trabajo de la eliminación de Gauss.
+Además, solo se almacena una parte triangular.
+\end{block}
+\end{frame}
+
+\begin{frame}{Estructura tridiagonal}
+Una matriz tridiagonal tiene la forma
+\[
+A=\mat{
+a_1&c_1&0&\cdots&0\\
+b_2&a_2&c_2&\ddots&\vdots\\
+0&b_3&a_3&\ddots&0\\
+\vdots&\ddots&\ddots&\ddots&c_{n-1}\\
+0&\cdots&0&b_n&a_n}.
+\]
+Solo se almacenan los vectores
+\[
+(b_2,\ldots,b_n),\quad(a_1,\ldots,a_n),\quad(c_1,\ldots,c_{n-1}).
+\]
+\end{frame}
+
+\begin{frame}{El factor $LU$ tridiagonal mantiene el patrón}
+Buscamos
+\[
+L=\mat{\alpha_1&0&\cdots&0\\
+b_2&\alpha_2&\ddots&\vdots\\
+0&\ddots&\ddots&0\\
+0&\cdots&b_n&\alpha_n},
+\qquad
+U=\mat{1&u_1&\cdots&0\\
+0&1&\ddots&\vdots\\
+\vdots&\ddots&\ddots&u_{n-1}\\
+0&\cdots&0&1}.
+\]
+Las recurrencias son
+\[
+\alpha_1=a_1,\qquad u_1=c_1/\alpha_1,
+\]
+\[
+\alpha_j=a_j-b_ju_{j-1},\qquad u_j=c_j/\alpha_j.
+\]
+\end{frame}
+
+\begin{frame}{Algoritmo compuesto para una tridiagonal}
+\small
+\begin{block}{Factorizar, avanzar y retroceder}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & diagonales $b,a,c$ y lado derecho $f$.\\[1mm]
+1. & $\alpha_1\leftarrow a_1$, $u_1\leftarrow c_1/\alpha_1$.\\
+2. & Para $j=2,\ldots,n-1$:
+      $\alpha_j\leftarrow a_j-b_ju_{j-1}$,
+      $u_j\leftarrow c_j/\alpha_j$.\\
+3. & $\alpha_n\leftarrow a_n-b_nu_{n-1}$.\\
+4. & $y_1\leftarrow f_1/\alpha_1$; para $j=2,\ldots,n$:
+      $y_j\leftarrow(f_j-b_jy_{j-1})/\alpha_j$.\\
+5. & $x_n\leftarrow y_n$; para $j=n-1,\ldots,1$:
+      $x_j\leftarrow y_j-u_jx_{j+1}$.\\
+Salida: & solución de $Ax=f$.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo tridiagonal: el costo es lineal}
+Para
+\[
+A=\mat{2&-1&0\\-1&2&-1\\0&-1&2},
+\qquad
+f=\mat{1\\0\\1},
+\]
+se obtiene
+\[
+\alpha=(2,3/2,4/3),
+\qquad
+u=(-1/2,-2/3).
+\]
+Las dos sustituciones dan
+\[
+\textcolor{upverde}{\boldsymbol{x=(1,1,1)^t}}.
+\]
+El algoritmo usa $O(n)$ operaciones y $O(n)$ posiciones de memoria.
+\end{frame}
+
+\begin{frame}{La inversa describe, pero no suele resolver}
+Si $A$ es invertible, existe $A^{-1}$ tal que
+\[
+A^{-1}A=AA^{-1}=I,
+\qquad x=A^{-1}b.
+\]
+La identidad es útil para el análisis, pero en cómputo conviene resolver
+$Ax=b$ mediante factores triangulares.
+\begin{itemize}
+  \item Formar $A^{-1}$ exige resolver $n$ sistemas.
+  \item Almacena información que puede no necesitarse.
+  \item No mejora la exactitud frente a resolver con $PA=LU$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Las normas miden tamaños de vectores}
+Para $x=(x_1,\ldots,x_n)^t\in\R^n$:
+\[
+\|x\|_1=\sum_{i=1}^{n}|x_i|,
+\qquad
+\|x\|_2=\left(\sum_{i=1}^{n}|x_i|^2\right)^{1/2},
+\qquad
+\|x\|_\infty=\max_i|x_i|.
+\]
+\begin{block}{Lectura}
+$\|x\|_1$ suma magnitudes, $\|x\|_2$ mide distancia euclidiana y
+$\|x\|_\infty$ conserva la componente de mayor magnitud.
+\end{block}
+En dimensión finita, cualquiera de estas normas permite expresar convergencia
+y error; las constantes numéricas pueden cambiar.
+\end{frame}
+
+\begin{frame}{Una norma inducida mide amplificación}
+Dada una norma vectorial, su norma matricial inducida es
+\[
+\|A\|=\max_{x\neq0}\frac{\|Ax\|}{\|x\|}
+=\max_{\|x\|=1}\|Ax\|.
+\]
+Por definición,
+\[
+\|Ax\|\leq\|A\|\,\|x\|,
+\qquad
+\|AB\|\leq\|A\|\,\|B\|.
+\]
+\begin{block}{Interpretación}
+$\|A\|$ es el máximo factor por el que la transformación $x\mapsto Ax$
+puede ampliar un vector en la norma elegida.
+\end{block}
+\end{frame}
+
+\begin{frame}{Tres normas matriciales tienen fórmulas útiles}
+Para $A=(a_{ij})$:
+\[
+\|A\|_\infty=\max_i\sum_{j=1}^{n}|a_{ij}|,
+\qquad
+\|A\|_1=\max_j\sum_{i=1}^{n}|a_{ij}|,
+\]
+\[
+\|A\|_2=\sqrt{\rho(A^*A)}=\sigma_{\max}(A).
+\]
+\begin{itemize}
+  \item $\|A\|_\infty$: máxima suma absoluta por filas.
+  \item $\|A\|_1$: máxima suma absoluta por columnas.
+  \item $\|A\|_2$: mayor valor singular.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{El número de condición mide sensibilidad}
+Para una matriz invertible y una norma inducida,
+\[
+\boxed{\cond(A)=\|A\|\,\|A^{-1}\|}\qquad\text{y}\qquad\cond(A)\geq1.
+\]
+Si solo se perturba el lado derecho,
+\[
+Ax=b,\qquad A(x+\Delta x)=b+\Delta b,
+\]
+entonces
+\[
+\frac{\|\Delta x\|}{\|x\|}
+\leq
+\cond(A)\frac{\|\Delta b\|}{\|b\|}.
+\]
+\end{frame}
+
+\begin{frame}{Bien o mal condicionado describe al problema}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+\begin{block}{Bien condicionado}
+$\cond(A)$ está cerca de $1$: pequeñas perturbaciones relativas no pueden
+amplificarse demasiado según la cota.
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Mal condicionado}
+$\cond(A)$ es grande: existen perturbaciones pequeñas que pueden cambiar mucho
+la solución.
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.45cm}
+\centering
+El condicionamiento pertenece a $(A,b)$ como problema; la estabilidad pertenece
+al algoritmo que lo resuelve.
+\end{frame}
+
+\begin{frame}{Un cambio diminuto puede alterar la solución}
+Considere
+\[
+A=\mat{1&0.99\\0.99&0.98},\quad
+b=\mat{1.99\\1.97},\quad
+\widetilde b=\mat{1.989903\\1.970106}.
+\]
+Las soluciones son
+\[
+x=\mat{1\\1},
+\qquad
+\widetilde x\approx\mat{3\\-1.0203}.
+\]
+La perturbación relativa en $b$ es aproximadamente $5.33\times10^{-5}$,
+pero la perturbación relativa en $x$ es aproximadamente $2.02$.
+\end{frame}
+
+\begin{frame}{La condición acota la amplificación}
+Para el ejemplo anterior,
+\[
+A^{-1}=\mat{-9800&9900\\9900&-10000},
+\]
+y por tanto
+\[
+\cond_\infty(A)=\|A\|_\infty\|A^{-1}\|_\infty
+=1.99(19900)=39601.
+\]
+El factor observado es
+\[
+\frac{2.0203}{5.3266\times10^{-5}}\approx37928<39601.
+\]
+La cota no predice el error exacto; limita la peor amplificación posible.
+\end{frame}
+
+\begin{frame}{En norma 2 aparecen los valores singulares}
+Para cualquier matriz no singular,
+\[
+\cond_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+\]
+Si $A$ es simétrica definida positiva, sus valores singulares coinciden con
+sus valores propios positivos y
+\[
+\cond_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}.
+\]
+\begin{block}{Corrección importante}
+El cociente de valores propios no es válido para una matriz general; la fórmula
+general utiliza valores singulares.
+\end{block}
+\end{frame}
+
+\begin{frame}{Perturbar $A$ y $b$ exige una cota conjunta}
+Suponga
+\[
+Ax=b,
+\qquad
+(A+\Delta A)(x+\Delta x)=b+\Delta b.
+\]
+Si
+\[
+\cond(A)\frac{\|\Delta A\|}{\|A\|}<1,
+\]
+entonces
+\[
+\frac{\|\Delta x\|}{\|x\|}
+\leq
+\frac{\cond(A)}{1-\cond(A)\frac{\|\Delta A\|}{\|A\|}}
+\left(
+\frac{\|\Delta A\|}{\|A\|}+
+\frac{\|\Delta b\|}{\|b\|}
+\right).
+\]
+\end{frame}
+
+\begin{frame}{Un pivote pequeño puede destruir cifras}
+Considere, con aritmética de dos cifras significativas,
+\[
+0.005x+y=0.5,
+\qquad
+x+y=1.
+\]
+Sin intercambio, el multiplicador es $200$ y se obtiene
+\[
+-199y=-99,
+\qquad y\approx0.50,
+\qquad x\approx0.
+\]
+La solución exacta es aproximadamente
+\[
+x=0.503,\qquad y=0.497.
+\]
+\end{frame}
+
+\begin{frame}{El pivoteo parcial reduce la pérdida}
+Si primero intercambiamos las ecuaciones,
+\[
+x+y=1,
+\qquad
+0.005x+y=0.5,
+\]
+el multiplicador es $0.005$ y la aritmética de dos cifras produce
+\[
+y\approx0.50,
+\qquad x\approx0.50.
+\]
+\begin{block}{Resultado}
+El pivoteo no vuelve exacto el cálculo, pero evita el gran multiplicador que
+amplificaba los errores intermedios.
+\end{block}
+\end{frame}
+
+\begin{frame}{Las escalas pueden engañar al pivoteo simple}
+Multiplicar la primera ecuación por $400$ no cambia la solución:
+\[
+2x+400y=200,
+\qquad
+x+y=1.
+\]
+El pivoteo parcial escogería $2$ por ser mayor que $1$, aunque esa elección
+reproduce la mala secuencia de cálculo.
+\begin{block}{Pivoteo parcial escalado}
+Compare $|a_{ik}|/s_i$, donde $s_i=\max_j|a_{ij}|$. Así se considera el tamaño
+del candidato en relación con toda su fila.
+\end{block}
+\end{frame}
+
+\begin{frame}{El residuo es un error hacia atrás}
+Para una solución calculada $\widehat x$, el residuo es
+\[
+r=b-A\widehat x.
+\]
+Entonces $\widehat x$ satisface exactamente
+\[
+A\widehat x=b-r.
+\]
+Por ello, $\|r\|/\|b\|$ mide cuánto habría que perturbar el lado derecho para
+que $\widehat x$ fuera una solución exacta.
+\begin{block}{Error hacia adelante}
+El error que normalmente interesa es $\|x-\widehat x\|/\|x\|$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Condición y residuo deben leerse juntos}
+Aplicando la cota de perturbación al residuo,
+\[
+\frac{\|x-\widehat x\|}{\|x\|}
+\leq
+\cond(A)\frac{\|r\|}{\|b\|}.
+\]
+\begin{itemize}
+  \item Si $A$ está bien condicionada, un residuo relativo pequeño controla el error.
+  \item Si $A$ está mal condicionada, el mismo residuo puede coexistir con un error grande.
+  \item Reportar solo el residuo omite una parte esencial del diagnóstico.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estrategia de solución y diagnóstico}
+\begin{enumerate}
+  \item Factorice una vez $PA=LU$ y reutilice los factores.
+  \item Use Cholesky o el algoritmo tridiagonal cuando la estructura lo permita.
+  \item Use pivoteo y escalamiento en la factorización general.
+  \item Distinga redondeo del algoritmo y sensibilidad del problema.
+  \item Evalúe residuo y condición antes de interpretar la exactitud.
+\end{enumerate}
+\begin{block}{Siguiente presentación}
+La Unidad 3C estudia la factorización $QR$ mediante Householder y Givens.
+\end{block}
+\end{frame}
+
+\end{document}

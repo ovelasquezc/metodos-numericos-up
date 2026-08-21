@@ -1,0 +1,535 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+
+\title{Sistemas de ecuaciones lineales}
+\subtitle{Factorización QR: Householder y Givens}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\DeclareMathOperator{\sgn}{sign}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{QR triangulariza sin eliminar con múltiplos}
+La eliminación de Gauss usa transformaciones triangulares. La factorización
+$QR$ usa transformaciones ortogonales:
+\[
+A=QR,
+\qquad Q^tQ=I,
+\qquad R\ \text{triangular superior}.
+\]
+\begin{block}{Ventaja estructural}
+Las transformaciones ortogonales preservan longitudes y no amplifican el error
+en norma 2: $\|Qx\|_2=\|x\|_2$.
+\end{block}
+Householder elimina una columna mediante una reflexión; Givens elimina una
+entrada mediante una rotación.
+\end{frame}
+
+\begin{frame}{QR también cubre matrices rectangulares}
+Sea $A\in\R^{m\times n}$, con $m\geq n$. Una factorización completa tiene
+\[
+Q\in\R^{m\times m},
+\qquad
+R=\mat{R_1\\0}\in\R^{m\times n},
+\]
+donde $Q$ es ortogonal y $R_1\in\R^{n\times n}$ es triangular superior.
+\begin{block}{Existencia}
+Toda matriz real con $m\geq n$ admite una factorización $QR$. Si
+$\operatorname{rang}(A)=n$, la diagonal de $R_1$ no contiene ceros.
+\end{block}
+\end{frame}
+
+\begin{frame}{La forma reducida evita columnas innecesarias}
+Si $Q=[Q_1\ Q_2]$, con $Q_1\in\R^{m\times n}$, entonces
+\[
+A=Q\mat{R_1\\0}=Q_1R_1.
+\]
+La factorización reducida o delgada es
+\[
+\boxed{A=Q_1R_1},
+\qquad Q_1^tQ_1=I_n.
+\]
+\begin{itemize}
+  \item La forma completa describe una base ortonormal de $\R^m$.
+  \item La forma reducida basta para representar $A$ y ahorrar almacenamiento.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Resolver con QR termina en sustitución}
+Para un sistema cuadrado no singular,
+\[
+Ax=b,
+\qquad A=QR.
+\]
+Como $Q^{-1}=Q^t$,
+\[
+QRx=b
+\quad\Longrightarrow\quad
+Rx=Q^tb.
+\]
+\begin{enumerate}
+  \item Calcule $c=Q^tb$ aplicando las transformaciones ortogonales.
+  \item Resuelva $Rx=c$ por sustitución hacia atrás.
+\end{enumerate}
+No es necesario formar $Q$ explícitamente.
+\end{frame}
+
+\begin{frame}{QR también resuelve mínimos cuadrados}
+Si $m>n$, el sistema $Ax=b$ puede ser incompatible. Con
+\[
+Q^tb=\mat{c_1\\c_2},
+\qquad
+R=\mat{R_1\\0},
+\]
+se tiene
+\[
+\|Ax-b\|_2^2
+=\|R_1x-c_1\|_2^2+\|c_2\|_2^2.
+\]
+La solución de mínimos cuadrados satisface
+\[
+\boxed{R_1x=c_1}.
+\]
+El residuo mínimo tiene norma $\|c_2\|_2$.
+\end{frame}
+
+\begin{frame}{Una reflexión anula varias componentes}
+Para $u\neq0$, la matriz de Householder es
+\[
+P=I-\frac{2uu^t}{u^tu}=I-\beta uu^t,
+\qquad \beta=\frac{2}{u^tu}.
+\]
+\begin{itemize}
+  \item $P^t=P$: la reflexión es simétrica.
+  \item $P^tP=P^2=I$: la reflexión es ortogonal e involutiva.
+  \item $Px=x-\beta u(u^tx)$: se aplica mediante un producto interno y una actualización.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Householder refleja hacia un eje coordenado}
+Para $x\in\R^p$, $x\neq0$, defina
+\[
+u=x+\sgn(x_1)\|x\|_2e_1,
+\qquad
+P=I-\frac{2uu^t}{u^tu}.
+\]
+Entonces
+\[
+\boxed{Px=-\sgn(x_1)\|x\|_2e_1}.
+\]
+Todas las componentes salvo la primera se vuelven cero en una sola reflexión.
+\begin{block}{Elección del signo}
+Sumar un vector con el mismo signo que $x_1$ evita cancelación en la construcción de $u$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Cada reflexión trabaja sobre una submatriz}
+En la etapa $k$, tome
+\[
+x=A_{k:m,k}
+\]
+y construya una reflexión $\widetilde P_k$ que transforme $x$ en un múltiplo
+de $e_1$. Extiéndala a toda la matriz mediante
+\[
+P_k=\operatorname{diag}(I_{k-1},\widetilde P_k).
+\]
+Así, las primeras $k-1$ filas no cambian y la columna $k$ queda anulada debajo
+de la diagonal.
+\end{frame}
+
+\begin{frame}{El producto de reflexiones produce $Q$ y $R$}
+Después de $s=\min\{n,m-1\}$ etapas,
+\[
+R=P_sP_{s-1}\cdots P_1A.
+\]
+Como cada $P_k$ es simétrica y ortogonal,
+\[
+Q=P_1P_2\cdots P_s,
+\qquad
+A=QR.
+\]
+Para calcular $Q^tb$ se aplican las reflexiones en el mismo orden usado para
+transformar $A$:
+\[
+Q^tb=P_s\cdots P_1b.
+\]
+\end{frame}
+
+\begin{frame}{Algoritmo QR de Householder}
+\small
+\begin{block}{Transformación por columnas}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & $A\in\R^{m\times n}$, $m\geq n$.\\[1mm]
+1. & Para $k=1,\ldots,\min\{n,m-1\}$:\\
+2. & \quad $x\leftarrow A_{k:m,k}$.\\
+3. & \quad $u\leftarrow x+\sgn(x_1)\|x\|_2e_1$,
+      $\beta\leftarrow2/(u^tu)$.\\
+4. & \quad Para $j=k,\ldots,n$:\\
+5. & \qquad $A_{k:m,j}\leftarrow
+      A_{k:m,j}-\beta u(u^tA_{k:m,j})$.\\
+6. & \quad guardar $u$ y $\beta$ para aplicar $Q$ o $Q^t$.\\
+Salida: & $R$ en la parte triangular y los datos de las reflexiones.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Escalar el vector evita extremos numéricos}
+Calcular directamente $u=x+\sgn(x_1)\|x\|_2e_1$ puede desbordar o subdesbordar.
+Una versión escalada usa
+\[
+y=\frac{x}{\|x\|_\infty},
+\qquad
+u=y+\sgn(y_1)\|y\|_2e_1,
+\]
+\[
+\beta=\frac{1}{\|y\|_2(\|y\|_2+|y_1|)}.
+\]
+\begin{block}{Implementación}
+Se almacenan los vectores $u_k$ debajo de la diagonal de $A$, la diagonal de
+$R$ por separado y los escalares $\beta_k$; no se almacena cada $P_k$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo común para Householder y Givens}
+Usaremos la matriz de las notas:
+\[
+A=\mat{
+63&41&-88\\
+42&60&51\\
+0&-28&56\\
+126&82&-71}
+\in\R^{4\times3}.
+\]
+El objetivo es producir tres ceros en la primera columna, dos en la segunda y
+uno en la tercera.
+\begin{block}{Resultado esperado}
+$R$ tendrá una parte triangular $3\times3$ y una última fila nula.
+\end{block}
+\end{frame}
+
+\begin{frame}{Householder 1 elimina la primera columna}
+Para
+\[
+x_1=(63,42,0,126)^t,
+\qquad \|x_1\|_2=147,
+\]
+tomamos
+\[
+u_1=(210,42,0,126)^t.
+\]
+La primera reflexión produce
+\[
+P_1A=\mat{
+-147&-105&84\\
+0&30.8&85.4\\
+0&-28&56\\
+0&-5.6&32.2}.
+\]
+\end{frame}
+
+\begin{frame}{Householder 2 elimina la segunda columna}
+Trabajamos solo con las filas 2 a 4:
+\[
+x_2=(30.8,-28,-5.6)^t,
+\qquad
+u_2=(72.8,-28,-5.6)^t.
+\]
+Al extender la reflexión con un $1$ en la primera coordenada,
+\[
+P_2P_1A=\mat{
+-147&-105&84\\
+0&-42&-21\\
+0&0&96.9231\\
+0&0&40.3846}.
+\]
+Los ceros de la primera columna permanecen intactos.
+\end{frame}
+
+\begin{frame}{Householder 3 completa $R$}
+Para las dos últimas componentes de la tercera columna,
+\[
+x_3=(96.9231,40.3846)^t,
+\qquad
+u_3=(201.9231,40.3846)^t.
+\]
+La tercera reflexión da
+\[
+R=P_3P_2P_1A=
+\mat{-147&-105&84\\0&-42&-21\\0&0&-105\\0&0&0}.
+\]
+Las tres reflexiones han eliminado seis entradas.
+\end{frame}
+
+\begin{frame}{Resultado de Householder: $Q$ y $R$}
+Con la convención de signos anterior,
+\[
+Q=P_1P_2P_3=
+\mat{
+-0.4286&0.0952&0.4762&-0.7619\\
+-0.2857&-0.7143&-0.5714&-0.2857\\
+0&0.6667&-0.6667&-0.3333\\
+-0.8571&0.1905&-0.0476&0.4762}.
+\]
+Se comprueba, salvo redondeo, que
+\[
+Q^tQ=I,
+\qquad
+QR=A.
+\]
+Cambiar simultáneamente el signo de una columna de $Q$ y la fila correspondiente
+de $R$ produce otra factorización válida.
+\end{frame}
+
+\begin{frame}{Una rotación de Givens actúa en dos filas}
+Para $1\leq i<k\leq m$, $G_{ik}$ coincide con la identidad salvo por el bloque
+\[
+\mat{C&S\\-S&C},
+\qquad C^2+S^2=1,
+\]
+en las filas y columnas $i,k$.
+\begin{itemize}
+  \item $G_{ik}$ es ortogonal.
+  \item Solo cambia las componentes o filas $i$ y $k$.
+  \item Los ceros presentes en ambas filas se conservan.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Givens convierte un par en $(\gamma,0)$}
+Dados $\alpha$ y $\beta$, elegimos $C$ y $S$ para que
+\[
+\mat{C&S\\-S&C}\mat{\alpha\\\beta}
+=\mat{\gamma\\0}.
+\]
+Con $\gamma=\operatorname{hypot}(\alpha,\beta)$,
+\[
+C=\frac{\alpha}{\gamma},
+\qquad
+S=\frac{\beta}{\gamma}.
+\]
+\begin{block}{Caso especial}
+Si $\beta=0$, se toma $C=1$, $S=0$ y no se modifica el par.
+La función \texttt{hypot} evita elevar al cuadrado números extremos.
+\end{block}
+\end{frame}
+
+\begin{frame}{La actualización mezcla únicamente dos filas}
+Al multiplicar $A$ por la izquierda,
+\[
+\begin{aligned}
+(G_{ik}A)_{ij}&=C a_{ij}+S a_{kj},\\
+(G_{ik}A)_{kj}&=-S a_{ij}+C a_{kj},
+\end{aligned}
+\qquad j=1,\ldots,n.
+\]
+Si se elige $C,S$ a partir de $(a_{ii},a_{ki})$, entonces
+\[
+(G_{ik}A)_{ki}=0.
+\]
+La rotación modifica dos filas desde la columna $i$ en adelante.
+\end{frame}
+
+\begin{frame}{Givens elimina una entrada por rotación}
+Para una matriz $4\times3$, el recorrido por columnas es
+\[
+G_{12},\ G_{13},\ G_{14},
+\qquad
+G_{23},\ G_{24},
+\qquad
+G_{34}.
+\]
+El patrón evoluciona como
+\[
+\mat{*&*&*\\ *&*&*\\ *&*&*\\ *&*&*}
+\longrightarrow
+\mat{*&*&*\\ 0&*&*\\ 0&*&*\\ 0&*&*}
+\longrightarrow
+\mat{*&*&*\\ 0&*&*\\ 0&0&*\\ 0&0&0}.
+\]
+Los ceros ya creados no se destruyen.
+\end{frame}
+
+\begin{frame}{Algoritmo QR de Givens}
+\small
+\begin{block}{Rotaciones por columnas}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & $A\in\R^{m\times n}$, $m\geq n$.\\[1mm]
+1. & Para $i=1,\ldots,\min\{n,m-1\}$:\\
+2. & \quad Para $k=i+1,\ldots,m$:\\
+3. & \qquad calcular $(C,S,\gamma)$ para $(a_{ii},a_{ki})$.\\
+4. & \qquad $a_{ii}\leftarrow\gamma$, $a_{ki}\leftarrow0$.\\
+5. & \qquad Para $j=i+1,\ldots,n$, rotar
+      $(a_{ij},a_{kj})^t$.\\
+6. & \qquad guardar $(i,k,C,S)$ si se necesita $Q$.\\
+Salida: & $R=G_s\cdots G_1A$ y $Q=G_1^t\cdots G_s^t$.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Givens: la primera columna requiere tres pasos}
+Para la misma matriz $A$, primero
+\[
+\operatorname{rot}(63,42)=(0.8321,0.5547,75.7166).
+\]
+Después de $G_{12}$ y de la rotación trivial $G_{13}$:
+\[
+\mat{
+75.7166&67.3961&-44.9307\\
+0&27.1803&91.2482\\
+0&-28&56\\
+126&82&-71}.
+\]
+Luego $G_{14}$ combina $75.7166$ y $126$ y deja $a_{41}=0$.
+\end{frame}
+
+\begin{frame}{Givens completa la columna 1}
+Con
+\[
+\operatorname{rot}(75.7166,126)=(0.5151,0.8571,147),
+\]
+se obtiene
+\[
+G_{14}G_{13}G_{12}A=
+\mat{
+147&105&-84\\
+0&27.1803&91.2482\\
+0&-28&56\\
+0&-15.5316&1.9415}.
+\]
+La primera columna ya tiene la forma requerida.
+\end{frame}
+
+\begin{frame}{Givens: dos rotaciones reducen la columna 2}
+Primero,
+\[
+\operatorname{rot}(27.1803,-28)=(-0.6965,0.7175,-39.0227).
+\]
+Después se combina $-39.0227$ con $-15.5316$:
+\[
+\operatorname{rot}(-39.0227,-15.5316)=(0.9291,0.3698,-42).
+\]
+El resultado es
+\[
+\mat{147&105&-84\\0&-42&-21\\0&0&-104.4789\\0&0&10.4479}.
+\]
+\end{frame}
+
+\begin{frame}{Givens: la sexta rotación completa $R$}
+La última rotación usa
+\[
+\operatorname{rot}(-104.4789,10.4479)
+=(0.9950,-0.0995,-105).
+\]
+Por tanto,
+\[
+R=G_{34}G_{24}G_{23}G_{14}G_{13}G_{12}A
+=\mat{147&105&-84\\0&-42&-21\\0&0&-105\\0&0&0}.
+\]
+La diferencia de signos respecto de Householder no cambia la validez de la
+factorización.
+\end{frame}
+
+\begin{frame}{El producto de rotaciones recupera $Q$}
+Para el ejemplo,
+\[
+Q=\mat{
+0.4286&0.0952&0.4762&-0.7619\\
+0.2857&-0.7143&-0.5714&-0.2857\\
+0&0.6667&-0.6667&-0.3333\\
+0.8571&0.1905&-0.0476&0.4762}.
+\]
+Se verifica, salvo redondeo,
+\[
+Q^tQ=I,
+\qquad QR=A.
+\]
+Para resolver o calcular mínimos cuadrados basta aplicar las rotaciones a $b$;
+no es necesario formar esta matriz completa.
+\end{frame}
+
+\begin{frame}{Householder y Givens tienen usos distintos}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+\begin{block}{Householder}
+\begin{itemize}
+  \item Anula una cola completa de columna.
+  \item Usa una reflexión generalmente densa.
+  \item Requiere menos operaciones en matrices densas.
+  \item Puede crear llenado en matrices dispersas.
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Givens}
+\begin{itemize}
+  \item Anula una entrada por rotación.
+  \item Modifica únicamente dos filas.
+  \item Conserva mejor la localidad y los ceros.
+  \item Facilita actualizaciones puntuales.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.3cm}
+Ambos métodos usan transformaciones ortogonales estables para triangularizar.
+\end{frame}
+
+\begin{frame}{Una implementación evita formar $Q$}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+\begin{block}{Householder}
+Guarde cada vector $u_k$ y su escalar $\beta_k$. Para aplicar $Q^t$, repita
+$z\leftarrow z-\beta_ku_k(u_k^tz)$.
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Givens}
+Guarde los índices $(i,k)$ y los valores $(C,S)$. Para aplicar $Q^t$, rote las
+dos componentes correspondientes.
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.4cm}
+Esto reduce almacenamiento y evita multiplicaciones innecesarias por matrices
+ortogonales completas.
+\end{frame}
+
+\begin{frame}{QR completa los métodos directos generales}
+Al usar $QR$:
+\begin{enumerate}
+  \item elija la forma completa o reducida según la aplicación;
+  \item use Householder para matrices densas;
+  \item use Givens cuando importa modificar pocas filas o conservar dispersidad;
+  \item aplique las transformaciones también al lado derecho;
+  \item termine resolviendo un sistema triangular superior.
+\end{enumerate}
+\begin{block}{Siguiente presentación}
+La Unidad 3D estudiará Jacobi, Gauss--Seidel y SOR como métodos iterativos
+matriciales para sistemas lineales.
+\end{block}
+\end{frame}
+
+\end{document}

@@ -31,6 +31,9 @@ cuadrática, y criterios de parada.
 - [Unidad 1: Fundamentos del análisis numérico](presentaciones/Unidad_1_Fundamentos_Analisis_Numerico.pdf)
 - [Unidad 2: Métodos iterativos y velocidad de convergencia](presentaciones/Unidad_2_Metodos_Iterativos_Convergencia.pdf)
 - [Unidad 3A: Sistemas lineales, sustitución, Gauss y Gauss--Jordan](presentaciones/Unidad_3A_Sistemas_Gauss.pdf)
+- [Unidad 3B: Factorización LU, estructuras especiales y condicionamiento](presentaciones/Unidad_3B_LU_Estructuras_Condicionamiento.pdf)
+- [Unidad 3C: Factorización QR mediante Householder y Givens](presentaciones/Unidad_3C_QR_Householder_Givens.pdf)
+- [Unidad 3D: Métodos iterativos matriciales](presentaciones/Unidad_3D_Metodos_Iterativos_Lineales.pdf)
 
 La presentación de la Unidad 1 desarrolla representación en punto flotante,
 errores, análisis diferencial, condicionamiento, estabilidad y costo
@@ -47,6 +50,21 @@ eliminación de Gauss con pivoteo parcial, Gauss--Jordan, el costo computacional
 y la verificación mediante el residuo. Su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_3A_Sistemas_Gauss.tex)
 se publica junto con el estilo y el logo necesarios para recompilarla.
+
+La Unidad 3B desarrolla la factorización LU con pivoteo, Cholesky, sistemas
+tridiagonales, normas, condicionamiento, perturbaciones y diagnóstico mediante
+el residuo. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_3B_LU_Estructuras_Condicionamiento.tex).
+
+La Unidad 3C presenta la factorización QR completa y reducida, su aplicación a
+sistemas y mínimos cuadrados, y los algoritmos de Householder y Givens con un
+ejemplo común. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_3C_QR_Householder_Givens.tex).
+
+La Unidad 3D cierra el capítulo con iteraciones estacionarias, radio espectral,
+Jacobi, Gauss--Seidel, relajación, SOR y criterios de convergencia y detención.
+Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_3D_Metodos_Iterativos_Lineales.tex).
 
 ### Laboratorios
 

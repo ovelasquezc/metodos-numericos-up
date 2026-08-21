@@ -1,0 +1,585 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+
+\title{Sistemas de ecuaciones lineales}
+\subtitle{Métodos iterativos matriciales}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\cond}{cond}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Iterar reemplaza una factorización costosa}
+Los métodos directos producen una solución después de factorizar $A$. Los
+métodos iterativos construyen aproximaciones
+\[
+x^{(0)},x^{(1)},x^{(2)},\ldots
+\]
+usando operaciones simples con $A$.
+\begin{block}{Cuándo resultan atractivos}
+Sistemas grandes, matrices dispersas, almacenamiento limitado o una precisión
+moderada que no exige completar una factorización.
+\end{block}
+El reto es doble: cada paso debe ser barato y la sucesión debe converger.
+\end{frame}
+
+\begin{frame}{Una matriz sencilla define la iteración}
+Escriba
+\[
+A=B+(A-B),
+\]
+donde resolver sistemas con $B$ sea fácil. Entonces
+\[
+Ax=b
+\quad\Longleftrightarrow\quad
+Bx=(B-A)x+b.
+\]
+Esto sugiere
+\[
+\boxed{Bx^{(k+1)}=(B-A)x^{(k)}+b}.
+\]
+\begin{block}{Implementación}
+No se calcula $B^{-1}$: en cada paso se resuelve un sistema diagonal o
+triangular con matriz $B$.
+\end{block}
+\end{frame}
+
+\begin{frame}{La forma de punto fijo facilita el análisis}
+Como $B$ es no singular,
+\[
+x^{(k+1)}=Tx^{(k)}+c,
+\qquad
+T=I-B^{-1}A,
+\qquad
+c=B^{-1}b.
+\]
+Un punto fijo $x^*$ satisface
+\[
+x^*=Tx^*+c
+\quad\Longleftrightarrow\quad
+Ax^*=b.
+\]
+\begin{itemize}
+  \item La elección de $B$ determina el costo de cada paso.
+  \item La matriz $T$ determina la convergencia.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{El error evoluciona con la matriz iterativa}
+Sea $x^*$ la solución y defina $e^{(k)}=x^{(k)}-x^*$. Restando las dos
+ecuaciones de punto fijo,
+\[
+e^{(k+1)}=Te^{(k)}.
+\]
+Por inducción,
+\[
+\boxed{e^{(k)}=T^ke^{(0)}}.
+\]
+Por tanto, el método converge para todo valor inicial exactamente cuando
+$T^k\to0$.
+\end{frame}
+
+\begin{frame}{Convergencia: radio espectral}
+El radio espectral de $T$ es
+\[
+\rho(T)=\max_{\lambda\in\sigma(T)}|\lambda|.
+\]
+\begin{block}{Criterio necesario y suficiente}
+La iteración estacionaria converge hacia $x^*$ para todo $x^{(0)}$ si y solo si
+\[
+\boxed{\rho(T)<1}.
+\]
+\end{block}
+Si $\|T\|<1$ para alguna norma matricial subordinada, entonces
+\[
+\rho(T)\leq\|T\|<1,
+\]
+una condición suficiente que suele ser más fácil de comprobar.
+\end{frame}
+
+\begin{frame}{El radio mide la rapidez}
+Para errores dominados por el modo propio más lento,
+\[
+\|e^{(k)}\|\approx C\,\rho(T)^k.
+\]
+\begin{itemize}
+  \item $\rho(T)$ cercano a $0$: pocas iteraciones.
+  \item $\rho(T)$ cercano a $1$: convergencia lenta.
+  \item $\rho(T)>1$: existe un error inicial que crece.
+\end{itemize}
+\begin{block}{Conexión con la Unidad 2}
+Los métodos estacionarios convergentes presentan típicamente convergencia
+lineal; el factor asintótico está relacionado con $\rho(T)$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Una contracción ofrece cotas computables}
+Si $L=\|T\|<1$, entonces para $k\geq1$:
+\[
+\|x^{(k)}-x^*\|
+\leq \frac{L^k}{1-L}\|x^{(1)}-x^{(0)}\|,
+\]
+\[
+\|x^{(k)}-x^*\|
+\leq \frac{L}{1-L}\|x^{(k)}-x^{(k-1)}\|.
+\]
+\begin{itemize}
+  \item La primera es una cota \concepto{a priori}.
+  \item La segunda es una cota \concepto{a posteriori}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Separar $D$, $L$ y $U$ genera los métodos}
+Separe
+\[
+D=\diag(a_{11},\ldots,a_{nn}),
+\]
+\[
+L=\mat{0&\cdots&0\\a_{21}&\ddots&\vdots\\
+\vdots&\ddots&0\\a_{n1}&\cdots&a_{n,n-1}},
+\qquad
+U=\mat{0&\cdots&a_{1n}\\\vdots&\ddots&\vdots\\
+0&\cdots&0}.
+\]
+Supondremos $a_{ii}\neq0$. Jacobi usa $B=D$; Gauss--Seidel usa $B=D+L$.
+\end{frame}
+
+\begin{frame}{Jacobi actualiza en paralelo}
+Con $B=D$,
+\[
+Dx^{(k+1)}=-(L+U)x^{(k)}+b,
+\]
+\[
+x^{(k+1)}=T_Jx^{(k)}+c_J,
+\qquad
+T_J=-D^{-1}(L+U),
+\qquad c_J=D^{-1}b.
+\]
+Componente a componente,
+\[
+\boxed{x_i^{(k+1)}
+=\frac{1}{a_{ii}}\left(b_i-\sum_{j\neq i}a_{ij}x_j^{(k)}\right)}.
+\]
+Todas las componentes nuevas usan exclusivamente la iteración anterior.
+\end{frame}
+
+\begin{frame}{Algoritmo de Jacobi}
+\small
+\begin{block}{Una iteración completa}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & $A$, $b$, $x^{(0)}$, tolerancia y máximo de iteraciones.\\[1mm]
+1. & Para $k=0,1,\ldots$:\\
+2. & \quad Para $i=1,\ldots,n$:\\
+3. & \qquad $x_i^{\rm nuevo}\leftarrow
+       (b_i-\sum_{j\neq i}a_{ij}x_j^{(k)})/a_{ii}$.\\
+4. & \quad evaluar residuo y cambio entre iteraciones.\\
+5. & \quad si se satisface el criterio, terminar.\\
+6. & \quad $x^{(k+1)}\leftarrow x^{\rm nuevo}$.\\
+Salida: & aproximación, residuo, iteraciones y diagnóstico.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Sistema de comparación}
+Considere
+\[
+A=\mat{4&-1&0\\-1&4&-1\\0&-1&3},
+\qquad
+b=\mat{15\\10\\10},
+\qquad
+x^{(0)}=\mat{0\\0\\0}.
+\]
+La solución exacta es
+\[
+x^*=\mat{5\\5\\5}.
+\]
+La matriz es simétrica, definida positiva y estrictamente dominante por filas.
+Estas propiedades anticipan convergencia de Jacobi, Gauss--Seidel y SOR.
+\end{frame}
+
+\begin{frame}{Jacobi se aproxima usando valores atrasados}
+\begin{center}
+\begin{tabular}{c@{\qquad}ccc}
+\toprule
+$k$ & $x_1^{(k)}$ & $x_2^{(k)}$ & $x_3^{(k)}$\\
+\midrule
+0 & 0.0000 & 0.0000 & 0.0000\\
+1 & 3.7500 & 2.5000 & 3.3333\\
+2 & 4.3750 & 4.2708 & 4.1667\\
+3 & 4.8177 & 4.6354 & 4.7569\\
+\bottomrule
+\end{tabular}
+\end{center}
+\[
+x_1^{(k+1)}=\frac{15+x_2^{(k)}}4,\quad
+x_2^{(k+1)}=\frac{10+x_1^{(k)}+x_3^{(k)}}4,\quad
+x_3^{(k+1)}=\frac{10+x_2^{(k)}}3.
+\]
+Los tres valores de la fila $k+1$ se calculan desde la fila $k$.
+\end{frame}
+
+\begin{frame}{Gauss--Seidel reutiliza valores nuevos}
+Con $B=D+L$,
+\[
+(D+L)x^{(k+1)}=-Ux^{(k)}+b,
+\]
+\[
+T_{GS}=-(D+L)^{-1}U.
+\]
+Por componentes,
+\[
+\boxed{x_i^{(k+1)}=\frac{1}{a_{ii}}\left(
+b_i-\sum_{j<i}a_{ij}x_j^{(k+1)}
+-\sum_{j>i}a_{ij}x_j^{(k)}\right)}.
+\]
+La actualización sigue el orden de las ecuaciones.
+\end{frame}
+
+\begin{frame}{Algoritmo de Gauss--Seidel}
+\small
+\begin{block}{Actualización en el mismo vector}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & $A$, $b$, $x^{(0)}$, tolerancia y máximo de iteraciones.\\[1mm]
+1. & Para $k=0,1,\ldots$:\\
+2. & \quad guardar $x^{\rm anterior}\leftarrow x$.\\
+3. & \quad Para $i=1,\ldots,n$:\\
+4. & \qquad $x_i\leftarrow
+  (b_i-\sum_{j<i}a_{ij}x_j-\sum_{j>i}a_{ij}x_j^{\rm anterior})/a_{ii}$.\\
+5. & \quad evaluar residuo y cambio entre iteraciones.\\
+6. & \quad si se satisface el criterio, terminar.\\
+Salida: & aproximación, residuo, iteraciones y diagnóstico.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Gauss--Seidel avanza dentro de cada barrido}
+Para el mismo sistema:
+\begin{center}
+\begin{tabular}{c@{\qquad}ccc}
+\toprule
+$k$ & $x_1^{(k)}$ & $x_2^{(k)}$ & $x_3^{(k)}$\\
+\midrule
+0 & 0.0000 & 0.0000 & 0.0000\\
+1 & 3.7500 & 3.4375 & 4.4792\\
+2 & 4.6094 & 4.7721 & 4.9240\\
+3 & 4.9430 & 4.9668 & 4.9889\\
+\bottomrule
+\end{tabular}
+\end{center}
+Al calcular $x_2^{(1)}$ ya se usa $x_1^{(1)}=3.75$; al calcular
+$x_3^{(1)}$ ya se usa $x_2^{(1)}=3.4375$.
+\end{frame}
+
+\begin{frame}{El radio explica la diferencia observada}
+Para el ejemplo,
+\[
+\rho(T_J)=\sqrt{\frac{7}{48}}\approx0.3819,
+\qquad
+\rho(T_{GS})=\frac{7}{48}\approx0.1458.
+\]
+Después de suficientes iteraciones, el error de Gauss--Seidel se contrae mucho
+más por barrido.
+\begin{block}{Advertencia}
+Gauss--Seidel no siempre supera a Jacobi. La comparación depende de la matriz,
+del orden de las variables y de las posibilidades de paralelización.
+\end{block}
+\end{frame}
+
+\begin{frame}{La dominancia diagonal es fácil de verificar}
+$A=(a_{ij})$ es estrictamente dominante por filas si
+\[
+\sum_{j\neq i}|a_{ij}|<|a_{ii}|,
+\qquad i=1,\ldots,n.
+\]
+En ese caso,
+\[
+\|T_J\|_\infty
+=\max_i\frac{\sum_{j\neq i}|a_{ij}|}{|a_{ii}|}<1.
+\]
+\begin{block}{Consecuencia}
+Jacobi y Gauss--Seidel convergen para cualquier valor inicial. SOR también
+converge en el intervalo subrelajado $0<\omega\leq1$. Estas condiciones son
+suficientes, pero no necesarias.
+\end{block}
+\end{frame}
+
+\begin{frame}{La dominancia débil necesita conexión}
+La dominancia débil exige
+\[
+\sum_{j\neq i}|a_{ij}|\leq|a_{ii}|
+\]
+en todas las filas y desigualdad estricta en al menos una.
+\begin{block}{Irreducibilidad}
+La matriz es irreducible si no puede reordenarse en bloques triangulares con
+un bloque completamente desconectado del otro.
+\end{block}
+Si $A$ es irreducible y débilmente dominante por filas, entonces
+$\rho(T_J)<1$ y Jacobi converge.
+\end{frame}
+
+\begin{frame}{Positividad definida y Gauss--Seidel}
+Si $A$ es real, simétrica y definida positiva, entonces Gauss--Seidel converge
+para cualquier $x^{(0)}$.
+\begin{itemize}
+  \item No se necesita comprobar dominancia diagonal.
+  \item La propiedad depende de la estructura global de $A$.
+  \item Esta es la misma clase de matrices para la que existe Cholesky.
+\end{itemize}
+\begin{block}{Dos alternativas}
+Cholesky es directo; Gauss--Seidel permite detenerse cuando la aproximación ya
+es suficiente.
+\end{block}
+\end{frame}
+
+\begin{frame}{Relajar Jacobi modifica la longitud del paso}
+Primero calcule la propuesta de Jacobi $z^{(k+1)}$ y luego combine
+\[
+x^{(k+1)}=(1-\omega)x^{(k)}+\omega z^{(k+1)}.
+\]
+En forma matricial,
+\[
+x^{(k+1)}=J(\omega)x^{(k)}+\omega D^{-1}b,
+\]
+\[
+J(\omega)=(1-\omega)I-\omega D^{-1}(L+U)
+=I-\omega D^{-1}A.
+\]
+Para $\omega=1$ se recupera Jacobi.
+\end{frame}
+
+\begin{frame}{Los autovalores orientan el peso de Jacobi}
+Si los autovalores reales de $T_J$ satisfacen
+\[
+\lambda_1\leq\cdots\leq\lambda_n<1,
+\]
+los autovalores de $J(\omega)$ son
+\[
+1-\omega+\omega\lambda_i.
+\]
+El peso que equilibra los dos extremos es
+\[
+\boxed{\omega_{\rm opt}=\frac{2}{2-\lambda_1-\lambda_n}}.
+\]
+Esta fórmula minimiza $\max_i|1-\omega+\omega\lambda_i|$ bajo las hipótesis
+indicadas.
+\end{frame}
+
+\begin{frame}{SOR relaja cada actualización de Gauss--Seidel}
+Sea $z_i^{(k+1)}$ la propuesta de Gauss--Seidel:
+\[
+z_i^{(k+1)}=\frac{1}{a_{ii}}\left(
+b_i-\sum_{j<i}a_{ij}x_j^{(k+1)}
+-\sum_{j>i}a_{ij}x_j^{(k)}\right).
+\]
+SOR usa
+\[
+\boxed{x_i^{(k+1)}
+=(1-\omega)x_i^{(k)}+\omega z_i^{(k+1)}}.
+\]
+$\omega$ significa \emph{successive over-relaxation}; también permite
+subrelajación.
+\end{frame}
+
+\begin{frame}{SOR mantiene un sistema triangular}
+Reordenando las actualizaciones,
+\[
+(D+\omega L)x^{(k+1)}
+=\bigl[(1-\omega)D-\omega U\bigr]x^{(k)}+\omega b.
+\]
+La matriz iterativa es
+\[
+\boxed{T_\omega=(D+\omega L)^{-1}
+\bigl[(1-\omega)D-\omega U\bigr]}.
+\]
+En cada paso se resuelve un sistema triangular inferior; no se forma
+$(D+\omega L)^{-1}$.
+\end{frame}
+
+\begin{frame}{Algoritmo SOR}
+\small
+\begin{block}{Barrido relajado}
+\begin{tabular}{>{\color{upazul}\bfseries}r@{\quad}p{0.76\textwidth}}
+Entrada: & $A$, $b$, $x^{(0)}$, $\omega\neq0$, tolerancia y máximo.\\[1mm]
+1. & Para $k=0,1,\ldots$:\\
+2. & \quad guardar $x^{\rm anterior}\leftarrow x$.\\
+3. & \quad Para $i=1,\ldots,n$:\\
+4. & \qquad calcular la propuesta $z_i$ de Gauss--Seidel.\\
+5. & \qquad $x_i\leftarrow(1-\omega)x_i^{\rm anterior}+\omega z_i$.\\
+6. & \quad evaluar residuo y cambio entre iteraciones.\\
+7. & \quad si se satisface el criterio, terminar.\\
+Salida: & aproximación, residuo, iteraciones y diagnóstico.
+\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{El parámetro cambia dirección y amplitud}
+\begin{center}
+\begin{tabular}{cl}
+\toprule
+Valor de $\omega$ & Interpretación\\
+\midrule
+$0<\omega<1$ & subrelajación: paso más conservador\\
+$\omega=1$ & Gauss--Seidel\\
+$1<\omega<2$ & sobrerrelajación: paso más largo\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{block}{No existe un valor universal}
+El mejor $\omega$ depende de $A$. Un valor demasiado agresivo puede volver
+lenta o divergente una iteración que convergía con $\omega=1$.
+\end{block}
+\end{frame}
+
+\begin{frame}{SOR solo puede converger dentro de $(0,2)$}
+Para la matriz iterativa de SOR se cumple
+\[
+\rho(T_\omega)\geq|\omega-1|.
+\]
+Por tanto, una condición necesaria de convergencia es
+\[
+\boxed{0<\omega<2}.
+\]
+Esta condición no es suficiente para una matriz general.
+\begin{itemize}
+  \item $\omega\leq0$ no produce una relajación convergente.
+  \item $\omega\geq2$ fuerza $\rho(T_\omega)\geq1$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{En matrices positivas, todo $(0,2)$ es seguro}
+Si $A$ es hermitiana definida positiva, entonces SOR converge para
+\[
+0<\omega<2.
+\]
+En particular, $\omega=1$ garantiza la convergencia de Gauss--Seidel.
+\begin{block}{Lo que aún debe elegirse}
+La garantía de convergencia no identifica el valor más rápido. Se busca
+$\omega$ que haga pequeño $\rho(T_\omega)$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Una relajación adecuada acelera el ejemplo}
+Para el sistema de comparación,
+\[
+\rho(T_J)\approx0.3819,
+\qquad
+\rho(T_{GS})\approx0.1458.
+\]
+La estructura tridiagonal simétrica permite estimar
+\[
+\omega_{\rm opt}\approx1.04,
+\qquad
+\rho(T_{\omega_{\rm opt}})\approx0.04.
+\]
+\begin{block}{Lectura}
+La mejora es asintótica. El costo por barrido de SOR es casi el mismo que el
+de Gauss--Seidel, pero la selección de $\omega$ requiere información adicional.
+\end{block}
+\end{frame}
+
+\begin{frame}{El residuo debe controlar la detención}
+Para una aproximación $x^{(k)}$, calcule
+\[
+r^{(k)}=b-Ax^{(k)}.
+\]
+Un criterio escalado es
+\[
+\frac{\|r^{(k)}\|}
+{\|A\|\,\|x^{(k)}\|+\|b\|}
+\leq \text{tol}.
+\]
+También puede exigirse
+\[
+\frac{\|x^{(k)}-x^{(k-1)}\|}
+{1+\|x^{(k)}\|}\leq\text{tol}.
+\]
+Conviene verificar ambos y fijar siempre un máximo de iteraciones.
+\end{frame}
+
+\begin{frame}{Un paso pequeño no basta por sí solo}
+Una actualización pequeña puede aparecer por:
+\begin{itemize}
+  \item convergencia verdadera;
+  \item un parámetro $\omega$ demasiado pequeño;
+  \item estancamiento por redondeo;
+  \item mala escala de las variables.
+\end{itemize}
+\begin{block}{Diagnóstico mínimo}
+Reporte método, valor inicial, tolerancia, iteraciones, norma del residuo y
+razón de salida. Si se usa SOR, reporte también $\omega$.
+\end{block}
+\end{frame}
+
+\begin{frame}{La dispersidad reduce el costo de cada barrido}
+Si $A$ tiene $s$ elementos no nulos:
+\begin{itemize}
+  \item un barrido de Jacobi, Gauss--Seidel o SOR cuesta $O(s)$;
+  \item el almacenamiento puede ser $O(s+n)$;
+  \item no se genera necesariamente el llenado de una factorización directa.
+\end{itemize}
+\begin{block}{Diferencia computacional}
+Jacobi separa lectura y escritura y se paraleliza con facilidad.
+Gauss--Seidel y SOR tienen dependencias dentro de cada barrido.
+\end{block}
+\end{frame}
+
+\begin{frame}{Comparación de los tres métodos}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & Jacobi & Gauss--Seidel & SOR\\
+\midrule
+$B$ & $D$ & $D+L$ & $\omega^{-1}D+L$\\
+Nuevos valores & No & Sí & Sí\\
+Parámetro & ninguno & ninguno & $\omega$\\
+Paralelización & sencilla & limitada & limitada\\
+Punto fuerte & simplicidad & mayor contracción & aceleración\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{block}{La elección depende del problema}
+Importan la estructura de $A$, la memoria, la arquitectura de cómputo y la
+precisión requerida.
+\end{block}
+\end{frame}
+
+\begin{frame}{La matriz iterativa resume todo el método}
+\begin{enumerate}
+  \item Elija $B$ fácil de resolver y forme conceptualmente $T=I-B^{-1}A$.
+  \item Compruebe convergencia mediante $\rho(T)<1$ o una condición suficiente.
+  \item Use Jacobi, Gauss--Seidel o SOR según estructura y paralelización.
+  \item Controle residuo, cambio entre iteraciones y máximo de pasos.
+  \item Compare costo por barrido y rapidez de contracción.
+\end{enumerate}
+\begin{block}{Cierre del capítulo 3}
+Los métodos directos transforman o factorizan $A$; los iterativos explotan una
+descomposición sencilla y aceptan una aproximación controlada.
+\end{block}
+\end{frame}
+
+\end{document}
