@@ -69,10 +69,28 @@ Está disponible su
 ### Laboratorios
 
 - [Laboratorio 1: punto flotante, error y estabilidad](laboratorios/Lab_Unidad_1_Punto_Flotante.ipynb)
+- [Laboratorio del capítulo 3: sistemas lineales](laboratorios/Lab_Capitulo_3_Sistemas_Lineales.ipynb)
+- [Laboratorio complementario: matrices dispersas y economía peruana](laboratorios/Lab_Matrices_Dispersas_Economia_Peruana.ipynb)
 
-El cuaderno está ejecutado y utiliza Python y NumPy. Incluye experimentos sobre
+Los cuadernos están ejecutados y utilizan Python y las bibliotecas indicadas en
+`requirements.txt`. El laboratorio 1 incluye experimentos sobre
 representación, truncamiento, redondeo, cancelación, propagación de errores y
 comparación de algoritmos.
+
+El laboratorio del capítulo 3 desarrolla métodos directos e iterativos para
+sistemas lineales, factorizaciones y aplicaciones. Su sección geométrica
+interpreta las transformaciones ortogonales de QR como reflexiones de
+Householder y rotaciones de Givens, y verifica la conservación de normas,
+ángulos y productos internos.
+
+El laboratorio complementario introduce los formatos COO, CSR y CSC, patrones
+de dispersión, almacenamiento, solución directa e iterativa y redes. La
+aplicación utiliza la matriz insumo-producto peruana de 2007, nivel 101
+productos, publicada por el
+[Instituto Nacional de Estadística e Informática (INEI)](https://www1.inei.gob.pe/estadisticas/indice-tematico/matriz-insumo-producto-13673/).
+El archivo original se distribuye en
+[`laboratorios/datos`](laboratorios/datos/inei_mip_2007_precios_basicos_total.xlsx)
+para permitir la ejecución reproducible del cuaderno.
 
 ## Ejecución del laboratorio
 
@@ -85,8 +103,9 @@ python -m pip install -r requirements.txt
 jupyter lab
 ```
 
-Luego abra `laboratorios/Lab_Unidad_1_Punto_Flotante.ipynb` y ejecute las
-celdas en orden.
+Luego abra el cuaderno elegido dentro de `laboratorios/` y ejecute las celdas
+en orden. Los cuadernos publicados conservan también una ejecución completa de
+referencia.
 
 ## Estado del material
 
