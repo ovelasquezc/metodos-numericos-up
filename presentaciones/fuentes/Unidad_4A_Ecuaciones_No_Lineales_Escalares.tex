@@ -1,0 +1,445 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing}
+
+\title{Ecuaciones no lineales}
+\subtitle{Bisección, punto fijo, Newton y secante}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\absval}[1]{\left|#1\right|}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{El problema escalar}
+Dada una función continua $f:\R\to\R$, buscamos una raíz $x^*$ que satisfaga
+\[
+f(x^*)=0.
+\]
+\begin{block}{Dos decisiones antes de iterar}
+Primero localizamos una región plausible. Después elegimos entre un método que
+\concepto{garantiza avance} y uno que privilegia la \concepto{velocidad local}.
+\end{block}
+La función
+\[
+f(x)=x^3-x-2
+\]
+servirá como ejemplo común. Su raíz positiva es $x^*\approx1.521379707$.
+\end{frame}
+
+\begin{frame}{Una gráfica orienta, pero no certifica}
+Un cambio de signo permite construir una garantía matemática.
+\begin{block}{Teorema del valor intermedio}
+Si $f$ es continua en $[a,b]$ y $f(a)f(b)<0$, entonces existe al menos una raíz
+$x^*\in(a,b)$.
+\end{block}
+Para $f(x)=x^3-x-2$,
+\[
+f(1)=-2,
+\qquad
+f(2)=4.
+\]
+Por tanto, hay una raíz en $(1,2)$. La condición no afirma que la raíz sea única.
+\end{frame}
+
+\begin{frame}{Intervalo de bisección}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.46\textwidth}
+Partimos de $[a_k,b_k]$ y calculamos
+\[
+m_k=\frac{a_k+b_k}{2}.
+\]
+Conservamos la mitad donde los valores extremos tienen signos opuestos.
+\begin{block}{Invariante}
+$f(a_k)f(b_k)\leq0$ en cada iteración.
+\end{block}
+\end{column}
+\begin{column}{0.52\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{figuras/tikz/biseccion}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Algoritmo de bisección}
+\begin{block}{Entrada}
+$f$ continua, $f(a)f(b)<0$, tolerancia $\varepsilon>0$ y máximo de iteraciones.
+\end{block}
+\begin{enumerate}
+  \item Calcular $m=(a+b)/2$.
+  \item Si $f(m)=0$, terminar.
+  \item Si $f(a)f(m)<0$, reemplazar $b$ por $m$. En otro caso, reemplazar $a$ por $m$.
+  \item Repetir hasta que $(b-a)/2\leq\varepsilon$ o el residuo sea aceptable.
+\end{enumerate}
+\begin{block}{Salida certificada}
+El punto medio final satisface $\absval{m-x^*}\leq(b-a)/2$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Bisección ofrece una cota antes de calcular}
+Después de $k$ reducciones,
+\[
+b_k-a_k=\frac{b_0-a_0}{2^k},
+\qquad
+\absval{m_k-x^*}\leq\frac{b_0-a_0}{2^{k+1}}.
+\]
+Para garantizar $\absval{m_k-x^*}\leq\varepsilon$, basta tomar
+\[
+k\geq
+\left\lceil
+\log_2\!\left(\frac{b_0-a_0}{2\varepsilon}\right)
+\right\rceil.
+\]
+\begin{block}{Lectura}
+Cada iteración gana un bit de precisión. La convergencia es lineal y predecible.
+\end{block}
+\end{frame}
+
+\begin{frame}{Bisección aplicada a $x^3-x-2=0$}
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$k$ & $a_k$ & $b_k$ & $m_k$ & $f(m_k)$ \\
+\midrule
+0 & 1.000000 & 2.000000 & 1.500000 & $-0.125000$ \\
+1 & 1.500000 & 2.000000 & 1.750000 & $ 1.609375$ \\
+2 & 1.500000 & 1.750000 & 1.625000 & $ 0.666016$ \\
+3 & 1.500000 & 1.625000 & 1.562500 & $ 0.252197$ \\
+4 & 1.500000 & 1.562500 & 1.531250 & $ 0.059113$ \\
+5 & 1.500000 & 1.531250 & 1.515625 & $-0.034054$ \\
+\bottomrule
+\end{tabular}
+\vspace{0.35cm}
+
+El método nunca pierde la raíz encerrada, aunque el punto medio cambie de lado.
+\end{frame}
+
+\begin{frame}{El criterio de parada depende del objetivo}
+En una implementación conviene vigilar dos cantidades:
+\[
+\text{paso relativo}
+=\frac{|x_{k+1}-x_k|}{\max\{1,|x_{k+1}|\}},
+\qquad
+\text{residuo}=|f(x_{k+1})|.
+\]
+\begin{itemize}
+  \item Un paso pequeño indica estancamiento, pero no certifica una raíz.
+  \item Un residuo pequeño indica que la ecuación casi se satisface.
+  \item En bisección, el ancho del intervalo aporta una cota directa del error.
+\end{itemize}
+\advertencia{Siempre se fija también un máximo de iteraciones.}
+\end{frame}
+
+\begin{frame}{Punto fijo cambia la pregunta}
+Una ecuación $f(x)=0$ puede reformularse como
+\[
+x=g(x).
+\]
+A partir de $x_0$, la iteración toma la forma
+\[
+x_{k+1}=g(x_k).
+\]
+\begin{block}{La elección de $g$ importa}
+Dos reformulaciones algebraicamente equivalentes pueden producir una sucesión
+convergente y otra divergente.
+\end{block}
+Ejemplo: $x=\cos x$ genera $x_{k+1}=\cos x_k$.
+\end{frame}
+
+\begin{frame}{El diagrama de telaraña muestra la dinámica}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.43\textwidth}
+La trayectoria alterna entre:
+\begin{itemize}
+  \item la curva $y=g(x)$, donde se evalúa $x_{k+1}$;
+  \item la recta $y=x$, donde el nuevo valor pasa al eje horizontal.
+\end{itemize}
+La intersección es el punto fijo $x^*$.
+\end{column}
+\begin{column}{0.55\textwidth}
+\centering
+\resizebox{0.86\linewidth}{!}{\input{figuras/tikz/punto_fijo}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Una contracción garantiza convergencia}
+Sea $g:[a,b]\to[a,b]$. Si existe $L<1$ tal que
+\[
+|g(x)-g(y)|\leq L|x-y|
+\qquad\text{para todo }x,y\in[a,b],
+\]
+entonces $g$ tiene un único punto fijo y $x_{k+1}=g(x_k)$ converge a él para
+cualquier $x_0\in[a,b]$.
+\begin{block}{Cota a posteriori}
+\[
+|x_k-x^*|\leq\frac{L}{1-L}|x_k-x_{k-1}|.
+\]
+\end{block}
+La cota traduce un paso observable en una estimación del error.
+\end{frame}
+
+\begin{frame}{La derivada permite verificar la contracción}
+Si $g$ es derivable y
+\[
+\max_{x\in[a,b]}|g'(x)|\leq L<1,
+\]
+entonces $g$ es una contracción en $[a,b]$.
+\begin{itemize}
+  \item $|g'(x^*)|<1$ anticipa convergencia local.
+  \item Cuanto menor sea $|g'(x^*)|$, más rápida será la convergencia lineal.
+  \item $|g'(x^*)|>1$ hace que el punto fijo sea localmente repulsivo.
+\end{itemize}
+\begin{block}{Diseño de la iteración}
+La reformulación debe mantener las iteraciones en el intervalo y reducir las distancias.
+\end{block}
+\end{frame}
+
+\begin{frame}{Punto fijo para $x=\cos x$}
+Con $x_0=1$,
+\[
+x_{k+1}=\cos x_k.
+\]
+\centering
+\begin{tabular}{ccc}
+\toprule
+$k$ & $x_k$ & $|x_{k+1}-x_k|$ \\
+\midrule
+0 & 1.000000 & 0.459698 \\
+1 & 0.540302 & 0.317251 \\
+2 & 0.857553 & 0.203263 \\
+3 & 0.654290 & 0.139191 \\
+4 & 0.793480 & 0.092111 \\
+5 & 0.701369 & 0.062591 \\
+\bottomrule
+\end{tabular}
+
+La sucesión oscila y converge linealmente a $x^*\approx0.739085$.
+\end{frame}
+
+\begin{frame}{Newton usa una aproximación lineal local}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.45\textwidth}
+La expansión de Taylor en $x_k$ da
+\[
+f(x_k+s)\approx f(x_k)+f'(x_k)s.
+\]
+Al imponer que el modelo lineal sea cero,
+\[
+s_k=-\frac{f(x_k)}{f'(x_k)},
+\qquad
+\boxed{x_{k+1}=x_k+s_k}.
+\]
+\end{column}
+\begin{column}{0.53\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{figuras/tikz/newton}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Algoritmo de Newton}
+\begin{block}{Entrada}
+$f$, su derivada $f'$, un valor inicial $x_0$, tolerancias y un máximo de iteraciones.
+\end{block}
+Para $k=0,1,\ldots$:
+\begin{enumerate}
+  \item evaluar $f(x_k)$ y $f'(x_k)$;
+  \item detenerse o cambiar de estrategia si $|f'(x_k)|$ es demasiado pequeño;
+  \item calcular $s_k=-f(x_k)/f'(x_k)$ y $x_{k+1}=x_k+s_k$;
+  \item comprobar paso y residuo.
+\end{enumerate}
+\advertencia{Una fórmula correcta no compensa un punto inicial inadecuado.}
+\end{frame}
+
+\begin{frame}{Newton aplicado a $x^3-x-2=0$}
+Con $x_0=1.5$,
+\[
+x_{k+1}=x_k-\frac{x_k^3-x_k-2}{3x_k^2-1}.
+\]
+\centering
+\begin{tabular}{cccc}
+\toprule
+$k$ & $x_k$ & $|f(x_k)|$ & $|x_k-x^*|$ \\
+\midrule
+0 & 1.500000000 & $1.25\times10^{-1}$ & $2.14\times10^{-2}$ \\
+1 & 1.521739130 & $2.14\times10^{-3}$ & $3.59\times10^{-4}$ \\
+2 & 1.521379806 & $5.89\times10^{-7}$ & $9.92\times10^{-8}$ \\
+3 & 1.521379707 & $4.53\times10^{-14}$ & $7.55\times10^{-15}$ \\
+\bottomrule
+\end{tabular}
+
+El número de cifras correctas casi se duplica cerca de la raíz.
+\end{frame}
+
+\begin{frame}{La convergencia cuadrática es local}
+Si $f(x^*)=0$, $f'(x^*)\neq0$ y $f''$ permanece acotada cerca de $x^*$, entonces
+Newton satisface, para $x_k$ suficientemente cercano,
+\[
+|e_{k+1}|\leq C|e_k|^2,
+\qquad e_k=x_k-x^*.
+\]
+\begin{block}{Consecuencia}
+Un error pequeño se eleva al cuadrado en cada paso. Lejos de la raíz, Newton
+puede alejarse, ciclar o encontrar otra raíz.
+\end{block}
+La teoría combina una condición local con una elección razonable de $x_0$.
+\end{frame}
+
+\begin{frame}{Las raíces múltiples frenan a Newton}
+Para $f(x)=(x-1)^2$, Newton produce
+\[
+x_{k+1}=x_k-\frac{(x_k-1)^2}{2(x_k-1)}
+=\frac{x_k+1}{2}.
+\]
+Por tanto,
+\[
+|x_{k+1}-1|=\frac12|x_k-1|,
+\]
+y la convergencia pasa de cuadrática a lineal.
+\begin{block}{Corrección si se conoce la multiplicidad $m$}
+\[
+x_{k+1}=x_k-m\frac{f(x_k)}{f'(x_k)}.
+\]
+\end{block}
+\end{frame}
+
+\begin{frame}{Método de la secante}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+Con dos aproximaciones consecutivas,
+\[
+f'(x_k)\approx
+\frac{f(x_k)-f(x_{k-1})}{x_k-x_{k-1}}.
+\]
+Así obtenemos
+\[
+x_{k+1}=x_k-f(x_k)
+\frac{x_k-x_{k-1}}{f(x_k)-f(x_{k-1})}.
+\]
+\end{column}
+\begin{column}{0.50\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{figuras/tikz/secante}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Algoritmo de la secante}
+\begin{block}{Entrada}
+Dos valores iniciales $x_0,x_1$, tolerancias y máximo de iteraciones.
+\end{block}
+Para $k=1,2,\ldots$:
+\begin{enumerate}
+  \item calcular $d_k=f(x_k)-f(x_{k-1})$;
+  \item detenerse si $|d_k|$ es demasiado pequeño;
+  \item actualizar $x_{k+1}=x_k-f(x_k)(x_k-x_{k-1})/d_k$;
+  \item comprobar paso y residuo.
+\end{enumerate}
+Cada paso nuevo requiere una sola evaluación adicional de $f$ si se reutilizan
+los valores anteriores.
+\end{frame}
+
+\begin{frame}{Secante aplicada a $x^3-x-2=0$}
+Con $x_0=1$ y $x_1=2$:
+\centering
+\begin{tabular}{ccc}
+\toprule
+$k$ & $x_k$ & $|f(x_k)|$ \\
+\midrule
+0 & 1.000000000 & $2.000000$ \\
+1 & 2.000000000 & $4.000000$ \\
+2 & 1.333333333 & $0.962963$ \\
+3 & 1.462686567 & $0.333339$ \\
+4 & 1.531169432 & $0.058626$ \\
+5 & 1.520926421 & $0.002693$ \\
+6 & 1.521376317 & $2.02\times10^{-5}$ \\
+\bottomrule
+\end{tabular}
+
+Su orden teórico es $\varphi=(1+\sqrt5)/2\approx1.618$ para una raíz simple.
+\end{frame}
+
+\begin{frame}{Costo, garantía y velocidad}
+\centering
+\small
+\begin{tabular}{p{2.2cm}p{2.5cm}p{2.6cm}p{2.6cm}}
+\toprule
+Método & Datos iniciales & Ventaja principal & Riesgo principal \\
+\midrule
+Bisección & Intervalo con cambio de signo & Garantía y cota del error & Convergencia lineal \\
+Punto fijo & Una función $g$ y $x_0$ & Iteración muy simple & Depende de la reformulación \\
+Newton & $x_0$ y $f'$ & Convergencia cuadrática local & Derivada pequeña o mal inicio \\
+Secante & $x_0,x_1$ & Evita calcular $f'$ & No conserva un intervalo \\
+\bottomrule
+\end{tabular}
+\normalsize
+\vspace{0.35cm}
+
+La mejor elección depende de la información disponible y de la garantía requerida.
+\end{frame}
+
+\begin{frame}{Método híbrido}
+Una estrategia práctica mantiene un intervalo $[a_k,b_k]$ con cambio de signo.
+\begin{enumerate}
+  \item Proponer un paso de Newton o secante.
+  \item Aceptarlo si permanece en el intervalo y reduce el residuo.
+  \item Usar bisección cuando la propuesta no es segura.
+  \item Actualizar el intervalo con el nuevo punto.
+\end{enumerate}
+\begin{block}{Resultado}
+La fase inicial conserva la robustez de bisección. Cerca de la raíz, los pasos
+abiertos aportan mayor velocidad.
+\end{block}
+\end{frame}
+
+\begin{frame}{Actividad de clase}
+Para
+\[
+f(x)=e^{-x}-x,
+\qquad x\in[0,1],
+\]
+realice lo siguiente:
+\begin{enumerate}
+  \item justifique que existe una raíz en $[0,1]$;
+  \item ejecute cuatro pasos de bisección;
+  \item ejecute cuatro pasos de punto fijo con $g(x)=e^{-x}$ y $x_0=0$;
+  \item ejecute tres pasos de Newton desde $x_0=0.5$;
+  \item compare los residuos y el número de evaluaciones.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Ideas centrales}
+\begin{itemize}
+  \item El cambio de signo convierte continuidad en una garantía computable.
+  \item Una iteración de punto fijo converge si la reformulación contrae distancias.
+  \item Newton obtiene velocidad cuadrática cerca de una raíz simple.
+  \item Secante conserva buena velocidad sin evaluar derivadas.
+  \item Paso, residuo y cota de error responden preguntas distintas.
+\end{itemize}
+\end{frame}
+
+\end{document}

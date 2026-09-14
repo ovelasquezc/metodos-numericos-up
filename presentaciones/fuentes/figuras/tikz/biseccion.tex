@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1.25cm,y=1.05cm,>=Latex]
+  \draw[->] (-0.2,0) -- (6.4,0) node[right] {$x$};
+  \draw[->] (0,-1.5) -- (0,2.1) node[above] {$f(x)$};
+  \draw[thick,blue!70!black,smooth] plot coordinates
+    {(0.4,-1.1) (1.2,-0.8) (2,-0.25) (2.5,0.15) (3.4,0.9) (4.5,1.45) (5.8,1.6)};
+  \coordinate (a) at (0.7,0);
+  \coordinate (b) at (5.5,0);
+  \coordinate (m) at (3.1,0);
+  \draw[dashed] (a) -- (0.7,-0.95);
+  \draw[dashed] (b) -- (5.5,1.55);
+  \draw[dashed] (m) -- (3.1,0.68);
+  \fill (a) circle (1.5pt) node[above left] {$a^{(0)}$};
+  \fill (b) circle (1.5pt) node[below right] {$b^{(0)}$};
+  \fill (m) circle (1.5pt) node[below] {$x^{(1)}$};
+  \fill (2.3,0) circle (1.7pt) node[below left] {$x^*$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt}] (a) -- (m)
+    node[midway,below=7pt] {nuevo intervalo};
+\end{tikzpicture}

@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1.15cm,y=1cm,>=Latex]
+  \draw[->] (-0.2,0) -- (6.5,0) node[right] {$x$};
+  \draw[->] (0,-1.4) -- (0,2.5) node[above] {$f(x)$};
+  \draw[thick,blue!70!black,smooth] plot coordinates
+    {(0.4,2.0) (1.2,1.25) (2.2,0.3) (2.7,-0.15) (3.5,-0.55) (4.5,-0.35) (5.8,0.9)};
+  \coordinate (P0) at (1.1,1.35);
+  \coordinate (P1) at (4.7,-0.22);
+  \draw[orange!80!black,thick] (P0) -- (5.4,-0.52);
+  \fill (P0) circle (1.7pt) node[above] {$(x^{(j-1)},f(x^{(j-1)}))$};
+  \fill (P1) circle (1.7pt) node[below] {$(x^{(j)},f(x^{(j)}))$};
+  \fill (4.20,0) circle (1.7pt) node[above right] {$x^{(j+1)}$};
+  \draw[dashed] (1.1,0)--(P0) (4.7,0)--(P1);
+\end{tikzpicture}

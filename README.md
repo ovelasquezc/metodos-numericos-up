@@ -34,6 +34,8 @@ cuadrática, y criterios de parada.
 - [Unidad 3B: Factorización LU, estructuras especiales y condicionamiento](presentaciones/Unidad_3B_LU_Estructuras_Condicionamiento.pdf)
 - [Unidad 3C: Factorización QR mediante Householder y Givens](presentaciones/Unidad_3C_QR_Householder_Givens.pdf)
 - [Unidad 3D: Métodos iterativos matriciales](presentaciones/Unidad_3D_Metodos_Iterativos_Lineales.pdf)
+- [Unidad 4A: Ecuaciones no lineales escalares](presentaciones/Unidad_4A_Ecuaciones_No_Lineales_Escalares.pdf)
+- [Unidad 4B: Sistemas no lineales, Newton y Broyden](presentaciones/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.pdf)
 
 La presentación de la Unidad 1 desarrolla representación en punto flotante,
 errores, análisis diferencial, condicionamiento, estabilidad y costo
@@ -65,6 +67,16 @@ La Unidad 3D cierra el capítulo con iteraciones estacionarias, radio espectral,
 Jacobi, Gauss--Seidel, relajación, SOR y criterios de convergencia y detención.
 Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_3D_Metodos_Iterativos_Lineales.tex).
+
+La Unidad 4A desarrolla bisección, punto fijo, Newton y secante para ecuaciones
+escalares. Compara garantías, velocidad, costo y criterios de parada, e incluye
+ejemplos numéricos y una estrategia híbrida. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_4A_Ecuaciones_No_Lineales_Escalares.tex).
+
+La Unidad 4B extiende punto fijo y Newton a sistemas, presenta amortiguamiento,
+aproximación del jacobiano y el método de Broyden, y cierra con una aplicación
+al equilibrio de Cournot. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.tex).
 
 ### Laboratorios
 

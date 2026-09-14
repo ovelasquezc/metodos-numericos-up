@@ -1,0 +1,419 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+
+\usepackage{array}
+
+\title{Sistemas de ecuaciones no lineales}
+\subtitle{Punto fijo, Newton amortiguado y Broyden}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.70\textwidth}
+      \vspace{0.7cm}
+      {\usebeamerfont{title}\color{upazul}\inserttitle\par}
+      \vspace{0.35cm}
+      {\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+      \vspace{1.1cm}
+      {\large\insertauthor\par}
+      {\normalsize\insertdate\par}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \vspace{0.55cm}
+      \includegraphics[width=\linewidth]{UPlogo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{El problema vectorial}
+Buscamos $x^*\in\R^n$ tal que
+\[
+F(x^*)=0,
+\qquad
+F=\mat{f_1\\ \vdots\\ f_n}:\R^n\to\R^n.
+\]
+En dos dimensiones, cada ecuación $f_i(x_1,x_2)=0$ describe una curva. Una
+solución es un punto donde ambas curvas se intersectan.
+\begin{block}{Dificultad adicional}
+Las variables están acopladas. Cada actualización debe corregir todas las
+ecuaciones al mismo tiempo.
+\end{block}
+\end{frame}
+
+\begin{frame}{Punto fijo en varias variables}
+Una reformulación $F(x)=0$ puede escribirse como
+\[
+x=G(x),
+\qquad
+x_{k+1}=G(x_k).
+\]
+Si $G$ lleva un conjunto cerrado $D$ dentro de sí mismo y
+\[
+\norm{G(x)-G(y)}\leq L\norm{x-y},
+\qquad L<1,
+\]
+entonces la iteración converge al único punto fijo de $G$ en $D$.
+\begin{block}{Condición local}
+$\rho(J_G(x^*))<1$ garantiza convergencia para puntos iniciales cercanos.
+\end{block}
+\end{frame}
+
+\begin{frame}{La norma elegida afecta la verificación}
+Para una matriz $A$, la desigualdad
+\[
+\norm{G(x)-G(y)}\leq
+\sup_{\xi\in D}\norm{J_G(\xi)}\norm{x-y}
+\]
+permite estimar una constante de Lipschitz.
+\begin{itemize}
+  \item Si alguna norma matricial da una cota menor que uno, tenemos una contracción.
+  \item Una cota mayor que uno no demuestra divergencia.
+  \item El radio espectral de $J_G(x^*)$ describe el comportamiento local.
+\end{itemize}
+Las normas son equivalentes en dimensión finita, pero sus cotas pueden tener
+calidades muy distintas.
+\end{frame}
+
+\begin{frame}{Newton linealiza todas las ecuaciones}
+La expansión de Taylor alrededor de $x_k$ es
+\[
+F(x_k+s)\approx F(x_k)+J_F(x_k)s.
+\]
+El paso de Newton anula el modelo lineal:
+\[
+J_F(x_k)s_k=-F(x_k),
+\qquad
+x_{k+1}=x_k+s_k.
+\]
+\begin{block}{Implementación correcta}
+Se resuelve el sistema lineal para $s_k$. No se calcula $J_F(x_k)^{-1}$ de forma explícita.
+\end{block}
+\end{frame}
+
+\begin{frame}{El jacobiano organiza las sensibilidades}
+Para $F=(f_1,\ldots,f_n)^T$,
+\[
+J_F(x)=
+\mat{
+\dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n}\\[2mm]
+\vdots & \ddots & \vdots\\[1mm]
+\dfrac{\partial f_n}{\partial x_1} & \cdots & \dfrac{\partial f_n}{\partial x_n}
+}.
+\]
+La columna $j$ mide cómo cambian todas las ecuaciones al perturbar $x_j$.
+\begin{block}{Lectura del paso}
+$s_k$ compensa simultáneamente los residuos mediante el modelo local definido por $J_F(x_k)$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Algoritmo de Newton para sistemas}
+\begin{block}{Entrada}
+$F$, $J_F$, $x_0$, tolerancias y máximo de iteraciones.
+\end{block}
+Para $k=0,1,\ldots$:
+\begin{enumerate}
+  \item evaluar $r_k=F(x_k)$;
+  \item resolver $J_F(x_k)s_k=-r_k$;
+  \item actualizar $x_{k+1}=x_k+s_k$;
+  \item comprobar $\norm{F(x_{k+1})}$ y $\norm{s_k}/\max\{1,\norm{x_{k+1}}\}$.
+\end{enumerate}
+Una factorización con pivoteo permite resolver el sistema lineal de cada paso.
+\end{frame}
+
+\begin{frame}{Ejemplo: circunferencia y recta}
+Considere
+\[
+F(x,y)=
+\mat{x^2+y^2-1\\x-y}=0.
+\]
+El jacobiano es
+\[
+J_F(x,y)=\mat{2x&2y\\1&-1}.
+\]
+Las soluciones son
+\[
+(x^*,y^*)=\left(\frac{1}{\sqrt2},\frac{1}{\sqrt2}\right),
+\qquad
+\left(-\frac{1}{\sqrt2},-\frac{1}{\sqrt2}\right).
+\]
+El punto inicial determina cuál de ellas atrae la iteración.
+\end{frame}
+
+\begin{frame}{Primer paso de Newton}
+Desde $x_0=(1,0.5)^T$,
+\[
+F(x_0)=\mat{0.25\\0.5},
+\qquad
+J_F(x_0)=\mat{2&1\\1&-1}.
+\]
+El paso resuelve
+\[
+\mat{2&1\\1&-1}\mat{s_1\\s_2}
+=-\mat{0.25\\0.5},
+\qquad
+s=\mat{-0.25\\0.25}.
+\]
+Por tanto,
+\[
+x_1=x_0+s=\mat{0.75\\0.75}.
+\]
+Una sola linealización elimina exactamente el residuo de la segunda ecuación.
+\end{frame}
+
+\begin{frame}{Iteraciones del ejemplo}
+\centering
+\begin{tabular}{cccc}
+\toprule
+$k$ & $x_k$ & $y_k$ & $\norm{F(x_k)}_2$ \\
+\midrule
+0 & 1.000000000 & 0.500000000 & $5.590\times10^{-1}$ \\
+1 & 0.750000000 & 0.750000000 & $1.250\times10^{-1}$ \\
+2 & 0.708333333 & 0.708333333 & $3.472\times10^{-3}$ \\
+3 & 0.707107843 & 0.707107843 & $3.003\times10^{-6}$ \\
+4 & 0.707106781 & 0.707106781 & $2.255\times10^{-12}$ \\
+\bottomrule
+\end{tabular}
+\vspace{0.4cm}
+
+La simetría $x=y$ aparece después del primer paso y reduce el resto del cálculo
+a la aproximación de $1/\sqrt2$.
+\end{frame}
+
+\begin{frame}{Convergencia local de Newton}
+Si $F(x^*)=0$, $F$ es continuamente diferenciable cerca de $x^*$ y
+$J_F(x^*)$ es no singular, entonces Newton converge superlinealmente desde
+puntos iniciales suficientemente cercanos.
+
+Si además $J_F$ es Lipschitz cerca de $x^*$, entonces
+\[
+\norm{x_{k+1}-x^*}\leq C\norm{x_k-x^*}^2.
+\]
+\begin{block}{Alcance del resultado}
+La rapidez está garantizada cerca de la solución. El teorema no ofrece una
+garantía global para un punto inicial arbitrario.
+\end{block}
+\end{frame}
+
+\begin{frame}{Jacobiano mal condicionado}
+El paso satisface
+\[
+J_F(x_k)s_k=-F(x_k).
+\]
+Si $J_F(x_k)$ es casi singular:
+\begin{itemize}
+  \item una perturbación pequeña del residuo puede cambiar mucho el paso;
+  \item el sistema lineal puede perder cifras significativas;
+  \item la dirección calculada puede ser excesivamente grande.
+\end{itemize}
+\begin{block}{Diagnóstico}
+Conviene vigilar el condicionamiento del jacobiano, el tamaño del paso y la
+reducción efectiva del residuo.
+\end{block}
+\end{frame}
+
+\begin{frame}{Newton amortiguado amplía la región útil}
+Definimos la función de mérito
+\[
+\phi(x)=\frac12\norm{F(x)}_2^2.
+\]
+Después de calcular el paso de Newton $s_k$, usamos
+\[
+x_{k+1}=x_k+\alpha_k s_k,
+\qquad 0<\alpha_k\leq1.
+\]
+La búsqueda hacia atrás reduce $\alpha_k$ hasta obtener una disminución
+suficiente de $\phi$.
+\begin{block}{Comportamiento esperado}
+Lejos de la solución se amortigua el paso. Cerca de ella se acepta $\alpha_k=1$
+y se recupera la velocidad de Newton.
+\end{block}
+\end{frame}
+
+\begin{frame}{El jacobiano puede aproximarse por diferencias}
+La columna $j$ puede aproximarse mediante
+\[
+J_F(x)e_j\approx
+\frac{F(x+h_j e_j)-F(x)}{h_j}.
+\]
+Esto requiere aproximadamente $n+1$ evaluaciones de $F$ para construir un
+jacobiano completo hacia adelante.
+\begin{itemize}
+  \item Un $h_j$ grande produce error de truncamiento.
+  \item Un $h_j$ demasiado pequeño produce cancelación.
+  \item La escala de cada componente debe influir en $h_j$.
+\end{itemize}
+La aproximación evita derivadas analíticas, pero todavía reconstruye una matriz en cada paso.
+\end{frame}
+
+\begin{frame}{Broyden generaliza la idea de la secante}
+Sean
+\[
+s_k=x_{k+1}-x_k,
+\qquad
+y_k=F(x_{k+1})-F(x_k).
+\]
+El jacobiano exacto cumple aproximadamente $J_F(x_{k+1})s_k\approx y_k$.
+Broyden construye matrices $B_k$ que satisfacen la condición secante
+\[
+B_{k+1}s_k=y_k.
+\]
+\begin{block}{Objetivo}
+Actualizar una aproximación del jacobiano usando evaluaciones de $F$, sin
+calcular todas sus derivadas en cada iteración.
+\end{block}
+\end{frame}
+
+\begin{frame}{Actualización de Broyden}
+La actualización de rango uno conocida como Broyden bueno es
+\[
+B_{k+1}
+=B_k+
+\frac{(y_k-B_ks_k)s_k^T}{s_k^Ts_k}.
+\]
+En efecto,
+\[
+B_{k+1}s_k
+=B_ks_k+(y_k-B_ks_k)=y_k.
+\]
+La corrección modifica $B_k$ únicamente en la dirección necesaria para cumplir
+la nueva condición secante.
+\begin{block}{Costo}
+Se evita reconstruir el jacobiano completo, aunque todavía debe resolverse un
+sistema lineal con $B_k$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Algoritmo de Broyden}
+Elegir $x_0$ y una matriz no singular $B_0$, por ejemplo $J_F(x_0)$.
+Para $k=0,1,\ldots$:
+\begin{enumerate}
+  \item resolver $B_ks_k=-F(x_k)$;
+  \item definir $x_{k+1}=x_k+s_k$;
+  \item calcular $y_k=F(x_{k+1})-F(x_k)$;
+  \item actualizar $B_{k+1}$ con la fórmula de rango uno;
+  \item comprobar paso y residuo.
+\end{enumerate}
+Si $s_k^Ts_k$ es demasiado pequeño, se omite o reinicia la actualización.
+\end{frame}
+
+\begin{frame}{Broyden en el ejemplo de dos ecuaciones}
+Con $x_0=(1,0.5)^T$ y $B_0=J_F(x_0)$:
+\centering
+\begin{tabular}{cccc}
+\toprule
+$k$ & $x_k$ & $y_k$ & $\norm{F(x_k)}_2$ \\
+\midrule
+0 & 1.000000000 & 0.500000000 & $5.590\times10^{-1}$ \\
+1 & 0.750000000 & 0.750000000 & $1.250\times10^{-1}$ \\
+2 & 0.708333333 & 0.708333333 & $3.472\times10^{-3}$ \\
+3 & 0.707142857 & 0.707142857 & $1.020\times10^{-4}$ \\
+4 & 0.707106812 & 0.707106812 & $8.842\times10^{-8}$ \\
+5 & 0.707106781 & 0.707106781 & $2.255\times10^{-12}$ \\
+\bottomrule
+\end{tabular}
+
+Broyden necesita más pasos que Newton, pero evita nuevas evaluaciones del jacobiano.
+\end{frame}
+
+\begin{frame}{Comparación de Newton y Broyden}
+\centering
+\small
+\begin{tabular}{p{2.6cm}p{3.2cm}p{3.2cm}}
+\toprule
+Criterio & Newton & Broyden \\
+\midrule
+Derivadas & Jacobiano en cada paso & Matriz inicial y actualizaciones \\
+Velocidad local & Cuadrática bajo hipótesis estándar & Habitualmente superlineal \\
+Costo dominante & Evaluar y factorizar el jacobiano & Resolver con $B_k$ y actualizarla \\
+Robustez global & Requiere salvaguardas & También requiere salvaguardas \\
+Uso natural & Derivadas disponibles y costo moderado & Evaluar derivadas resulta costoso \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{frame}
+
+\begin{frame}{Aplicación: equilibrio de Cournot}
+Dos firmas eligen cantidades $q_1,q_2$ y $Q=q_1+q_2$. Considere
+\[
+P(Q)=Q^{-1/\alpha},
+\qquad
+C_i(q_i)=\frac12c_iq_i^2.
+\]
+El beneficio de la firma $i$ es
+\[
+\pi_i(q_1,q_2)=P(Q)q_i-\frac12c_iq_i^2.
+\]
+Las condiciones de primer orden producen el sistema
+\[
+f_i(q_1,q_2)=P(Q)+P'(Q)q_i-c_iq_i=0,
+\qquad i=1,2.
+\]
+\end{frame}
+
+\begin{frame}{Jacobiano del modelo de Cournot}
+Como
+\[
+P'(Q)=-\frac1\alpha Q^{-1/\alpha-1},
+\qquad
+P''(Q)=\frac1\alpha\left(\frac1\alpha+1\right)Q^{-1/\alpha-2},
+\]
+el jacobiano tiene entradas
+\[
+\begin{aligned}
+\frac{\partial f_i}{\partial q_i}
+&=2P'(Q)+P''(Q)q_i-c_i,\\
+\frac{\partial f_i}{\partial q_j}
+&=P'(Q)+P''(Q)q_i,
+\qquad j\neq i.
+\end{aligned}
+\]
+Newton usa estas derivadas. Broyden puede comenzar con este jacobiano y
+actualizarlo durante el cálculo.
+\end{frame}
+
+\begin{frame}{Restricciones y validación económica}
+Una solución numérica debe comprobar más que un residuo pequeño.
+\begin{itemize}
+  \item Factibilidad: $q_1,q_2\geq0$ y $Q>0$.
+  \item Equilibrio: $\norm{F(q^*)}$ debe ser pequeño.
+  \item Estabilidad numérica: el resultado debe resistir cambios razonables en $q_0$.
+  \item Interpretación: precio, cantidades y beneficios deben permanecer en escalas plausibles.
+\end{itemize}
+Una búsqueda amortiguada puede impedir pasos que produzcan cantidades negativas.
+\end{frame}
+
+\begin{frame}{Actividad de clase}
+Para
+\[
+F(x,y)=\mat{x^2+y^2-1\\x-y},
+\qquad (x_0,y_0)=(1,0.5),
+\]
+realice lo siguiente:
+\begin{enumerate}
+  \item construya el jacobiano;
+  \item calcule dos pasos de Newton;
+  \item use $B_0=J_F(x_0)$ y calcule una actualización de Broyden;
+  \item compare $\norm{F(x_k)}_2$ en ambos métodos;
+  \item explique por qué el método converge a la solución positiva.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Ideas centrales}
+\begin{itemize}
+  \item Newton convierte cada iteración no lineal en un sistema lineal.
+  \item El jacobiano describe el acoplamiento local entre variables y ecuaciones.
+  \item El amortiguamiento controla pasos poco fiables lejos de la solución.
+  \item Broyden impone una condición secante mediante una actualización de rango uno.
+  \item Residuo, tamaño del paso, condicionamiento y factibilidad completan la validación.
+\end{itemize}
+\end{frame}
+
+\end{document}
