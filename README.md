@@ -78,6 +78,17 @@ aproximación del jacobiano y el método de Broyden, y cierra con una aplicació
 al equilibrio de Cournot. Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.tex).
 
+### Repaso del examen parcial
+
+- [Lista de repaso en PDF](repaso/Lista_Repaso_Parciales_2026-2.pdf)
+- [Fuente LaTeX editable](repaso/fuentes/Lista_Repaso_Parciales_2026-2.tex)
+
+Siete preguntas de material anterior sobre **sistemas lineales, sistemas no
+lineales y propagación de error**. La lista reúne cinco preguntas de parciales
+y dos ejercicios complementarios de un examen final y una práctica calificada
+de 2025-2, con su procedencia y notas sobre erratas. No incluye soluciones ni
+evaluaciones del ciclo 2026-2.
+
 ### Laboratorios
 
 - [Laboratorio 1: punto flotante, error y estabilidad](laboratorios/Lab_Unidad_1_Punto_Flotante.ipynb)
@@ -121,6 +132,7 @@ referencia.
 
 ## Estado del material
 
-Este repositorio contiene las versiones vigentes para el periodo 2026-2. Las
-notas históricas, evaluaciones y archivos internos de preparación no forman
-parte de esta publicación.
+Este repositorio contiene las versiones vigentes para el periodo 2026-2 y una
+selección de preguntas de evaluaciones anteriores para el repaso del parcial.
+Las evaluaciones del ciclo actual y los archivos internos de preparación no
+forman parte de esta publicación.

@@ -1,0 +1,295 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,enumitem,geometry,fancyhdr,xcolor}
+\geometry{left=22mm,right=22mm,top=22mm,bottom=22mm,headheight=14pt}
+\definecolor{azul}{HTML}{17365D}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\color{azul}Métodos Numéricos}
+\fancyhead[R]{\small Repaso del examen parcial}
+\fancyfoot[L]{\footnotesize Universidad del Pacífico}
+\fancyfoot[R]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlist[enumerate]{label=(\alph*),leftmargin=7mm,itemsep=5pt,topsep=4pt}
+\newcommand{\pregunta}[3]{\par\medskip{\large\bfseries\color{azul}#1. #2}\par
+{\small\itshape #3}\par\smallskip}
+\newcommand{\nota}[1]{\par\smallskip{\footnotesize\textbf{Nota editorial.} #1}\par}
+\begin{document}
+{\LARGE\bfseries\color{azul}Lista de repaso}\par
+{\large Preguntas de exámenes parciales anteriores}\par
+\smallskip
+Selección por temas: sistemas lineales, sistemas no lineales y propagación de error. Se copian los enunciados con sus datos e incisos; las notas editoriales señalan erratas del original. No se incluyen soluciones.
+
+\textbf{Fuentes.} Las preguntas 1--5 proceden de los dos parciales disponibles. Para completar los otros temas, las preguntas 6--7 proceden de un examen final y una práctica calificada de 2025-2; se identifican como material complementario. TEO: parte teórica; PRA: parte práctica.
+
+\textbf{I. Sistemas lineales y normas asociadas}\par
+\pregunta{1}{Normas ponderadas}{Parcial sin fecha indicada, ejercicio 1}
+Sean $w_1, w_2,\dots, w_n$ n\'umeros positivos. Para $x \in \mathbb{R}^n$ definimos
+$$\|x\|_{1,w} = \sum_{i=1}^{n} w_i |x_i|. $$
+\begin{enumerate}
+\item (TEO) Demuestre que $\| \cdot \|_{1,w}$ es una norma.
+
+\item (TEO) Demuestre que la norma matricial subordinada puede calcularse por la f\'ormula
+$$\|A\|_{1,W} = \max_{1 \leq j \leq n} \sum_{i=1}^{n} w_i |a_{ij}|$$
+para $A = [a_{ij}] \in \mathbb{R}^{n \times n}$. 
+
+\item (PRA) Implemente en Python las mencionadas normas, y calcule las normas de 
+$$ x = (1,2,3), \quad 
+A= \begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{bmatrix}
+$$
+cuando $(w_1,w_2,w_3)=(3,1,2)$.
+\end{enumerate}
+
+\nota{La fórmula del inciso (b) se conserva tal como aparece en el examen. Si la norma de entrada y la de salida son ambas $\|\cdot\|_{1,w}$, la norma subordinada correcta es $\displaystyle\max_{1\le j\le n}\frac{1}{w_j}\sum_{i=1}^n w_i|a_{ij}|$. Utilice esta corrección para el repaso de (b) y (c).}
+
+\newpage
+
+\pregunta{2}{Convergencia de métodos iterativos}{Parcial sin fecha indicada, ejercicio 2}
+Considere el siguiente texto \footnote{William Ford, in 
+Numerical Linear Algebra with Applications
+, 2015}:
+\begin{quote}
+Analysis of convergence criteria for the basic iterations is based upon writing the equations defining the iteration in the matrix form
+
+\begin{equation}
+\mathbf{x}^{(k)} = B \mathbf{x}^{(k-1)} + \mathbf{c}.
+\end{equation}
+
+If \( \| B \| > 1 \) for any subordinate norm, then any iteration (20.25) converges. The matrices \( B_J \), \( B_{GS} \), and \( B_{SOR} \) for the Jacobi, Gauss-Seidel, and SOR methods, respectively, are determined in Sections 20.4.1--20.4.3. Note that this is a sufficient condition only. It is possible for the iteration (20.25) to converge if \( \| B \| > 1 \). A necessary and sufficient condition for an iteration to converge is that the spectral radius of \( B \) (\( \rho(B) \)) is less than 1. While this result is of significant theoretical importance, computing the spectral radius is computationally costly. It is appropriate to first check to see if \( \| B \| > 1 \).
+
+Also, the Jacobi and Gauss-Seidel methods converge if \( A \) is strictly diagonally dominant, and the Gauss-Seidel iteration converges if \( A \) is positive definite. Convergence of the SOR iteration is guaranteed if \( 0 < \omega < 2 \) and \( A \) is positive definite.
+\end{quote}
+
+\begin{enumerate}
+\item (TEO) Comente las afirmaciones del texto en concordancia con las notas de clase, y qu\'e nuevo elemento se presenta.
+
+
+\item (PRA) Genere un ejemplo de matriz $3 \times 3$ para la cual la iteraci\'on de Gauss-Seidel converja, pero la iteraci\'on de Jacobi diverja, y muestre c\'omo el m\'etodo SOR
+\[
+x_i^{(k+1)} = \omega \left( \frac{1}{a_{ii}} \right) \left[ b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \right] + (1-\omega) x_i^{(k)},
+\]
+asegura la convergencia para valores adecuados de $0 < \omega < 2$.
+\end{enumerate}
+
+\nota{Se conserva el texto citado, incluidos sus signos. El criterio suficiente de contracción es $\|B\|<1$; $\|B\|>1$ no garantiza convergencia ni divergencia. Las garantías citadas para Gauss-Seidel y SOR con matrices reales definidas positivas se aplican bajo la hipótesis de simetría.}
+
+\newpage
+
+\pregunta{3}{Norma subordinada y cambio de coordenadas}{Parcial 2025-2, ejercicio 1}
+Sean $\| \cdot \| $ una norma matricial subordinada y $S 	\in \mathbb{R}^{n \times n}$ una matriz invertible.  Defina $\| A \|' = \| S A S^{-1} \|$ para $A \in \mathbb{R}^{n \times n}$,  y demuestre que $\| \cdot \|'$ es una norma matricial subordinada a alguna norma bien definida sobre $\mathbb{R}^{n \times n}$.
+
+\nota{En la última frase, el espacio de la norma vectorial a la que se subordina la norma matricial debe ser $\mathbb{R}^n$. El original dice $\mathbb{R}^{n\times n}$.}
+
+\pregunta{4}{Factorización de Cholesky con parámetro}{Parcial 2025-2, ejercicio 2}
+Sea la familia de matrices simétricas
+\[
+A(t)=\begin{pmatrix}
+t & 1 & 1\\
+1 & 2 & 1\\
+1 & 1 & 2
+\end{pmatrix},\qquad t\in\mathbb{R}.
+\]
+
+\begin{enumerate}[label=(\alph*)]
+\item Da una condición necesaria y suficiente para que $A(t)$ sea \textbf{definida positiva}
+\item Determina el \textbf{conjunto de valores de $t$} para los cuales existe la \textbf{factorización de Cholesky} $A(t)=LL^{\top}$, con $L$ triangular inferior y diagonal estrictamente positiva.
+
+\item Para un valor \textbf{admisible} concreto (por ejemplo $t=1$), calcula \textbf{a mano} la factorización de Cholesky $A(1)=LL^{\top}$, mostrando el cálculo de cada entrada de $L$.
+
+\item Justifica la \textbf{unicidad} de $L$ cuando se impone que la diagonal de $L$ sea positiva. 
+\end{enumerate}
+
+\newpage
+
+\pregunta{5}{Iterativos en Python}{Parcial 2025-2, ejercicio 4}
+Considere el sistema $Ax=b$ con
+\[
+A=\begin{pmatrix}
+4 & -1 & 0 & 0\\
+-1 & 4 & -1 & 0\\
+0 & -1 & 4 & -1\\
+0 & 0 & -1 & 4
+\end{pmatrix},
+\qquad
+b=\begin{pmatrix}1\\2\\2\\1\end{pmatrix},
+\qquad
+x^{(0)}=\mathbf{0},\quad \text{tol}=10^{-6},\ \text{maxit}=500.
+\]
+
+\textbf{Restricción didáctica (obligatoria).} En Python use únicamente operaciones básicas de \texttt{numpy}. \textbf{No} usar \texttt{scipy}, \texttt{numpy.linalg.solve} ni funciones no vistas en clase. Verifique consistencia sólo con el residual y la coincidencia entre métodos.
+
+\medskip
+\noindent\textbf{1) (Richardson detallado).} 
+Implemente
+\[
+x^{(k+1)} \;=\; x^{(k)}+\tau\bigl(b-Ax^{(k)}\bigr),
+\]
+con un paso $\tau$ que \emph{usted debe fijar y justificar} usando únicamente herramientas vistas en clase.  La condición de convergencia del m\'etodo es $0<\tau<2/\lambda_{\max}(A)$; utilice una \emph{cota superior elemental} para $\lambda_{\max}(A)$ y elija un valor seguro de $\tau$.
+\begin{enumerate}
+\item[(a)] Explique brevemente su elección de $\tau$ y la cota usada.
+\item[(b)] Programe \texttt{richardson(A,b,x0,tau,tol,maxit)} que retorne la aproximación y el historial de $\|r^{(k)}\|_\infty=\|b-Ax^{(k)}\|_\infty$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{2) (Dos métodos vistos en clase).} 
+\emph{Explícite e implemente} las iteraciones de \textbf{otros dos métodos de punto fijo estudiados en clase} para el mismo sistema (indique primero sus fórmulas). Use $A=D-L-U$ si lo requiere.
+\begin{enumerate}
+\item[(a)] Defina funciones análogas a \texttt{richardson} para cada método.
+\item[(b)] Mantenga \texttt{tol}, \texttt{maxit} y $x^{(0)}$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{3) (Análisis del error vs. iteraciones).} 
+Para cada método, registre por iteración:
+\[
+\|r^{(k)}\|_\infty=\|b-Ax^{(k)}\|_\infty, \qquad
+e^{(k)}=\|x^{(k)}-x^{(k-1)}\|_\infty.
+\]
+\begin{enumerate}
+\item[(a)] Muestre en consola la tabla (iteración, $\|r^{(k)}\|_\infty$, $e^{(k)}$).
+\item[(b)] Grafique $\|r^{(k)}\|_\infty$ vs. $k$ para los tres métodos en una sola figura.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{4) (Revisión de consistencia).} 
+\begin{enumerate}
+\item[(a)] Verifique que cada método cumple $\|b-Ax^{(\text{final})}\|_\infty \le \text{tol}$.
+\item[(b)] Compare las aproximaciones finales: exija coincidencia al menos en 4 cifras significativas (use $\|x^{(i)}-x^{(j)}\|_\infty$).
+\end{enumerate}
+
+\newpage
+
+\textbf{II. Sistemas no lineales}\par\smallskip
+
+\pregunta{6}{Newton en un equilibrio de Cournot}{Complemento: examen final 2025-2, ejercicio 3}
+Revise la siguiente lectura:
+
+
+
+We consider a two--player Cournot duopoly model used to illustrate multivariate
+methods for solving nonlinear systems. There are two goods, $Y$ and $Z$, and the
+utility over goods and money $M$ is
+\[
+U(Y,Z)=u(Y,Z)+M = (1 + Y^{\alpha} + Z^{\alpha})^{\eta/\alpha} + M,
+\]
+with parameters $\alpha = 0.999$ and $\eta = 0.2$. The unit costs are $0.07$ for
+good $Y$ and $0.08$ for good $Z$.
+
+Each firm simultaneously chooses its output. If the firms choose quantities
+$(Y,Z)$, then $u_Y(Y,Z)$ is the price of good $Y$ and $u_Z(Y,Z)$ the price of
+$Z$. Profit of the $Y$--firm is
+\[
+\Pi^Y(Y,Z)=Y(u_Y(Y,Z)-0.07),
+\]
+and the profit of the $Z$--firm is
+\[
+\Pi^Z(Y,Z)=Z(u_Z(Y,Z)-0.08).
+\]
+
+A Cournot--Nash equilibrium is any pair $(Y,Z)$ solving
+\[
+Y \in \arg\max_Y \Pi^Y(Y,Z), \qquad 
+Z \in \arg\max_Z \Pi^Z(Y,Z).
+\]
+In practice this means solving the first--order conditions
+\[
+\Pi^Y_1(Y,Z)=0, \tag{5.4.6a}
+\]
+\[
+\Pi^Z_2(Y,Z)=0. \tag{5.4.6b}
+\]
+
+Since utility is not defined for negative outputs, we restrict to $Y>0$,
+$Z>0$. It is numerically convenient to reparametrize using
+\[
+y=\ln Y, \qquad z=\ln Z,
+\]
+and to solve instead
+\[
+\Pi^Y_1(e^y, e^z)=0, \tag{5.4.7a}
+\]
+\[
+\Pi^Z_2(e^y, e^z)=0. \tag{5.4.7b}
+\]
+
+Reaction functions $R_Y(z)$ and $R_Z(y)$ describe optimal choices of each firm
+given the other's output. Their intersection determines a unique Cournot--Nash
+equilibrium, found at
+\[
+(y^\ast,z^\ast)=(-0.137,\,-0.576), \qquad
+(Y^\ast,Z^\ast)=(0.87,\,0.56).
+\]
+
+These logarithmic equations, (5.4.7a)--(5.4.7b), are used to illustrate several
+numerical methods (Newton, Gauss--Newton, and others) for solving nonlinear
+systems.
+
+
+
+\newpage\textbf{Pregunta 6 (continuación): incisos}\par
+
+\begin{enumerate}
+    \item Explique por qué las condiciones de primer orden
+    \[
+    \Pi^Y_1(Y,Z)=0, \qquad \Pi^Z_2(Y,Z)=0,
+    \]
+    caracterizan un equilibrio de Cournot para el par de decisiones $(Y,Z)$.
+    
+
+    \item Justifique por qué es útil la transformación $(Y,Z)\mapsto (y,z)=(\ln Y,\ln Z)$
+    al resolver el sistema (5.4.7a)--(5.4.7b).  
+    Mencione explícitamente la relación con el dominio del problema.
+    
+
+    \item Considere el sistema en logaritmos que define el equilibrio:
+    \[
+    F_1(y,z)=\Pi^Y_1(e^y,e^z)=0, 
+    \qquad
+    F_2(y,z)=\Pi^Z_2(e^y,e^z)=0.
+    \]
+    Sea
+    \[
+    J(y,z)=
+    \begin{pmatrix}
+    \frac{\partial F_1}{\partial y} & \frac{\partial F_1}{\partial z}\\[4pt]
+    \frac{\partial F_2}{\partial y} & \frac{\partial F_2}{\partial z}
+    \end{pmatrix}
+    \]
+    la matriz Jacobiana del sistema.  
+    Explique por qué una condición como
+    \[
+    \det J(y^\ast,z^\ast)\neq 0
+    \]
+    es relevante para garantizar la convergencia local del método de Newton al equilibrio
+    $(y^\ast,z^\ast)$, e interprete brevemente esta condición en términos del comportamiento
+    local del modelo.
+    
+\end{enumerate}
+
+\newpage
+
+\textbf{III. Propagación de error}\par\smallskip
+
+\pregunta{7}{Errores de entrada y redondeo}{Complemento: práctica calificada rezagada 2025-2, ejercicio 1}
+Calcule el efecto total de errores de entrada y redondeo (mediante an\'alisis
+diferencial) de dos algoritmos para evaluaciones distintas de
+$$ y = (a + b)^2 = a^2 + 2ab + b^2. $$
+
+\medskip
+\textbf{Mapa de fuentes de la recopilación}
+\begin{itemize}[leftmargin=5mm,itemsep=5pt]
+\item Preguntas 1--2: \texttt{Beamers/examenparcial.tex}. El documento no indica semestre ni fecha.
+\item Preguntas 3--5: \texttt{Beamers/examenparcialmn20252.tex}. Semestre identificado por el nombre del archivo.
+\item Pregunta 6: \texttt{Beamers/EFMN20252/}\allowbreak\texttt{examenfinalmn20252.tex}.
+\item Pregunta 7: \texttt{Beamers/pcrezagada20252MN.tex}.
+\end{itemize}
+\textit{Criterio de selección.} Se excluyen mínimos cuadrados y los demás temas ajenos al alcance indicado. No se incluyen evaluaciones del ciclo 2026-2. Se omiten espacios para responder, puntajes e instrucciones administrativas. El texto posterior a \texttt{\textbackslash end\{document\}} de los archivos originales no se considera parte de las evaluaciones.
+\end{document}
