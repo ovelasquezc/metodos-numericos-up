@@ -1,0 +1,412 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\title{Mínimos cuadrados}
+\subtitle{QR, condicionamiento y aplicaciones}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\begin{document}
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.70\textwidth}
+\vspace{.7cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.35cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{1cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.25\textwidth}\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de la clase}
+\begin{itemize}
+\item Resolver mínimos cuadrados mediante factorización QR.
+\item Explicar la pérdida de precisión al formar $A^TA$.
+\item Reconocer columnas casi dependientes y problemas de escala.
+\item Formular ajustes ponderados y regularizados.
+\item Distinguir un ajuste en niveles de uno en logaritmos.
+\end{itemize}
+Usaremos la misma recta y los mismos datos de la clase anterior.
+\end{frame}
+
+\begin{frame}{Ecuaciones normales y cómputo}
+La caracterización matemática es
+\[
+A^TA\theta=A^Tb.
+\]
+Si $A$ tiene rango columna completo, podemos formar $A^TA$, aplicar Cholesky
+y resolver dos sistemas triangulares.
+\begin{block}{Dificultad numérica}
+El producto $A^TA$ puede perder información cuando las columnas de $A$ son
+casi dependientes. QR trabaja directamente con $A$.
+\end{block}
+La equivalencia algebraica entre dos métodos no garantiza la misma precisión.
+\end{frame}
+
+\begin{frame}{Condicionamiento}
+Para una matriz rectangular de rango columna completo,
+\[
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+\]
+Los valores propios de $A^TA$ son los cuadrados de los valores singulares de $A$.
+Así,
+\[
+\boxed{\kappa_2(A^TA)=\kappa_2(A)^2.}
+\]
+Si $\kappa_2(A)=10^6$, el sistema normal tiene condición $10^{12}$.
+Este ejemplo describe el condicionamiento, no una cifra exacta de error final.
+\end{frame}
+
+\begin{frame}{Columnas casi dependientes}
+Considere
+\[
+A_\varepsilon=\mat{1&1\\0&\varepsilon},\qquad
+A_\varepsilon^TA_\varepsilon
+=\mat{1&1\\1&1+\varepsilon^2}.
+\]
+La independencia de las columnas depende de $\varepsilon$.
+Cuando $\varepsilon^2$ queda por debajo de la precisión relativa de la máquina,
+el cálculo de $1+\varepsilon^2$ puede redondearse a $1$.
+\begin{block}{Consecuencia}
+Una matriz de rango completo puede producir un sistema normal singular
+en aritmética de máquina.
+\end{block}
+\end{frame}
+
+\begin{frame}{Factorización QR completa}
+Sea $A\in\R^{m\times n}$, $m\geq n$, de rango $n$. Escribimos
+\[
+A=Q\mat{R\\0},\qquad
+Q^TQ=I_m,\qquad R\in\R^{n\times n}.
+\]
+La matriz $R$ es triangular superior y no singular. Separamos
+\[
+Q^Tb=\mat{c\\d},\qquad c\in\R^n,\quad d\in\R^{m-n}.
+\]
+Householder y Givens permiten construir esta factorización con transformaciones ortogonales.
+\end{frame}
+
+\begin{frame}{Reducción a un sistema triangular}
+Como las matrices ortogonales preservan la norma,
+\[
+\begin{aligned}
+\norm{A\theta-b}_2^2
+&=\norm{Q^T(A\theta-b)}_2^2\\
+&=\norm{R\theta-c}_2^2+\norm{d}_2^2.
+\end{aligned}
+\]
+El segundo término no depende de $\theta$. Por tanto,
+\[
+\boxed{R\theta^*=c},\qquad
+\boxed{\min_\theta\norm{A\theta-b}_2=\norm{d}_2}.
+\]
+Una sustitución hacia atrás recupera los coeficientes.
+\end{frame}
+
+\begin{frame}{QR reducida}
+Si $A=Q_1R$ con $Q_1\in\R^{m\times n}$ y $Q_1^TQ_1=I_n$,
+\[
+R\theta^*=Q_1^Tb.
+\]
+La proyección y el residuo son
+\[
+\widehat b=Q_1Q_1^Tb,\qquad r=b-\widehat b.
+\]
+Para el ajuste basta almacenar las primeras $n$ columnas de $Q$ o aplicar
+sus reflectores directamente a $b$.
+\begin{block}{Conexión con el capítulo de QR}
+La factorización es la misma. Ahora la usamos para resolver un problema de aproximación.
+\end{block}
+\end{frame}
+
+\begin{frame}{Ejemplo: QR de la matriz de diseño}
+Para $A=\mat{1&0\\1&1\\1&2\\1&3}$, una QR reducida es
+\[
+Q_1=\mat{
+\frac12&-\frac{3}{2\sqrt5}\\
+\frac12&-\frac{1}{2\sqrt5}\\
+\frac12& \frac{1}{2\sqrt5}\\
+\frac12& \frac{3}{2\sqrt5}},
+\qquad R=\mat{2&3\\0&\sqrt5}.
+\]
+Se verifica $Q_1^TQ_1=I_2$ y $Q_1R=A$.
+La segunda columna ortogonaliza el predictor respecto de la constante.
+\end{frame}
+
+\begin{frame}{Ejemplo: sustitución hacia atrás}
+Con $b=(1,2,2,4)^T$,
+\[
+Q_1^Tb=\mat{4.5\\4.5/\sqrt5}.
+\]
+Resolvemos
+\[
+\mat{2&3\\0&\sqrt5}\mat{c\\a}
+=\mat{4.5\\4.5/\sqrt5}.
+\]
+Primero $a=4.5/5=0.9$. Después,
+\[
+c=\frac{4.5-3(0.9)}2=0.9.
+\]
+Obtenemos la misma recta $\widehat y=0.9+0.9x$.
+\end{frame}
+
+\begin{frame}{Algoritmo de mínimos cuadrados}
+Entrada: matriz $A$ de rango columna completo y vector $b$.
+\begin{enumerate}
+\item Factorizar $A$ mediante Householder o Givens.
+\item Aplicar las transformaciones ortogonales a $b$.
+\item Resolver $R\theta=c$ por sustitución hacia atrás.
+\item Calcular $r=b-A\theta$ en las variables originales.
+\item Revisar la norma del residuo y $A^Tr$.
+\end{enumerate}
+No se necesita formar una inversa explícita.
+\end{frame}
+
+\begin{frame}{Centrado del predictor}
+Tomamos $t_i=x_i-\bar x$ y escribimos
+\[
+\widehat y=\beta_0+\beta_1t.
+\]
+Como $\sum_i t_i=0$, las columnas $1$ y $t$ son ortogonales:
+\[
+A_t^TA_t=\mat{m&0\\0&\sum_i t_i^2}.
+\]
+En nuestro ejemplo, $\bar x=1.5$, $\beta_0=2.25$ y $\beta_1=0.9$.
+Se recupera el intercepto original mediante
+\[
+c=\beta_0-\beta_1\bar x=0.9.
+\]
+\end{frame}
+
+\begin{frame}{Escala de las columnas}
+Si los predictores tienen unidades o magnitudes muy diferentes, podemos usar
+\[
+t_i=\frac{x_i-\bar x}{s_x},\qquad s_x>0.
+\]
+\begin{itemize}
+\item El escalado mejora el equilibrio entre las magnitudes de las columnas.
+\item Debemos transformar los coeficientes al interpretar el modelo original.
+\item El escalado no elimina una dependencia lineal verdadera.
+\end{itemize}
+En bases polinómicas, centrar y escalar resulta especialmente útil.
+\end{frame}
+
+\begin{frame}{Rango deficiente y SVD}
+Si $A=U\Sigma V^T$, una solución de mínima norma es
+\[
+\theta^*=A^+b
+=\sum_{j:\sigma_j>0}\frac{u_j^Tb}{\sigma_j}v_j.
+\]
+$A^+$ es la pseudoinversa. Los valores singulares pequeños amplifican las
+perturbaciones de $b$.
+\begin{block}{Rango numérico}
+En cómputo se usa una tolerancia para decidir qué valores singulares son
+significativos. QR con pivoteo también ayuda a detectar dependencia.
+\end{block}
+\end{frame}
+
+\begin{frame}{Mínimos cuadrados ponderados}
+Con pesos $w_i>0$, minimizamos
+\[
+\sum_i w_i(y_i-\widehat y_i)^2
+=\norm{W^{1/2}(A\theta-b)}_2^2,
+\quad W=\operatorname{diag}(w_1,\ldots,w_m).
+\]
+La formulación equivalente es
+\[
+\widetilde A=W^{1/2}A,\qquad \widetilde b=W^{1/2}b.
+\]
+Aplicamos QR a $\widetilde A$.
+Si las observaciones tienen varianzas conocidas y errores independientes,
+una elección habitual es $w_i=1/\sigma_i^2$.
+\end{frame}
+
+\begin{frame}{Regularización de Tikhonov}
+Para limitar coeficientes grandes, consideramos
+\[
+J_\lambda(\theta)=\norm{A\theta-b}_2^2+\lambda\norm{\theta}_2^2,
+\qquad\lambda>0.
+\]
+Las condiciones de optimalidad son
+\[
+(A^TA+\lambda I)\theta^*=A^Tb.
+\]
+Como $A^TA+\lambda I$ es definida positiva, el minimizador es único,
+incluso si $A$ tiene rango deficiente.
+El parámetro $\lambda$ equilibra ajuste y tamaño de los coeficientes.
+\end{frame}
+
+\begin{frame}{Regularización mediante QR}
+La misma función objetivo puede escribirse como
+\[
+J_\lambda(\theta)
+=\left\lVert
+\mat{A\\\sqrt\lambda I}\theta-\mat{b\\0}
+\right\rVert_2^2.
+\]
+Así resolvemos un problema aumentado de mínimos cuadrados.
+\begin{block}{Penalización selectiva}
+Si queremos penalizar solo algunos coeficientes, reemplazamos $I$ por una
+matriz $L$ y usamos $\lambda\norm{L\theta}_2^2$.
+La unicidad exige $\mathcal N(A)\cap\mathcal N(L)=\{0\}$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Demostración del mínimo regularizado}
+Si $(A^TA+\lambda I)\theta^*=A^Tb$, entonces
+\[
+J_\lambda(\theta^*+h)-J_\lambda(\theta^*)
+=\norm{Ah}_2^2+\lambda\norm{h}_2^2.
+\]
+El miembro derecho es positivo para $h\neq0$.
+\begin{block}{Conclusión}
+$\theta^*$ es el único mínimo global. La penalización añade curvatura positiva
+en todas las direcciones.
+\end{block}
+Esta identidad permite verificar la solución sin invocar únicamente el gradiente.
+\end{frame}
+
+\begin{frame}{Modelo de potencia}
+Un modelo $y=bx^a$, con $x,y>0$ y $b>0$, se transforma en
+\[
+\ln y=\ln b+a\ln x.
+\]
+Con $z_i=\ln x_i$ y $v_i=\ln y_i$, ajustamos
+\[
+v_i\approx\theta_0+\theta_1z_i,
+\qquad b=e^{\theta_0},\quad a=\theta_1.
+\]
+\begin{block}{Objetivo que cambia}
+El ajuste minimiza errores cuadrados en logaritmos.
+Minimizar errores cuadrados en niveles define un problema distinto.
+\end{block}
+\end{frame}
+
+\begin{frame}{Bases trigonométricas}
+Para aproximar datos periódicos, podemos elegir
+\[
+\widehat y(x)=\theta_0+\theta_1\sin x+\theta_2\cos x.
+\]
+Entonces
+\[
+A=\mat{1&\sin x_1&\cos x_1\\\vdots&\vdots&\vdots\\1&\sin x_m&\cos x_m}.
+\]
+La selección de la base incorpora estructura al modelo.
+Los coeficientes se obtienen con el mismo procedimiento QR.
+\end{frame}
+
+\begin{frame}{Validación del ajuste}
+\begin{itemize}
+\item Residuo: calcular $\norm{b-A\theta}_2$ en las unidades originales.
+\item Optimalidad: comprobar que $A^T(b-A\theta)$ es pequeño respecto de las escalas.
+\item Rango: examinar valores singulares o la factorización con pivoteo.
+\item Modelo: buscar patrones sistemáticos en los residuos.
+\item Predicción: evaluar con datos que no participaron en el ajuste.
+\end{itemize}
+La estabilidad del algoritmo y la adecuación del modelo son propiedades distintas.
+\end{frame}
+
+\begin{frame}{Actividad de clase}
+Use $t_i=x_i-1.5$ para los datos de la clase y ajuste
+$\beta_0+\beta_1t_i$.
+\begin{enumerate}
+\item Compruebe que las columnas $1$ y $t$ son ortogonales.
+\item Recupere $\beta_0=2.25$ y $\beta_1=0.9$ mediante QR.
+\item Penalice solo la pendiente con $\lambda=1$.
+\item Verifique que la nueva pendiente es $0.75$.
+\item Calcule el nuevo error de ajuste y explique el compromiso introducido.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Ejercicio original: ajuste trigonométrico}
+Ajuste los datos mediante una combinación lineal de $1$, $\sin x$ y $\cos x$:
+\begin{center}\begin{tabular}{rrrrrrr}\toprule
+$x_i$ & 1.1 & 1.9 & 2.7 & 4.3 & 5.1 & 7.8\\
+$y_i$ & 11.2 & 16.8 & 18.7 & 8.1 & 2.7 & 14.3\\\bottomrule
+\end{tabular}\end{center}
+\begin{enumerate}
+\item Escriba la matriz de diseño y las ecuaciones normales.
+\item Resuelva el problema usando QR.
+\item Calcule los valores ajustados y la norma del residuo.
+\end{enumerate}
+\fuente{Notas del curso, capítulo Aproximación lineal, ejercicio 1}
+\end{frame}
+
+\begin{frame}{Ejercicio original: regularización}
+Sea $A\in\R^{m\times n}$, $b\in\R^m$ y $\alpha>0$. Defina
+\[
+F(\theta)=\norm{A\theta-b}_2^2+\alpha\norm{\theta}_2^2.
+\]
+Demuestre que $F$ alcanza su único mínimo en la solución de
+\[
+(A^TA+\alpha I)\theta=A^Tb.
+\]
+Para esa solución, pruebe la identidad
+\[
+F(\theta+h)=F(\theta)+\norm{Ah}_2^2+\alpha\norm{h}_2^2.
+\]
+\fuente{Notas del curso, ejercicio 2, identidad algebraica corregida}
+\end{frame}
+
+\begin{frame}{Ejercicio original: sistema transpuesto}
+Encuentre la solución en mínimos cuadrados de
+\[
+\begin{bmatrix}u&v\end{bmatrix}
+\mat{3&2&1\\2&3&2}
+=\begin{bmatrix}3&0&1\end{bmatrix}.
+\]
+\begin{enumerate}
+\item Transponga la expresión y formule $A\theta\approx b$.
+\item Obtenga y resuelva las ecuaciones normales.
+\item Verifique que el residuo es ortogonal a las columnas de $A$.
+\end{enumerate}
+\fuente{Notas del curso, capítulo Aproximación lineal, ejercicio 3}
+\end{frame}
+
+\begin{frame}{Ejercicio original: modelo de potencia}
+Las notas recogen datos de peso $W$ (gramos) y consumo de oxígeno $R$
+(mililitros por hora) para larvas de \emph{Pachysphinx modesta}.
+\begin{center}\small\begin{tabular}{rrrrrrrr}\toprule
+$W$ & .017 & .087 & .085 & .020 & .233 & 4.83 & 5.53\\
+$R$ & .154 & .296 & .260 & .180 & .537 & 4.66 & 6.94\\\bottomrule
+\end{tabular}\end{center}
+Ajuste el modelo $R=bW^a$ mediante logaritmos.
+\begin{enumerate}
+\item Obtenga $a$ y $b$ por mínimos cuadrados.
+\item Calcule el error en logaritmos y el error en la escala original.
+\end{enumerate}
+\fuente{Datos reproducidos de las notas del curso, ejercicio 4, atribuidos allí a L. Schroeder}
+\end{frame}
+
+\begin{frame}{Ejercicio original: modelo ampliado}
+Con los mismos datos, ajuste
+\[
+R=bW^aW^{c\ln W}.
+\]
+Tomar logaritmos da
+\[
+\ln R=\ln b+a\ln W+c(\ln W)^2.
+\]
+\begin{enumerate}
+\item Construya la matriz de diseño de tres columnas.
+\item Calcule los nuevos parámetros mediante QR.
+\item Compare el error en logaritmos con el modelo anterior.
+\item Explique qué garantiza agregar una columna al espacio de ajuste.
+\end{enumerate}
+\fuente{Notas del curso, capítulo Aproximación lineal, ejercicio 4(b)}
+\end{frame}
+
+\begin{frame}{Cierre de la clase}
+\begin{itemize}
+\item QR reduce mínimos cuadrados a un sistema triangular.
+\item Formar $A^TA$ eleva al cuadrado el número de condición.
+\item Centrado, escala y rango influyen en la calidad numérica.
+\item Los pesos y la regularización modifican el objetivo de aproximación.
+\end{itemize}
+\vspace{.4cm}
+El siguiente capítulo estudia interpolación y la construcción de funciones
+que cumplen condiciones exactas en los nodos.
+\end{frame}
+\end{document}

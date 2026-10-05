@@ -1,0 +1,392 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\title{Aproximación lineal}
+\subtitle{Mínimos cuadrados y ecuaciones normales}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\begin{document}
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.70\textwidth}
+\vspace{.7cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.35cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{1cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.25\textwidth}\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de la clase}
+Al terminar esta clase podremos:
+\begin{itemize}
+\item construir una matriz de diseño a partir de datos y funciones base;
+\item formular el ajuste como un problema de mínimos cuadrados;
+\item deducir las ecuaciones normales y justificar su suficiencia;
+\item interpretar el residuo como una componente ortogonal;
+\item distinguir unicidad de los coeficientes y unicidad del ajuste.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Datos y modelo}
+Supongamos que observamos cantidades $x_i$ y costos $y_i$:
+\begin{center}\begin{tabular}{ccccc}\toprule
+$x_i$ & 0 & 1 & 2 & 3\\
+$y_i$ & 1 & 2 & 2 & 4\\\bottomrule
+\end{tabular}\end{center}
+Buscamos un modelo sencillo
+\[
+\widehat y(x)=c+ax.
+\]
+Los datos de esta clase son ilustrativos. El parámetro $c$ representa el costo
+estimado cuando $x=0$ y $a$ el incremento por unidad de $x$.
+\end{frame}
+
+\begin{frame}{Interpolación y ajuste}
+\begin{center}\begin{tabular}{p{5.5cm}p{5.5cm}}\toprule
+Interpolación & Mínimos cuadrados\\\midrule
+Exige $p(x_i)=y_i$ en todos los nodos. & Elige un modelo que minimiza un error agregado.\\[2mm]
+La cantidad de parámetros permite cumplir las condiciones. & Puede haber muchas más observaciones que parámetros.\\[2mm]
+Es útil para representar valores de una función conocida. & Es útil cuando hay ruido o se busca una descripción sencilla.\\\bottomrule
+\end{tabular}\end{center}
+Una recta tiene dos parámetros. En general, no puede atravesar cuatro puntos arbitrarios.
+\end{frame}
+
+\begin{frame}{Residuos y función objetivo}
+El residuo de la observación $i$ es
+\[
+r_i=y_i-(c+ax_i).
+\]
+Minimizamos la suma de cuadrados de los residuos:
+\[
+S(c,a)=\sum_{i=1}^m\bigl(y_i-c-ax_i\bigr)^2.
+\]
+\begin{block}{Qué distancia medimos}
+Esta formulación usa desviaciones verticales en $y$. Las distancias
+perpendiculares a la recta corresponden a otro problema.
+\end{block}
+\end{frame}
+
+\begin{frame}{Formulación matricial}
+Definimos
+\[
+A=\mat{1&x_1\\\vdots&\vdots\\1&x_m},
+\quad \theta=\mat{c\\a},\quad b=\mat{y_1\\\vdots\\y_m}.
+\]
+Entonces $r=b-A\theta$ y el problema es
+\[
+\boxed{\min_{\theta\in\R^2}\norm{A\theta-b}_2^2.}
+\]
+La matriz $A$ contiene los valores de las funciones base $1$ y $x$.
+\end{frame}
+
+\begin{frame}{Linealidad en los coeficientes}
+La aproximación general tiene la forma
+\[
+\widehat y(x)=\sum_{j=1}^n\theta_j\varphi_j(x),
+\qquad A_{ij}=\varphi_j(x_i).
+\]
+Las funciones $\varphi_j$ pueden ser no lineales en $x$:
+\[
+1,\ x,\ x^2,\ \sin x,\ \cos x,\ e^x.
+\]
+\begin{block}{Aproximación lineal}
+La combinación es lineal en los coeficientes desconocidos $\theta_j$.
+Un ajuste polinómico también es un problema de mínimos cuadrados lineales.
+\end{block}
+\end{frame}
+
+\begin{frame}{Sistemas sobredeterminados}
+Para $A\in\R^{m\times n}$, con $m\geq n$, consideramos
+\[
+\min_{\theta\in\R^n}\norm{A\theta-b}_2.
+\]
+Si $m>n$, hay más ecuaciones que incógnitas. El sistema $A\theta=b$ puede
+ser incompatible.
+\begin{block}{Solución aproximada}
+Buscamos el vector $A\theta$ más cercano a $b$ entre todos los vectores del
+espacio columna de $A$.
+\end{block}
+Minimizar la norma o su cuadrado da los mismos minimizadores.
+\end{frame}
+
+\begin{frame}{Deducción de las ecuaciones normales}
+Definimos
+\[
+J(\theta)=\frac12\norm{A\theta-b}_2^2
+=\frac12\theta^TA^TA\theta-\theta^TA^Tb+\frac12b^Tb.
+\]
+Su gradiente y su hessiano son
+\[
+\nabla J(\theta)=A^T(A\theta-b),\qquad
+\nabla^2J(\theta)=A^TA.
+\]
+Una solución satisface
+\[
+\boxed{A^TA\theta^*=A^Tb.}
+\]
+\end{frame}
+
+\begin{frame}{Teorema de aproximación lineal}
+Sea $A\in\R^{m\times n}$, $m\geq n$, y $b\in\R^m$. Entonces:
+\begin{enumerate}
+\item $\theta^*$ minimiza $\norm{A\theta-b}_2$ si y solo si
+$A^TA\theta^*=A^Tb$.
+\item El conjunto de minimizadores es afín y no vacío. Todos sus elementos
+producen el mismo vector $A\theta^*$.
+\item El minimizador es único si y solo si $\operatorname{rango}(A)=n$.
+\item Entre los minimizadores existe exactamente uno de norma euclídea mínima.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{La condición también es suficiente}
+Si $A^T(A\theta^*-b)=0$, para cualquier perturbación $h$,
+\[
+\begin{aligned}
+J(\theta^*+h)
+&=J(\theta^*)+h^TA^T(A\theta^*-b)+\tfrac12\norm{Ah}_2^2\\
+&=J(\theta^*)+\tfrac12\norm{Ah}_2^2\geq J(\theta^*).
+\end{aligned}
+\]
+\begin{block}{Teorema}
+$\theta^*$ minimiza $\norm{A\theta-b}_2$ si y solo si satisface las ecuaciones normales.
+\end{block}
+La convexidad del problema permite pasar de estacionariedad a mínimo global.
+\end{frame}
+
+\begin{frame}{Geometría del residuo}
+Con $r^*=b-A\theta^*$, las ecuaciones normales equivalen a
+\[
+A^Tr^*=0.
+\]
+Por tanto, el residuo es ortogonal a cada columna de $A$.
+\[
+b=\underbrace{A\theta^*}_{\text{proyección en }\mathcal C(A)}
++\underbrace{r^*}_{\text{componente ortogonal}}.
+\]
+La identidad de Pitágoras muestra que cualquier cambio dentro de $\mathcal C(A)$
+aumenta o mantiene la distancia a $b$.
+\end{frame}
+
+\begin{frame}{Rango y unicidad}
+Para cualquier $v\in\R^n$,
+\[
+v^TA^TAv=\norm{Av}_2^2.
+\]
+En consecuencia,
+\[
+\mathcal N(A^TA)=\mathcal N(A).
+\]
+\begin{block}{Coeficientes únicos}
+El minimizador es único si y solo si $\operatorname{rango}(A)=n$.
+En ese caso $A^TA$ es definida positiva.
+\end{block}
+Con rango deficiente, varias combinaciones de coeficientes producen el mismo ajuste.
+\end{frame}
+
+\begin{frame}{Otras normas de aproximación}
+Con norma $1$, introducimos $t\in\R^m$:
+\[
+\min_{\theta,t}\sum_i t_i,\qquad
+-t\leq A\theta-b\leq t,\quad t\geq0.
+\]
+Con norma infinito, introducimos un escalar $t$:
+\[
+\min_{\theta,t}t,\qquad
+-t\mathbf1\leq A\theta-b\leq t\mathbf1,\quad t\geq0.
+\]
+Ambas formulaciones son problemas de programación lineal.
+La norma $2$ conduce a las ecuaciones normales estudiadas en esta clase.
+\end{frame}
+
+\begin{frame}{La recta de mínimos cuadrados}
+Para $\widehat y=c+ax$, las ecuaciones normales son
+\[
+\mat{m&\sum_i x_i\\\sum_i x_i&\sum_i x_i^2}
+\mat{c\\a}=\mat{\sum_i y_i\\\sum_i x_iy_i}.
+\]
+Si los $x_i$ no son todos iguales,
+\[
+a=\frac{\sum_i(x_i-\bar x)(y_i-\bar y)}{\sum_i(x_i-\bar x)^2},
+\qquad c=\bar y-a\bar x.
+\]
+La recta ajustada pasa por $(\bar x,\bar y)$.
+\end{frame}
+
+\begin{frame}{Ejemplo: construcción del sistema}
+Con los cuatro datos de la clase,
+\[
+A=\mat{1&0\\1&1\\1&2\\1&3},\qquad b=\mat{1\\2\\2\\4}.
+\]
+Las sumas necesarias son
+\[
+\sum_i x_i=6,\quad\sum_i x_i^2=14,\quad
+\sum_i y_i=9,\quad\sum_i x_iy_i=18.
+\]
+Por tanto,
+\[
+\mat{4&6\\6&14}\mat{c\\a}=\mat{9\\18}.
+\]
+\end{frame}
+
+\begin{frame}{Ejemplo: solución y residuos}
+Al resolver las ecuaciones normales obtenemos $c=0.9$ y $a=0.9$.
+\begin{center}\begin{tabular}{rrrrr}\toprule
+$x_i$ & $y_i$ & $\widehat y_i$ & $r_i$ & $r_i^2$\\\midrule
+0 & 1 & 0.9 & 0.1 & 0.01\\
+1 & 2 & 1.8 & 0.2 & 0.04\\
+2 & 2 & 2.7 & $-0.7$ & 0.49\\
+3 & 4 & 3.6 & 0.4 & 0.16\\\bottomrule
+\end{tabular}\end{center}
+\[
+S=\sum_i r_i^2=0.70,\qquad \norm{r}_2=\sqrt{0.70}\approx0.836660.
+\]
+\end{frame}
+
+\begin{frame}{Verificación de la solución}
+Para $r=(0.1,0.2,-0.7,0.4)^T$,
+\[
+\sum_i r_i=0,\qquad \sum_i x_ir_i=0.
+\]
+Esto verifica $A^Tr=0$.
+\begin{block}{Dos propiedades de una recta con intercepto}
+La suma de residuos es cero y el residuo es ortogonal al predictor.
+Estas propiedades caracterizan el óptimo en aritmética exacta.
+\end{block}
+Un residuo no nulo es compatible con una solución correcta de mínimos cuadrados.
+\end{frame}
+
+\begin{frame}{Existencia con rango deficiente}
+La proyección de $b$ sobre $\mathcal C(A)$ existe siempre y es única.
+Por eso siempre hay al menos un minimizador.
+\[
+\{\theta:\theta\text{ minimiza }J\}
+=\theta^*+\mathcal N(A).
+\]
+Si $z\in\mathcal N(A)$, entonces
+\[
+A(\theta^*+z)=A\theta^*.
+\]
+Los coeficientes pueden variar, mientras los valores ajustados y el residuo
+permanecen iguales.
+\end{frame}
+
+\begin{frame}{Existencia: prueba algebraica}
+Un sistema $M\theta=d$ es compatible si y solo si
+\[
+z^Td=0\qquad\text{para todo }z\in\mathcal N(M^T).
+\]
+Para $M=A^TA$ y $d=A^Tb$, sea $z\in\mathcal N(A^TA)$.
+Entonces
+\[
+0=z^TA^TAz=\norm{Az}_2^2,\qquad Az=0.
+\]
+Por tanto,
+\[
+z^TA^Tb=(Az)^Tb=0.
+\]
+Las ecuaciones normales son compatibles para cualquier $b$.
+\end{frame}
+
+\begin{frame}{Conjunto afín y ajuste único}
+Sea $\theta_0$ una solución de las ecuaciones normales. Entonces
+\[
+\mathcal L=\{\theta:A^TA\theta=A^Tb\}
+=\theta_0+\mathcal N(A^TA)=\theta_0+\mathcal N(A).
+\]
+Si $\theta_1,\theta_2\in\mathcal L$, su diferencia pertenece a $\mathcal N(A)$.
+Por ello,
+\[
+A\theta_1=A\theta_2.
+\]
+Si el núcleo es trivial, $\mathcal L$ contiene un solo elemento.
+Si el núcleo contiene un vector no nulo, hay infinitas soluciones.
+\end{frame}
+
+\begin{frame}{Existencia de norma mínima}
+El conjunto $\mathcal L$ es cerrado, afín y no vacío. Elegimos $\theta_0\in\mathcal L$.
+El conjunto
+\[
+K=\mathcal L\cap\{\theta:\norm{\theta}_2\leq\norm{\theta_0}_2\}
+\]
+es compacto y no vacío. La función continua $\theta\mapsto\norm{\theta}_2$
+alcanza un mínimo en $K$.
+\begin{block}{Mínimo en todo $\mathcal L$}
+Los elementos de $\mathcal L$ fuera de $K$ tienen norma mayor que
+$\norm{\theta_0}_2$, de modo que no pueden mejorar el mínimo alcanzado en $K$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Unicidad de norma mínima}
+Supongamos que $u,v\in\mathcal L$ tienen la misma norma mínima $\mu$.
+Como $\mathcal L$ es afín, $(u+v)/2\in\mathcal L$.
+La identidad del paralelogramo da
+\[
+\left\lVert\frac{u+v}{2}\right\rVert_2^2
+=\frac{\norm{u}_2^2+\norm{v}_2^2}{2}
+-\frac{\norm{u-v}_2^2}{4}
+=\mu^2-\frac{\norm{u-v}_2^2}{4}.
+\]
+Si $u\neq v$, el punto medio tendría norma menor que $\mu$, una contradicción.
+Por tanto $u=v$.
+\end{frame}
+
+\begin{frame}{Coeficientes no únicos}
+Considere dos columnas idénticas:
+\[
+A=\mat{1&1\\1&1\\1&1\\1&1},\qquad b=\mat{1\\2\\2\\4}.
+\]
+El ajuste depende únicamente de $\theta_1+\theta_2$. Su valor óptimo es
+\[
+\theta_1+\theta_2=\bar y=2.25.
+\]
+Entre todas estas soluciones, la de menor norma euclídea es
+\[
+\theta_1=\theta_2=1.125.
+\]
+La independencia de las columnas determina si podemos identificar los coeficientes.
+\end{frame}
+
+\begin{frame}{Ajuste polinómico}
+Para una parábola $\widehat y=c+ax+dx^2$,
+\[
+A=\mat{1&x_1&x_1^2\\\vdots&\vdots&\vdots\\1&x_m&x_m^2},
+\qquad\theta=\mat{c\\a\\d}.
+\]
+El problema conserva la misma forma:
+\[
+\min_\theta\norm{A\theta-b}_2^2.
+\]
+Agregar columnas puede reducir el error de ajuste dentro de la muestra.
+La capacidad de predecir fuera de ella requiere una evaluación adicional.
+\end{frame}
+
+\begin{frame}{Actividad de clase}
+Para los datos
+\[
+(x_i,y_i)=(0,1),(1,2),(2,2),(3,4),
+\]
+\begin{enumerate}
+\item Construya el sistema para ajustar $c+ax+dx^2$.
+\item Calcule $A^TA$ y $A^Tb$.
+\item Justifique la unicidad sin calcular una inversa.
+\item Explique por qué el error mínimo no puede superar $0.70$.
+\item Compare el ajuste cuadrático con la recta en $x=4$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Cierre de la clase}
+\begin{itemize}
+\item La matriz de diseño representa la familia de funciones elegida.
+\item Las ecuaciones normales caracterizan todos los minimizadores.
+\item El residuo óptimo es ortogonal al espacio columna.
+\item El rango completo garantiza coeficientes únicos.
+\end{itemize}
+\vspace{.4cm}
+En la siguiente clase resolveremos el problema mediante QR y estudiaremos
+el efecto del condicionamiento.
+\end{frame}
+\end{document}

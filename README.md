@@ -36,6 +36,8 @@ cuadrática, y criterios de parada.
 - [Unidad 3D: Métodos iterativos matriciales](presentaciones/Unidad_3D_Metodos_Iterativos_Lineales.pdf)
 - [Unidad 4A: Ecuaciones no lineales escalares](presentaciones/Unidad_4A_Ecuaciones_No_Lineales_Escalares.pdf)
 - [Unidad 4B: Sistemas no lineales, Newton y Broyden](presentaciones/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.pdf)
+- [Unidad 5A: Aproximación lineal y ecuaciones normales](presentaciones/Unidad_5A_Aproximacion_Lineal.pdf)
+- [Unidad 5B: Mínimos cuadrados mediante QR y aplicaciones](presentaciones/Unidad_5B_Minimos_Cuadrados_QR.pdf)
 
 La presentación de la Unidad 1 desarrolla representación en punto flotante,
 errores, análisis diferencial, condicionamiento, estabilidad y costo
@@ -77,6 +79,20 @@ La Unidad 4B extiende punto fijo y Newton a sistemas, presenta amortiguamiento,
 aproximación del jacobiano y el método de Broyden, y cierra con una aplicación
 al equilibrio de Cournot. Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.tex).
+
+La Unidad 5A desarrolla el capítulo de aproximación lineal de las notas con
+el teorema completo de mínimos cuadrados y las demostraciones de existencia,
+unicidad, estructura afín del conjunto de soluciones y solución de norma mínima.
+Incluye la formulación en otras normas y un ejemplo resuelto de ajuste de una
+recta. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_5A_Aproximacion_Lineal.tex).
+
+La Unidad 5B conserva el tratamiento numérico por QR y los cuatro ejercicios
+originales del capítulo. Incluye la relación correcta
+`cond₂(AᵀA) = cond₂(A)²` para rango columna completo y corrige la identidad del
+ejercicio de regularización. Añade ejemplos y complementos sobre escala, SVD,
+ponderación y ajuste en logaritmos. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_5B_Minimos_Cuadrados_QR.tex).
 
 ### Repaso del examen parcial
 
