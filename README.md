@@ -107,14 +107,22 @@ evaluaciones del ciclo 2026-2.
 
 ### Laboratorios
 
+- [Laboratorio de aproximación lineal y mínimos cuadrados con QR](laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb)
+
 - [Laboratorio 1: punto flotante, error y estabilidad](laboratorios/Lab_Unidad_1_Punto_Flotante.ipynb)
 - [Laboratorio del capítulo 3: sistemas lineales](laboratorios/Lab_Capitulo_3_Sistemas_Lineales.ipynb)
 - [Laboratorio complementario: matrices dispersas y economía peruana](laboratorios/Lab_Matrices_Dispersas_Economia_Peruana.ipynb)
 
-Los cuadernos están ejecutados y utilizan Python y las bibliotecas indicadas en
+Los cuadernos utilizan Python y las bibliotecas indicadas en
 `requirements.txt`. El laboratorio 1 incluye experimentos sobre
 representación, truncamiento, redondeo, cancelación, propagación de errores y
 comparación de algoritmos.
+
+El laboratorio de aproximación lineal incluye 24 datos simulados de ventas,
+un catálogo de ocho funciones base, construcción de la matriz de diseño y
+ecuaciones normales, resolución por QR y sustitución hacia atrás, análisis de
+residuos y comparación de modelos. Los datos están incluidos en el cuaderno y
+también disponibles en [CSV](laboratorios/datos/ventas_aproximacion_lineal_2026-2.csv).
 
 El laboratorio del capítulo 3 desarrolla métodos directos e iterativos para
 sistemas lineales, factorizaciones y aplicaciones. Su sección geométrica
@@ -143,8 +151,8 @@ jupyter lab
 ```
 
 Luego abra el cuaderno elegido dentro de `laboratorios/` y ejecute las celdas
-en orden. Los cuadernos publicados conservan también una ejecución completa de
-referencia.
+en orden. Los laboratorios anteriores conservan una ejecución completa de referencia.
+El laboratorio de aproximación lineal se entrega sin salidas para ejecutar en Colab.
 
 ## Estado del material
 
