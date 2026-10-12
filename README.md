@@ -38,6 +38,12 @@ cuadrática, y criterios de parada.
 - [Unidad 4B: Sistemas no lineales, Newton y Broyden](presentaciones/Unidad_4B_Sistemas_No_Lineales_Newton_Broyden.pdf)
 - [Unidad 5A: Aproximación lineal y ecuaciones normales](presentaciones/Unidad_5A_Aproximacion_Lineal.pdf)
 - [Unidad 5B: Mínimos cuadrados mediante QR y aplicaciones](presentaciones/Unidad_5B_Minimos_Cuadrados_QR.pdf)
+- [Unidad 6: Interpolación polinomial](presentaciones/Unidad_6_Interpolacion_Polinomial.pdf)
+
+La Unidad 6 presenta interpolación de Lagrange y Newton, diferencias divididas,
+el teorema y la cota del error, Hermite, splines y aplicaciones. Incluye ejemplos
+de implementación y verificación con NumPy, con el estilo institucional 2026-2.
+Está disponible su [fuente LaTeX editable](presentaciones/fuentes/Unidad_6_Interpolacion_Polinomial.tex).
 
 La presentación de la Unidad 1 desarrolla representación en punto flotante,
 errores, análisis diferencial, condicionamiento, estabilidad y costo

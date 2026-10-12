@@ -1,0 +1,806 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\usepackage{mathrsfs,bm,listings}
+\lstset{language=Python,basicstyle=\ttfamily\footnotesize,columns=fullflexible,keepspaces=true,showstringspaces=false,breaklines=true}
+
+\newcommand{\ovl}{\overline}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\eps}{\varepsilon}
+
+\DeclareMathOperator{\rd}{rd}
+\DeclareMathOperator{\fl}{fl}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\EPS}{eps}
+
+
+\newcommand{\estirar}{\renewcommand{\arraystretch}{0.6}}
+
+\newcommand{\Frac}{\displaystyle \frac}
+\newcommand{\mfrac}[2]{\mbox{$\frac{#1}{#2}$}}
+\newcommand{\ce}{\mathbb{C}}
+\newcommand{\gment}[1]{\left\lceil #1 \right\rceil}
+
+\newcommand{\rojo}[1]{\textcolor{uprojo}{#1}}
+
+\title{Interpolación polinomial}
+\subtitle{Lagrange, Newton, Hermite y aplicaciones}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\newtheorem{prop}{Proposici\'on}
+\newtheorem{defi}{Definici\'on}
+
+\newcommand{\tq}{\mid}
+\newcommand{\re}{\mathbb{R}}
+\newtheorem{thm}{Teorema}
+
+\newtheorem{cor}{Corolario}
+
+\theoremstyle{remark}
+
+
+\newtheorem{ejem}{Ejemplo}
+
+
+\DeclareMathOperator*{\res}{Res}
+\newcommand{\sigmap}[2]{\sigma >_{#1} #2}
+\newcommand{\zeros}{\partial}
+\newcommand{\zeross}{\partial}
+%\newcommand{\zerosa}{\mathfrak{Z}^*}
+\newcommand{\zerosa}{\partial^*}
+\newcommand{\zerossa}{\partial^*}
+\newcommand{\K}{K}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\vct}[1]{\bm{#1}}
+\newcommand{\Nr}{\mathbb{N}^{r*}}
+\newcommand{\conv}{\circ}
+
+
+\newcommand{\gamman}{\Gamma}
+
+\DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\Real}{Re}
+\DeclareMathOperator{\Imag}{Im}
+\renewcommand{\mod}{\Mod}
+
+
+\DeclareMathOperator{\PSL}{PSL}
+\DeclareMathOperator*{\Res}{Res}
+
+\newcommand{\summ}{\displaystyle \sum}
+
+\newcommand{\xframe}[1]{}
+
+
+%\DeclareMathOperator{\rd}{rd}
+%\DeclareMathOperator{\fl}{fl}
+%\DeclareMathOperator{\sign}{sign}
+
+
+\newcommand{\compacto}{\footnotesize
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}}
+\begin{document}
+
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.70\textwidth}
+\vspace{.7cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.35cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{1cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.25\textwidth}\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}\end{column}
+\end{columns}
+\end{frame}
+
+
+
+%\section[Programme]{}
+%\frame{\tableofcontents}
+
+%\subsection{Overview of the Beamer Class}
+
+\frame{
+\frametitle{Interpolaci\'on polinomial}
+Supongamos que tenemos $x_0,x_1,\dots,x_n$, $(n+1)$ puntos distintos del 
+eje real y $ f_0,f_1,\dots,f_n$ los valores correspondientes de la ordenada. Buscamos un polinomio 
+de grado menor o igual a $n$ %\index{Polinomio interpolante}
+$$ P_n (x) = a_0+a_1 x+a_2 x^2 + \dots + a_n x^n $$
+tal que $ P_n(x_i)=f_i, \quad i=0,1,\dots,n $.
+\uncover<2>{
+\begin{thm}
+%\index{Polinomio interpolante!existencia y unicidad del}
+Para $(n+1)$ puntos $(x_0,f_0), (x_1,f_1), \dots, (x_n,f_n) \in \re^2$ con 
+abscisas distintas (esto es, $x_i\neq x_j$ para $i \neq j$), existe un \'unico polinomio 
+$P_n $ de grado menor o igual a $ n $ que cumple las condiciones interpolantes:
+$$ P_n(x_i)=f_i, \quad i=0,1,\dots,n $$
+\end{thm}
+}
+}
+
+\frame{
+De hecho, las condiciones interpolantes
+$$ a_0 + a_1 x_i + a_2 x_i^2 + \dots + a_n x_i^n = f_i, \quad i=0,1,\dots,n $$
+constituyen un sistema lineal de $n+1$ ecuaciones con $n+1$ inc\'ognitas (los 
+coeficientes del polinomio), que escribimos en la forma
+$$ \left[
+\begin{array}{ccccc}
+1 & x_0 & x_0^2 & \dots &x_0^n \\
+1 & x_1 & x_1^2 & \dots &x_1^n \\
+\vdots & & & & \vdots \\
+1 & x_n & x_n^2 & \dots &x_n^n \\
+\end{array}
+\right] \left[
+\begin{array}{c}
+a_0 \\ a_1 \\ \vdots \\ a_n 
+\end{array}
+\right] = \left[
+\begin{array}{c}
+f_0 \\ f_1 \\ \vdots \\ f_n 
+\end{array}
+\right].
+$$
+La matriz $(n+1) \times (n+1)$ del sistema es inversible, y por lo tanto el sistema posee soluci\'on \'unica.
+}
+
+\frame{
+\compacto
+Consideramos los siguientes datos:
+$$ \begin{tabular}{c|ccccc}
+$j$   &  $0$  &  $1$  &  $2$  & $3$ \\ \hline
+$x_j$ &  $1$  & $3$   &  $5$  & $7$ \\
+$f_j$ & $2.5$ & $3.5$ &  $7.5$  & $5.5$ 
+\end{tabular} $$
+\uncover<2->{El \'unico polinomio interpolante para esta tabla de valores tiene la forma
+$$ P_3(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3. $$
+}
+\uncover<3->{Los coeficientes $a_0, a_1, a_2$ y $a_3$ resuelven el sistema
+$$
+\left[ \begin{array}{ccccc} 
+1 & 1 & 1 & 1 \\
+1 & 3 & 9 & 27\\
+1 & 5 & 25 & 125 \\
+1 & 7  & 49 & 343
+\end{array}\right]
+\left[
+\begin{array}{c}
+a_0 \\ a_1 \\ a_2 \\ a_3 
+\end{array}
+\right] = \left[
+\begin{array}{c}
+2.5 \\ 3.5 \\ 7.5 \\ 5.5
+\end{array}
+\right]
+$$
+}
+\uncover<4>{Resolviendo el sistema obtenemos $a_0=5.93750$, $a_1=-5.31250$, $a_2=2.06250$ y $a_3=-0.18750$, de donde
+$$ 
+P_3(x)=5.93750-5.31250 x + 2.06250x^2 -0.18750 x^3.
+$$
+}
+}
+
+
+\frame{
+\frametitle{F\'ormula de Lagrange}
+Si $(x_k,f_k)$, $k=0,\dots,n$ son los $n+1$ puntos antes considerados, el polinomio interpolante se puede obtener directamente por la f\'ormula
+$$ P_n (x) = f_0 L_0(x) +f_1 L_1(x) + \dots + f_n L_n(x) $$
+donde los polinomios $ L_0,L_1,\dots,L_n $ tienen grado $ n $, 
+%$$ f_j = P_n (x_j) = f_0 L_0(x_j) +f_1 L_1(x_j) + \dots + f_n L_n(x_j), \quad j=0,1,\dots,n $$
+%Esto se cumple, 
+si se exige que
+$$ L_j(x_k) = \left\{
+\begin{array}{cc}
+0, & j \neq k \\
+1, & j=k 
+\end{array}
+\right.
+%= \delta_{jk} 
+$$
+Esto se cumple para los \emph{polinomios b\'asicos de Lagrange}
+$$ L_j(x) = \prod_{ \substack{k=0 \\ k \neq j}}^n \frac{x-x_k}{x_j-x_k}. $$
+%\tiny \begin{array}{c} k \neq j \\[-8ex] k=0 \end{array}
+
+}
+
+
+\frame{
+\compacto
+Consideramos los datos de la tabla
+$$ \begin{tabular}{c|ccc}
+$j$   & $0$ &  $1$  & $2$ \\ \hline
+$x_j$ & $0$ & $0.5$ & $1$ \\ %\hline
+$f_j$ & $1.1$ & $0.9$ & $0.6$
+\end{tabular} $$
+\uncover<2->{Los polinomios b\'asicos de Lagrange son
+$$ \begin{array}{rcl}
+L_0(x) &=& \Frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)} = \Frac{(x-0.5)(x-1)}{(0-0.5)(0-1)} = 2x^2-3x+1\\
+L_1(x) &=& \Frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)} = \Frac{(x-0)(x-1)}{(0.5-0)(0.5-1)} = -4x^2+4x\\
+L_2(x) &=& \Frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)} = \Frac{(x-0)(x-0.5)}{(1-0)(1-0.5)} = 2x^2-x
+\end{array} $$
+}
+\uncover<3>{
+Luego:
+%$$ 
+\begin{align*}
+P_2(x) & = 1.1 (2x^2-3x+1) + 0.9 (-4x^2+4x) + 0.6 (2x^2-x) \\
+	& = -0.2 x^2-0.3x+1.1
+\end{align*}
+}
+}
+
+
+
+\frame{
+\compacto
+\compacto
+\frametitle{Forma de Newton}
+Se inicia con el polinomio de grado $ 0 $ (constante) que pasa por el punto $ (x_0,f_0) $
+$$ P_0 (x) = f_0. $$
+A\~nadiendo $ (x_1,f_1) $, se construye un polinomio $ P_1(x) $ de grado no mayor que $ 1 $ tal que 
+$$ P_1 (x_0) = f_0, \quad P_1 (x_1) = f_1. $$
+Sea $ P_1(x) = P_0(x) + q_1(x), $ donde $grado(q_1) \leq 1 $. Como $ P_1 (x_0) = f_0 $, entonces 
+$ q_1(x_0) = 0 $, luego $x-x_0$ divide $q_1(x)$ y 
+$ q_1(x) = (x-x_0) \alpha(x)$.
+Pero el grado de $q_1$ es $\leq 1$, luego $ \alpha(x) = \alpha $ (constante). Como $ P_1(x_1)=f_1 $, entonces 
+$ f_1 = P_1(x_1)= f_0+ \alpha (x_1-x_0)$. De esto \'ultimo %$ \alpha $:
+$$ \alpha = \Frac{f_1-f_0}{x_1-x_0} $$ %= \Frac{f_1-P_0(x_1)}{x_1-x_0}$$
+Denotando $f[x_0]=f_0$, $f[x_1]=f_1$ y $\alpha=f[x_0,x_1]$, se tiene que
+$$ f[x_0,x_1] = \frac{f[x_1]-f[x_0]}{x_1-x_0} $$
+y
+$$ P_1(x) = f[x_0]+f[x_0,x_1](x-x_0). $$
+}
+
+\frame{
+
+\compacto
+Ahora supongamos que tenemos $n+1$ puntos interpolantes 
+$(x_i,f_i)$ con $0 \leq i \leq n$, y el polinomio $P_{n-1}(x)$ de grado $\leq n-1$
+que interpola los $n$ primeros puntos, esto es
+$$ P_{n-1}(x_i) = f_i, \quad 0 \leq i \leq n-1. $$
+De manera an\'aloga a la anterior, se muestra que el polinomio $P_n(x)$ que interpola todos los puntos (incluido $(x_n,f_n)$) toma la forma
+
+$$ P_n(x) = P_{n-1}(x) + f[x_0,x_1,\dots,x_n] (x-x_0)(x-x_1)\cdots(x-x_{n-1}), $$
+donde $f[x_0,x_1,\dots,x_n]$ es el coeficiente de $x^n$ en el desarrollo de $P_n(x)$.
+%De aqu\'i concluimos que la forma del polinomio interpolante es
+%$$ P_n(x) = f[x_0] + \sum_{k=1}^{n-1} f[x_0,x_1,\dots,x_k] (x-x_0)(x-x_1)\cdots(x-x_{k-1}) $$
+Reutilizando la recurrencia, el polinomio interpolante $ P_n $ puede ser escrito %entonces como:
+como
+%\index{Polinomio interpolante!de Newton}
+$$ P_n(x) = f[x_0] + f[x_0,x_1] (x-x_0) + \dots + f[x_0,x_1,\dots,x_n] (x-x_0) \dots (x-x_{n-1}). $$
+
+
+% $ P_n(x) = P_{n-1}(x) + q_{n}(x)$, donde $q_(x)$ es de grado $\leq n$. De las condiciones interpolantes
+% $$ q_n(x_i) = P_n(x_i) - P_{n-1}(x_i) = f_i - f_i = 0, \mbox{ para } 0 \leq i \leq n-1. $$
+% Luego cada factor $x-x_i$ divide a $q_n$ y $q(x) = \displaystyle \alpha(x) \prod_{k=0}^{n-1} (x-x_k)$; como antes analizando los grados de los polinomios, se concluye que $\alpha(x) = \alpha$ es constante.
+% Si $f[x_0,x_1,\dots,x_n]$ es el coeficiente de $x^n$ en el desarrollo de $x^n$, entonces este coeficiente es igual a $\alpha$ ($P_{n-1}(x)$ no contiene un t\'ermino $x^n$).
+% Conclusi\'on
+
+}
+
+
+\frame{
+Denotemos con $ f[x_j,x_{j+1},\dots,x_{j+k}] $ al coeficiente de $x^k$ en el polinomio interpolante que pasa por los puntos 
+$(x_j,f_j), (x_{j+1},f_{j+1}), \dots, (x_{j+k},f_{j+k})$. Se cumple:
+$$ f[x_0] =f_0, \quad f[x_1] =f_1, \quad \dots , \quad f[x_n] =f_n $$
+y se muestra que
+%$$ f[x_0,\dots,x_n] = \Frac{f[x_1,\dots,x_n]-f[x_0,\dots,x_{n-1}]}{x_n-x_0} $$
+%En general:
+$$ f[x_j,\dots,x_{j+k}] = \Frac{f[x_{j+1},\dots,x_{j+k}]-f[x_j,\dots,x_{j+k-1}]}{x_{j+k}-x_j} $$
+
+}
+
+\frame{
+Para calcular $ f[x_0,\dots,x_n] $, se utiliza la 
+\emph{tabla de diferencias divididas}:
+%\index{Diferencias divididas!tabla de}
+\\[0.5cm]
+\footnotesize{
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{cccccc} 
+\hline 
+ $x$    & $f[x]$          & $f[x,x]$     & $f[x,x,x]$       & $f[x,x,x,x]$         & $\dots$ \\
+\hline 
+$x_0$   & \rojo{$f_0 := f[x_0]$} \\
+        &                 & \rojo{$f[x_0,x_1]=\frac{f[x_1]-f[x_0]}{x_1-x_0}$} \\
+$x_1$   & $f_1 := f[x_1]$ &              & \rojo{$f[x_0,x_1,x_2]=\frac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}$} \\
+        &                 & $f[x_1,x_2]=\frac{f[x_2]-f[x_1]}{x_2-x_1}$ &                  & \rojo{$f[x_0,x_1,x_2,x_3]$} \\
+$x_2$   & $f_2 := f[x_2]$ &              & $f[x_1,x_2,x_3]=\frac{f[x_2,x_3]-f[x_1,x_2]}{x_3-x_1}$ &                      & $\dots$ \\
+        &                 & $f[x_2,x_3]=\frac{f[x_3]-f[x_2]}{x_3-x_2}$ &                  & $f[x_1,x_2,x_3,x_4]$ \\
+$x_3$   & $f_3 := f[x_3]$ &              & $f[x_2,x_3,x_4]=\frac{f[x_3,x_4]-f[x_2,x_3]}{x_4-x_2}$ & \vdots \\
+        &                 & $f[x_3,x_4]=\frac{f[x_4]-f[x_3]}{x_4-x_3}$ & \vdots \\
+$x_4$   & $f_4 := f[x_4]$ & \vdots \\ 
+$\vdots$ & $\vdots$ \\
+$x_n$   & $f_n := f[x_n]$ \\ 
+\hline
+\end{tabular}
+}
+}
+
+\frame{
+\compacto
+\compacto
+\renewcommand{\arraystretch}{0.9}
+Retomamos el ejemplo de la tabla:
+$$ \begin{tabular}{c|ccccc}
+$j$   &  $0$  &  $1$  &  $2$  & $3$ \\ \hline
+$x_j$ &  $1$  & $3$   &  $5$  & $7$ \\
+$f_j$ & $2.5$ & $3.5$ &  $7.5$  & $5.5$ 
+\end{tabular} $$
+\uncover<2->{El esquema de diferencias divididas es
+\begin{center}
+\begin{tabular}{ccccc} 
+\hline 
+ $x$    & $f[x]$          & $f[x,x]$     & $f[x,x,x]$       & $f[x,x,x,x]$        \\
+\hline 
+$1$   & \rojo{$f[1]=2.5$} \\
+       &                 & \rojo{$f[1,3]=0.5$} \\
+$3$   & $f[3]=3.5$ &              & \rojo{$f[1,3,5]=0.375$} \\
+        &                 & $f[3,5]=2$ &                  & \rojo{$f[1,3,5,7]=-0.1875$} \\
+$5$   & $f[5]=7.5$ &              & $f[3,5,7]=-0.75$ \\ %&                      & $\dots$ \\
+        &                 & $f[5,7]=-1$ \\ %&                  & $f[x_1,x_2,x_3,x_4]$ \\
+$7$   & $f[7]=5.5$ \\
+\hline
+\end{tabular}
+\end{center}
+}
+\uncover<3>{
+El polinomio interpolante es
+\begin{align*}
+P_3(x) &= f[1] + f[1,3](x-1) + f[1,3,5](x-1)(x-3) \\
+	& \qquad  + f[1,3,5,7](x-1)(x-3)(x-5)\\
+	&= 2.5 + 0.5(x-1) +0.375 (x-1)(x-3) -0.1875(x-1)(x-3)(x-5)
+\end{align*}
+}
+}
+
+
+\frame{
+\frametitle{Error de la aproximaci\'on polinomial}
+Suponemos ahora que $f: \re \to \re$ es una funci\'on dada, y el polinomio interpolante 
+$P_n(x)$ la interpola en $n+1$ puntos dados. Puesto que, en general 
+$f(x) \neq P_n(x)$, hay un error en la aproximaci\'on de $f(x)$ mediante $P_n(x)$.
+Como
+$$f(x) = P_n(x) + f[x_0,x_1,\dots,x_n,x] \prod_{i=0}^n (x-x_i), $$
+el error en la aproximaci\'on por el polinomio $P_n(x)$ (y que pasa por los $n+1$ puntos prefijados) 
+est\'a dado por
+$$ E(x) = f[x_0,x_1,\dots,x_n,x] \prod_{i=0}^n (x-x_i). $$
+\rojo{Podemos calcular este error empleando un punto adicional $x$ en el esquema 
+de diferencias divididas, si conocemos $f(x)$.}
+}
+
+
+
+\begin{frame}{Teorema del error de interpolación}
+\begin{thm}
+Sea $f\in C^{n+1}[a,b]$, con nodos distintos $x_0,\dots,x_n\in[a,b]$.
+Sea $P_n$ el polinomio de grado $\leq n$ que satisface
+$P_n(x_i)=f(x_i)$, $i=0,\dots,n$.
+Para cada $x\in[a,b]$ que no sea un nodo, existe
+\[
+\xi\in\bigl(\min\{x,x_0,\dots,x_n\},
+                 \max\{x,x_0,\dots,x_n\}\bigr)
+\]
+tal que
+\[
+f(x)-P_n(x)=\frac{f^{(n+1)}(\xi)}{(n+1)!}
+                  \prod_{i=0}^n(x-x_i).
+\]
+En los nodos, el error es cero.
+\end{thm}
+\end{frame}
+
+\begin{frame}{Cota del error de interpolación}
+Si $M_{n+1}=\max_{t\in[a,b]}|f^{(n+1)}(t)|$, entonces
+\[
+|f(x)-P_n(x)|\leq\frac{M_{n+1}}{(n+1)!}
+                       \left|\prod_{i=0}^n(x-x_i)\right|.
+\]
+La cota depende tanto de la función como de la distribución de nodos.
+\begin{block}{Error de aproximación y error de cálculo}
+La fórmula supone que evaluamos el interpolante exacto.
+El cálculo en punto flotante agrega errores de redondeo.
+\end{block}
+El residual en los nodos verifica las condiciones interpolantes,
+pero no mide el error entre los nodos.
+\end{frame}
+
+\frame{
+Nota sobre interpolaci\'on con condiciones sobre las derivadas:
+
+Observe que 
+$$ \lim_{h \to 0} \frac{f[x+h]-f[x]}{h} = f'(x), $$
+por lo que definimos
+$$ f[x,x] = f'(x). $$
+Igualmente
+$$ f[x,x,x] = \frac{1}{2} f''(x), \quad f[x,x,x,x] = \frac{1}{6} f'''(x) $$
+y, en general (para $n+1$ puntos iguales $x$)
+$$ f[x,x,\dots, x] = \frac{1}{n!} f^{(n)}(x). $$
+Esto nos permite reemplazar condiciones sobre las derivadas en la tabla de diferencias divididas, 
+siempre y cuando el n\'umero de condiciones totales sea igual al n\'umero de coeficientes a calcular. La interpolaci\'on con este tipo de condiciones se denomina \emph{interpolaci\'on de Hermite}.
+}
+
+\frame{
+Consideremos la tabla
+\begin{center}
+\begin{tabular}{c|cc}
+$x_i$ & $x_0$ & $x_1$ \\ \hline
+$f_i$ & $f_0$ & $f_1$ \\ \hline
+$f'_i$ & $f'_0$ & $f'_1$ \\ \hline
+$f''_i$ & $f''_0$ & $f''_1$ \\
+\end{tabular}
+\end{center}
+Tenemos $ 6$ condiciones interpolantes. Se est\'a buscando un polinomio de 
+grado $\leq 5$: $ P_5(x) $.
+}
+
+
+\frame{
+%{ }\\[0.5cm]
+\begin{center}
+\tiny{\begin{tabular}{ccccccc} 
+\hline 
+ $x$    & $f[x]$   & $f[x,x]$     & $f[x,x,x]$        & $f[x,x,x,x]$         & $f[x,x,x,x,x]$           & $f[x,x,x,x,x,x]$ \\
+\hline 
+$x_0$   & $f[x_0]$ \\
+        &          & $f'(x_0) $ \\
+$x_0$   & $f[x_0]$ &              & $\Frac{1}{2}f''(x_0)$ \\
+        &          & $f'(x_0)   $ &                   & $f[x_0,x_0,x_0,x_1]$ \\
+$x_0$   & $f[x_0]$ &              & $f[x_0,x_0,x_1]$ &                      & $f[x_0,x_0,x_0,x_1,x_1]$ \\
+        &          & $f[x_0,x_1]$ &                   & $f[x_0,x_0,x_1,x_1]$ &                          & $f[x_0,x_0,x_0,x_1,x_1,x_1]$ \\
+$x_1$   & $f[x_1]$ &              & $f[x_0,x_1,x_1]$ &                      & $f[x_0,x_0,x_1,x_1,x_1]$ \\
+        &          & $f'(x_1)   $ &                   & $f[x_0,x_1,x_1,x_1]$ \\
+$x_1$   & $f[x_1]$ &              & $\Frac{1}{2}f''(x_1)$ \\
+        &          & $f'(x_1)   $ \\
+$x_1$   & $f[x_1]$  \\
+\hline
+\end{tabular}}
+\end{center}
+Entonces 
+\begin{align*} 
+P_5(x) =& b_0 + b_1(x-x_0) + b_2(x-x_0)^2 + b_3(x-x_0)^3 \\
+	&+ b_4(x-x_0)^3 (x-x_1) + b_5 (x-x_0)^3 (x-x_1)^2 
+\end{align*}
+%$$
+donde los $ b_i, \quad i=0,\dots,5 $ son los valores de la primera l\'{\i}nea oblicua.
+}
+
+
+\frame{
+\frametitle{Spline c\'ubico}
+
+Sean los puntos $(x_i,f_i)$, $i=1,\dots,n$ con 
+$$a=x_1 < x_2 < \dots < x_{n-1} < x_n = b. $$
+Un \emph{spline c\'ubico} es una funci\'on $S:[a,b] \to \re$ tal que
+\begin{enumerate}
+ \item $S(x)$ es un polinomio de grado $\leq 3$ en cada intervalo $[x_j,x_{j+1}]$, 
+$j=1,2,\dots,n-1$;
+\item $S(x_i)=f_i$, $i=1,2,\dots,n$;
+\item $S$, $S'$ y $S''$ son funciones continuas en $[a,b]$ (el spline $S$ es dos veces continuamente diferenciable en $[a,b]$).
+\end{enumerate}
+
+}
+
+\frame{
+\frametitle{Tipos de splines}
+Un spline c\'ubico es
+\begin{enumerate}
+ \item \emph{natural} si
+$$ S''(a) = S''(b) = 0, $$
+\item \emph{anclado} si 
+$$ S'(a) = \alpha, \quad S'(b) = \beta $$
+para ciertos valores $\alpha, \beta$.
+\item \emph{peri\'odico} si $S$ es una funci\'on peri\'odica de periodo $b-a$, esto es
+$$ S(a)=S(b), \quad S'(a)=S'(b), \quad S''(a)=S''(b). $$
+\end{enumerate}
+}
+
+\frame{
+Determine si la siguiente funci\'on es un spline c\'ubico:
+$$
+f(x) = \left\{
+\begin{array}{ll}
+x^3+x, & x \in [-1,0] \\
+x^3-x, & x \in [0,1].
+\end{array}
+\right.
+$$
+}
+
+\frame{
+Determine todos los valores de $a$, $b$, $c$, $d$ y $e$ para los cuales la siguiente funci\'on es un spline c\'ubico:
+$$
+f(x) = \left\{
+\begin{array}{ll}
+a(x-2)^2 + b(x-1)^3, & x \in [-10, 1] \\
+c(x-2)^2, & x \in [1,3] \\
+d(x-2)^2 + e(x-3)^3, & x \in [3,10]. 
+\end{array}
+\right.
+$$
+}
+
+
+\frame{
+\compacto
+\compacto
+\frametitle{Construcci\'on del spline c\'ubico}
+
+Observe que si un spline $S$ tiene $n$ nodos, estar\'a definido por $n-1$ polinomios c\'ubicos, de donde se necesitan $4(n-1)$ coeficientes. %Un spline interpolante para $5$ puntos necesita del c\'alculo de $16$ coeficientes.
+
+Definimos $h_i=x_{i+1}-x_i$ para $i=1,2,\dots,n-1$. 
+En cada intervalo $[x_i,x_{i+1}]$, desarrollamos el esquema de diferencias divididas siguiente:
+\begin{center}
+\begin{tabular}{ccccc} 
+%\hline 
+% $x$    & $f[x]$          & $f[x,x]$     & $f[x,x,x]$       & $f[x,x,x,x]$        \\
+\hline 
+$x_i$     & $f_i$ \\
+          &                 & \rojo{$\lambda_i=?$} \\
+$x_i$     & $f_i$ &              & $\frac{m_i-\lambda_i}{h_i}$ \\
+          &                 & $m_i$ &                  & $\frac{\lambda_{i+1}-2m_i+\lambda_i}{h_i^2}$ \\
+$x_{i+1}$ & $f_{i+1}$ &                    & $\frac{\lambda_{i+1}-m_i}{h_i}$ \\ %&                      & $\dots$ \\
+          &                 & $\lambda_{i+1}$ \\ %&                  & $f[x_1,x_2,x_3,x_4]$ \\
+$x_{i+1}$ & $f_{i+1}$ \\
+\hline
+\end{tabular}
+\end{center}
+El polinomio c\'ubico que representa el spline en $[x_i,x_{i+1}]$ est\'a dado por
+$$ S(x) = f_i + \lambda_i(x-x_i) + \frac{m_i-\lambda_i}{h_i} (x-x_i)^2 + 
+\frac{\lambda_{i+1}-2m_i + \lambda_i}{h_i^2} (x-x_i)^2 (x-x_{i+1}). $$
+
+}
+
+\frame{
+\compacto
+Para un spline natural, con $m_i=(f_{i+1}-f_i)/h_i$ y $\lambda_i=S'(x_i)$, debemos resolver el sistema lineal
+$$
+\begin{array}{l}
+2 \lambda_1 + \lambda_2 = 3m_1 \\
+\frac{h_i}{h_{i-1}} \lambda_{i-1} + 2 \Bigl( 1 + \frac{h_i}{h_{i-1}} \Bigr) \lambda_i + \lambda_{i+1} = 3 \Bigl( m_i + \frac{h_i}{h_{i-1}} m_{i-1} \Bigr), \quad i=2,\dots,n-1 \\
+\lambda_{n-1} + 2 \lambda_n = 3 m_{n-1}
+\end{array}
+$$
+}
+
+
+
+
+
+\frame{
+\frametitle{Diferenciaci\'on num\'erica} %\index{Diferenciaci\'on num\'erica}
+
+Consideramos una funci\'on $f$ interpolada  por un polinomio $P_n(x)$ en $n+1$ puntos.
+Sean $ (x_i,f_i), \quad i=0,1,\dots,n $ puntos interpolantes. De la f\'ormula de Lagrange:
+$$ P_n(x) = \sum_{j=0}^n f_j \alpha_j \prod_{\substack{k=0 \\ k \neq j}}^n (x-x_k) $$
+con $ \alpha_j = \ds\prod_{\substack{k=0 \\ k \neq j}}^n \Frac{1}{x_j-x_k} $. \\
+Se obtiene:
+$$ \frac{d^n P_n}{dx^n}(x) = \sum_{j=0}^n f_j \alpha_j n! \sim f^{(n)}(x) $$
+que resulta una aproximaci\'on de la n-\'esima derivada $ f^{(n)} $.
+}
+
+\frame{
+\frametitle{F\'ormulas de diferencias para las derivadas:}
+Consideramos puntos igualmente espaciados, con $x_{j+1}-x_j = h$. Entonces 
+$ \alpha_j = \frac{(-1)^{n-j}}{h^n n!} \binom{n}{j}$, y obtenemos la f\'ormula
+%y luego
+$$ f^{(n)} (x_0) \approx \sum_{j=0}^n f_j \frac{(-1)^{n-j}}{h^n} \binom{n}{j}. $$
+Para $ n=1,2,3$, con $f_j=f(x+jh)$:
+$$ \begin{array}{l}
+f'(x) \sim \frac{f_1-f_0}{h} = \frac{f(x+h)-f(x)}{h}\\[0.3cm]
+f''(x) \sim \frac{f_2-2 f_1+f_0}{h^2} = \frac{f(x+2h)-2f(x+h)+f(x)}{h^2}\\[0.3cm]
+f'''(x) \sim \frac{f_3-3 f_2 + 3 f_1 - f_0}{h^3} = \frac{f(x+3h)-3f(x+2h)+3f(x+h)-f(x)}{h^3}
+\end{array} $$
+
+}
+
+
+
+\frame{
+
+\frametitle{Interpolaci\'on en dimensi\'on dos}
+
+Dado un rect\'angulo $[a,b] \times [c,d]$, consideremos una malla regular, formada por puntos igualmente espaciados
+en cada dimensi\'on
+$$x_i= a+ i h, i=0,\dots,n, \quad y_j=c+jk, j=0,\cdots,m$$
+con $h=\frac{b-a}{n}$, $k=\frac{d-c}{m}$. 
+
+Denotamos
+$$ p_{i,j} =(x_i,y_j), \quad f_{i,j} = f(p_{i,j}); $$
+consideramos entonces el problema de interpolaci\'on en cada rect\'angulo
+$$ R_{i,j} = [x_i,x_{i+1}] \times [y_j,y_{j+1}], \quad i=0,\dots,n-1, \; j=0,\dots,m-1. $$
+
+
+}
+
+\frame{
+\compacto
+La funci\'on 
+%$$ 
+\begin{align*}
+P_{i,j}(x,y) =& f_{i,j} +mx_{i,j}(x-x_i)+my_{i,j} (y-y_j) \\
+	&+ \frac{mx_{i,j+1}-mx_{i,j}}{k}(x-x_i)(y-y_j), 
+\end{align*}
+%$$
+para $(x,y) \in R_{ij}$, donde 
+$$ mx_{i,j}= \frac{f_{i+1,j}-f_{i,j}}{h}, \quad my_{i,j} = \frac{f_{i,j+1}-f_{i,j}}{k} $$
+cumple las condiciones interpolantes en el rect\'angulo $R_{i,j}$. \\
+
+Con las condiciones establecidas, la funci\'on $P:[a,b] \times [c,d] \to \re$ tal que 
+$$ P(x,y) = P_{i,j}(x,y), \mbox{ para } (x,y) \in R_{i,j}, \quad i=0,\dots,n-1, \; j=0,\dots,m-1 $$
+cumple las condiciones interpolantes, y es una funci\'on continua (en general, no diferenciable en las interfaces).
+
+}
+
+\frame{
+
+\compacto
+En cada rect\'angulo $R_{i,j}$, la funci\'on $P_{i,j}$ tambi\'en puede 
+escribirse en forma similar a la forma de Lagrange 
+
+$$ P(x,y) = f_{i,j} \alpha_{i,j}(x,y) + f_{i+1,j} \beta_{i,j}(x,y) 
++ f_{i+1,j+1} \gamma_{i,j}(x,y) + f_{i,j+1} \delta_{i,j}(x,y), $$
+donde 
+$$ \alpha_{i,j}(x,y) = \Bigl(1-\frac{x-x_i}{h} \Bigr) \Bigl(  1 - \frac{y-y_j}{k} \Bigr), $$
+$$ \beta_{i,j}(x,y) = \Bigl( \frac{x-x_i}{h} \Bigr) \Bigl(  1 - \frac{y-y_j}{k} \Bigr), $$
+$$ \gamma_{i,j}(x,y) = \Bigl( \frac{x-x_i}{h} \Bigr) \Bigl(  \frac{y-y_j}{k} \Bigr), $$
+$$ \delta_{i,j}(x,y) = \Bigl( 1 -\frac{x-x_i}{h} \Bigr) \Bigl(   \frac{y-y_j}{k} \Bigr). $$
+}
+
+\frame{
+\compacto
+\frametitle{Interpolaci\'on en una malla triangulada}
+
+Consideramos una malla triangular de puntos $p_i=(x_i,y_i)$, $i=1,\dots,n$. 
+Dados tres puntos $p_i$, $p_j$, $p_k$ no colineales formando un tri\'angulo, formamos una funci\'on interpolante
+$P$ sobre el tri\'angulo $\Delta = p_ip_jp_k$ 
+$$ P(x,y) = f_i \phi_i(x,y) + f_j \phi_j(x,y) + f_k \phi_k(x,y), $$
+donde 
+$$ \phi_i(x,y)= F_{j,k}(x,y), \quad
+\phi_j(x,y) = F_{k,i}(x,y), \quad
+\phi_k(x,y) = F_{i,j}(x,y), $$
+donde 
+$$ F_{s,t} = \frac{1}{A_{i,j,k}} ( \alpha_{s,t}  + \beta_{s,t} x - \gamma_{s,t} y), $$
+con 
+$$ \alpha_{s,t} = x_s y_t - x_t y_s, \quad \beta_{s,t} = y_s - y_t, \quad \gamma_{s,t} = x_s - x_t, $$
+y
+$$ A_{i,j,k} = \left|
+\begin{array}{ccc}
+1 & x_i & y_i \\ 1 & x_j & y_j \\ 1 & x_k & y_k
+\end{array}
+\right|.$$
+
+
+}
+
+
+\frame{
+\rojo{Observaci\'on. } De hecho, la gr\'afica de $P$ es, dentro del tri\'angulo 
+$ \Delta = p_ip_jp_k$, el plano que pasa por los puntos $(x_i,y_i,f_i)$, 
+$(x_j,y_j,f_j)$ y $(x_k,y_k,f_k)$. Podemos determinar la ecuaci\'on del plano haciendo
+$$ P(x,y) = a + bx + cy, $$
+y luego estableciendo las ecuaciones (condiciones interpolantes)
+$$P(x_s,y_s) = a + bx_s + c y_s = f_s, \quad s=i,j,k $$
+esto es 
+$$ 
+\left[
+\begin{array}{ccc}
+1 & x_i & y_i \\
+1 & x_j & y_j \\
+1 & x_k & y_k
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+ a \\ b \\ c 
+\end{array}
+\right] = 
+\left[
+\begin{array}{c}
+ f_i \\ f_j \\ f_k 
+\end{array}
+\right] 
+$$
+para determinar $a,b,c$. Las f\'ormulas anteriores se obtienen aplicando la regla de Cramer para resolver este sistema.
+}
+
+
+\begin{frame}[fragile]{Vandermonde en NumPy}
+Retomamos los mismos cuatro puntos de la presentación.
+\begin{lstlisting}
+import numpy as np
+from numpy.polynomial.polynomial import polyval
+
+x = np.array([1., 3., 5., 7.])
+f = np.array([2.5, 3.5, 7.5, 5.5])
+V = np.vander(x, increasing=True)
+a = np.linalg.solve(V, f)
+print(a)
+# [5.9375, -5.3125, 2.0625, -0.1875]
+print(polyval(4., a))  # 5.6875
+\end{lstlisting}
+\texttt{increasing=True} ordena las columnas como $1,x,x^2,x^3$.
+\texttt{polyval} usa los coeficientes en ese mismo orden.
+\end{frame}
+
+\begin{frame}[fragile]{Diferencias divididas en NumPy}
+La recurrencia anterior permite obtener los coeficientes de Newton.
+\begin{lstlisting}
+def diferencias_divididas(x, f):
+    x = np.asarray(x, dtype=float)
+    c = np.array(f, dtype=float, copy=True)
+    if (x.ndim != 1 or c.ndim != 1
+            or len(x) != len(c) or len(x) == 0):
+        raise ValueError("Datos incompatibles")
+    if len(np.unique(x)) != len(x):
+        raise ValueError("Nodos repetidos")
+    for k in range(1, len(x)):
+        c[k:] = ((c[k:] - c[k-1:-1])
+                 / (x[k:] - x[:-k]))
+    return c
+\end{lstlisting}
+La función requiere nodos distintos. Hermite necesita un tratamiento
+específico de los nodos repetidos.
+\end{frame}
+
+\begin{frame}[fragile]{Evaluación anidada de Newton}
+Para cuatro nodos,
+\[
+P_3(t)=c_0+(t-x_0)\bigl[c_1+(t-x_1)
+                  [c_2+(t-x_2)c_3]\bigr].
+\]
+\begin{lstlisting}
+def evaluar_newton(t, x, c):
+    t = np.asarray(t, dtype=float)
+    p = np.full_like(t, c[-1], dtype=float)
+    for k in range(len(c)-2, -1, -1):
+        p = c[k] + (t-x[k])*p
+    return p
+
+c = diferencias_divididas(x, f)
+print(c)  # [2.5, 0.5, 0.375, -0.1875]
+print(evaluar_newton(4., x, c))  # 5.6875
+\end{lstlisting}
+Construcción: $O(n^2)$. Evaluación por punto: $O(n)$.
+\end{frame}
+
+\begin{frame}[fragile]{Verificación de la implementación}
+\begin{lstlisting}
+q = np.linspace(x.min(), x.max(), 101)
+p_v = polyval(q, a)
+p_n = evaluar_newton(q, x, c)
+
+assert np.allclose(polyval(x, a), f)
+assert np.allclose(evaluar_newton(x, x, c), f)
+assert np.allclose(p_v, p_n)
+
+residual = np.max(np.abs(polyval(x, a)-f))
+condicion = np.linalg.cond(V)
+print(residual, condicion)
+\end{lstlisting}
+Vandermonde y Newton representan el mismo polinomio en aritmética exacta.
+Una matriz de Vandermonde mal condicionada puede amplificar perturbaciones.
+La coincidencia de los valores en los nodos no garantiza una buena
+aproximación de la función en todo el intervalo.
+\end{frame}
+
+\begin{frame}{Convenciones de NumPy}
+\begin{itemize}
+\item \texttt{numpy.polynomial.polynomial.polyval(t, a)} recibe
+$a_0,a_1,\dots,a_n$ en orden creciente de potencias.
+\item \texttt{numpy.polyval(a, t)} recibe los coeficientes en orden decreciente.
+\item \texttt{numpy.interp} realiza interpolación lineal por tramos.
+\item Un ajuste de grado menor que el número de nodos menos uno
+resuelve un problema diferente de la interpolación exacta.
+\end{itemize}
+\vfill
+{\scriptsize Documentación oficial de NumPy:
+\href{https://numpy.org/doc/stable/reference/generated/numpy.vander.html}{vander},
+\href{https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html}{linalg.solve},
+\href{https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyval.html}{polynomial.polyval}.}
+\end{frame}
+
+\end{document}
