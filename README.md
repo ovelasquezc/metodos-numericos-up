@@ -39,6 +39,14 @@ cuadrática, y criterios de parada.
 - [Unidad 5A: Aproximación lineal y ecuaciones normales](presentaciones/Unidad_5A_Aproximacion_Lineal.pdf)
 - [Unidad 5B: Mínimos cuadrados mediante QR y aplicaciones](presentaciones/Unidad_5B_Minimos_Cuadrados_QR.pdf)
 - [Unidad 6: Interpolación polinomial](presentaciones/Unidad_6_Interpolacion_Polinomial.pdf)
+- [Unidad 7A: Integración numérica, Newton–Cotes, trapecio y Simpson](presentaciones/Unidad_7A_Integracion_Newton_Cotes.pdf)
+
+La Unidad 7A desarrolla la construcción de cuadraturas mediante interpolación,
+las reglas del trapecio y Simpson, sus errores y versiones compuestas. Incluye
+un ejemplo de excedente del consumidor, implementación en Python y complementos
+sobre reglas abiertas y fórmulas generales de error. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_7A_Integracion_Newton_Cotes.tex)
+con la figura necesaria para recompilarla.
 
 La Unidad 6 presenta interpolación de Lagrange y Newton, diferencias divididas,
 el teorema y la cota del error, Hermite, splines y aplicaciones. Incluye ejemplos
