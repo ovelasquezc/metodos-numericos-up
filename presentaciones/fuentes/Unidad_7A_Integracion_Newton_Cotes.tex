@@ -30,6 +30,7 @@ literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{
 \begin{itemize}
 \item Integrar el polinomio interpolante para construir una regla de cuadratura.
 \item Deducir trapecio y Simpson, con sus hipótesis y cotas de error.
+\item Construir el núcleo de Peano y deducir el error del trapecio.
 \item Comparar reglas compuestas y justificar el tamaño de la malla.
 \item Calcular un excedente del consumidor y verificar la implementación.
 \end{itemize}
@@ -103,6 +104,60 @@ La regla es exacta para grado $\leq1$.
 Si $f$ es convexa, la cuerda queda sobre su gráfica y $T(f)\geq I(f)$.
 \end{frame}
 
+% Referencia: D. N. Arnold, A Concise Introduction to Numerical Analysis,
+% cap. 2, sec. 2: https://www-users.cse.umn.edu/~arnold/597.00-01/nabook.pdf
+\begin{frame}{Taylor con resto integral}
+Si $f\in C^2[a,b]$, el teorema fundamental del cálculo, aplicado dos veces, da
+\[
+f(x)=\underbrace{f(a)+(x-a)f'(a)}_{p_1(x)\in\PiN_1}
++\int_a^x(x-t)f''(t)\,dt.
+\]
+Definimos la función de $x$, con $t$ fijo,
+\[
+g_t(x)=(x-t)_+=\max\{x-t,0\}
+=\begin{cases}0,&x\leq t,\\x-t,&x>t.\end{cases}
+\]
+Como $g_t(x)=0$ para $t\geq x$, podemos escribir
+\[f(x)=p_1(x)+\int_a^b g_t(x)f''(t)\,dt.\]
+Esta forma permite aplicar el error de cuadratura al resto integral.
+\end{frame}
+
+\begin{frame}{Núcleo de Peano de orden dos}
+\begin{thm}
+Sea $Q(f)=\sum_j\alpha_j f(x_j)$, con $x_j\in[a,b]$, exacta en $\PiN_1$.
+Si $E=I-Q$ y $f\in C^2[a,b]$, entonces
+\[
+E(f)=\int_a^b K_2(t)f''(t)\,dt,\qquad
+K_2(t)=E_x\bigl((x-t)_+\bigr).
+\]
+\end{thm}
+\textbf{Demostración.} En Taylor, $E(p_1)=0$ por exactitud. Por linealidad,
+\[
+E(f)=E_x\!\left(\int_a^b g_t(x)f''(t)\,dt\right)
+=\int_a^b E_x(g_t)f''(t)\,dt.
+\]
+Se intercambian las integrales por continuidad; $Q$ es una suma finita.
+El subíndice $x$ indica la variable sobre la que actúa $E$; $t$ queda fijo.
+\end{frame}
+
+\begin{frame}{Construcción del núcleo del trapecio}
+Para $t\in[a,b]$, aplicamos $E=I-T$ a $g_t(x)=(x-t)_+$:
+\[
+g_t(a)=0,\qquad g_t(b)=b-t,\qquad
+I(g_t)=\int_t^b(x-t)\,dx=\frac{(b-t)^2}{2}.
+\]
+Luego,
+\begin{align*}
+K_2(t)&=I(g_t)-T(g_t)\\
+&=\frac{(b-t)^2}{2}-\frac{b-a}{2}(b-t)
+=\boxed{-\frac{(t-a)(b-t)}{2}}.
+\end{align*}
+Así, $K_2(t)\leq0$ en $[a,b]$ y es estrictamente negativo en $(a,b)$.
+\[
+\boxed{I(f)-T(f)=-\frac12\int_a^b(t-a)(b-t)f''(t)\,dt.}
+\]
+\end{frame}
+
 \begin{frame}{Teorema del error del trapecio}
 \begin{thm}
 Si $f\in C^2[a,b]$, existe $\xi\in(a,b)$ tal que
@@ -113,6 +168,25 @@ En consecuencia,
 \textbf{Justificación.} El núcleo de Peano es
 $K(t)=-(t-a)(b-t)/2\leq0$. Así,
 $E(f)=\int_a^bK(t)f''(t)\,dt$, y $\int_a^bK=-(b-a)^3/12$.
+\end{frame}
+
+\begin{frame}{Constante y signo del error}
+Escriba $w(t)=-K_2(t)=(t-a)(b-t)/2\geq0$. Con $h=b-a$,
+\[
+\int_a^b w(t)\,dt=\frac12\int_0^h u(h-u)\,du
+=\frac{h^3}{12}.
+\]
+El teorema del valor medio integral con peso $w$ da un $\xi\in(a,b)$:
+\[
+I-T=-\int_a^b w(t)f''(t)\,dt
+=-f''(\xi)\int_a^b w(t)\,dt
+=-\frac{h^3}{12}f''(\xi).
+\]
+Además, $|I-T|\leq\norm{f''}_\infty\int_a^b w=h^3\norm{f''}_\infty/12$.
+\begin{itemize}
+\item Si $f''\geq0$, entonces $I-T\leq0$: el trapecio sobreestima.
+\item El signo fijo permite usar un mismo $\xi$ en toda la integral.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Trapecio compuesto}
@@ -396,6 +470,8 @@ Se aplica la hipótesis de signo; la cota integral anterior vale sin extraer $\x
 \begin{itemize}
 \item Material del curso: \texttt{unidadinteup.tex}, \texttt{unidadinte.tex} y capítulo 7 de las notas.
 \item \href{https://dlmf.nist.gov/3.5}{NIST DLMF, sección 3.5: cuadratura y fórmulas de error}.
+\item \href{https://www-users.cse.umn.edu/~arnold/597.00-01/nabook.pdf}{D. N. Arnold: \emph{A Concise Introduction to Numerical Analysis}},
+capítulo 2, sección 2: teorema del núcleo de Peano.
 \item \href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.simpson.html}{SciPy: simpson}
 \quad\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad.html}{SciPy: quad}.
 \end{itemize}

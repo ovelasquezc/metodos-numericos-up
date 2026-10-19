@@ -42,7 +42,9 @@ cuadrática, y criterios de parada.
 - [Unidad 7A: Integración numérica, Newton–Cotes, trapecio y Simpson](presentaciones/Unidad_7A_Integracion_Newton_Cotes.pdf)
 
 La Unidad 7A desarrolla la construcción de cuadraturas mediante interpolación,
-las reglas del trapecio y Simpson, sus errores y versiones compuestas. Incluye
+las reglas del trapecio y Simpson, sus errores y versiones compuestas. Explica
+el núcleo de Peano desde Taylor con resto integral y deduce el error del trapecio.
+Incluye
 un ejemplo de excedente del consumidor, implementación en Python y complementos
 sobre reglas abiertas y fórmulas generales de error. Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_7A_Integracion_Newton_Cotes.tex)
