@@ -40,6 +40,8 @@ cuadrática, y criterios de parada.
 - [Unidad 5B: Mínimos cuadrados mediante QR y aplicaciones](presentaciones/Unidad_5B_Minimos_Cuadrados_QR.pdf)
 - [Unidad 6: Interpolación polinomial](presentaciones/Unidad_6_Interpolacion_Polinomial.pdf)
 - [Unidad 7A: Integración numérica, Newton–Cotes, trapecio y Simpson](presentaciones/Unidad_7A_Integracion_Newton_Cotes.pdf)
+- [Unidad 7B: Cuadratura de Gauss y esperanzas](presentaciones/Unidad_7B_Integracion_Gauss.pdf)
+- [Unidad 7C: Ecuaciones integrales, EDO y Montecarlo](presentaciones/Unidad_7C_Integrales_EDO_Montecarlo.pdf)
 
 La Unidad 7A desarrolla la construcción de cuadraturas mediante interpolación,
 las reglas del trapecio y Simpson, sus errores y versiones compuestas. Explica
@@ -49,6 +51,19 @@ un ejemplo de excedente del consumidor, implementación en Python y complementos
 sobre reglas abiertas y fórmulas generales de error. Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_7A_Integracion_Newton_Cotes.tex)
 con la figura necesaria para recompilarla.
+
+La Unidad 7B presenta la construcción de la cuadratura de Gauss, los teoremas
+de exactitud y positividad, el error, Gauss–Legendre y el algoritmo de
+Golub–Welsch. Incluye esperanzas con pesos de Hermite y otras familias,
+además de integración doble. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_7B_Integracion_Gauss.tex).
+
+La Unidad 7C desarrolla la relación entre ecuaciones diferenciales e integrales
+de Volterra, Euler y trapecio implícito, con una aplicación a la acumulación
+de capital. Presenta integración de Montecarlo, error estándar e intervalos
+asintóticos, con implementación en Python. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_7C_Integrales_EDO_Montecarlo.tex)
+con las figuras necesarias para recompilarla.
 
 La Unidad 6 presenta interpolación de Lagrange y Newton, diferencias divididas,
 el teorema y la cota del error, Hermite, splines y aplicaciones. Incluye ejemplos

@@ -1,0 +1,384 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\usepackage{listings}
+\lstset{language=Python,basicstyle=\ttfamily\footnotesize,columns=fullflexible,
+keepspaces=true,showstringspaces=false,breaklines=true,
+literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\PiN}{\mathcal P}
+\newtheorem{thm}{Teorema}
+\newtheorem{lema}{Lema}
+\newtheorem{defi}{Definición}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+\title{Integración numérica}
+\subtitle{Cuadratura de Gauss y esperanzas}
+\begin{document}
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.70\textwidth}
+\vspace{.7cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.35cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{1cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.25\textwidth}\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}{Ruta de la clase}
+\begin{itemize}
+\item Elegir nodos para alcanzar la mayor exactitud polinomial posible.
+\item Construir Gauss--Legendre y justificar sus pesos positivos.
+\item Calcular nodos y pesos con Golub--Welsch.
+\item Usar el peso adecuado para una esperanza normal o exponencial.
+\end{itemize}
+El complemento final conserva las reglas de integración doble del material anterior.
+\end{frame}
+
+\begin{frame}{La elección de los nodos}
+Con $m$ nodos prefijados, la integración del interpolante asegura exactitud
+hasta grado $m-1$. Ahora elegimos también los nodos:
+\[I_w(f)=\int_a^b w(x)f(x)\,dx\approx
+G_m(f)=\sum_{j=1}^m\lambda_j f(x_j).\]
+Suponemos un peso integrable $w\geq0$, positivo casi en todas partes,
+y $a<b$ finitos para los teoremas que siguen.
+\begin{defi}
+La regla es de tipo Gauss si es exacta para todo polinomio de grado
+$\leq2m-1$.
+\end{defi}
+\end{frame}
+
+\begin{frame}{Grado máximo de exactitud}
+\begin{thm}
+Ninguna regla con $m$ nodos distintos puede ser exacta para todos los
+polinomios de grado $\leq2m$ bajo las hipótesis anteriores.
+\end{thm}
+\textbf{Demostración.} Tome
+\[q(x)=\prod_{j=1}^m(x-x_j)^2.\]
+Entonces $G_m(q)=0$, mientras que $I_w(q)>0$. Como $\deg q=2m$,
+la exactitud en todo $\PiN_{2m}$ es imposible.
+Una regla puede integrar algunos polinomios de grado mayor por simetría;
+la afirmación se refiere a todos los polinomios hasta un grado dado.
+\end{frame}
+
+\begin{frame}{Polinomios ortogonales}
+Definimos
+\[\langle p,q\rangle_w=\int_a^b w(x)p(x)q(x)\,dx.\]
+Al ortonormalizar $1,x,x^2,\ldots$ obtenemos $p_0,p_1,\ldots$, con
+\[\deg p_k=k,\quad \langle p_i,p_j\rangle_w=\delta_{ij}.\]
+\begin{thm}
+Los $m$ ceros de $p_m$ son reales, simples y pertenecen a $(a,b)$.
+\end{thm}
+Esos ceros serán los nodos de la regla de Gauss.
+\end{frame}
+
+\begin{frame}{Ceros del polinomio ortogonal}
+Sean $\xi_1,\ldots,\xi_k$ los ceros donde $p_m$ cambia de signo en $(a,b)$,
+y tome $q(x)=\prod_{j=1}^k(x-\xi_j)$.
+El producto $p_mq$ conserva signo y no es idénticamente nulo; por ello
+\[\langle p_m,q\rangle_w\ne0.\]
+Si $k<m$, entonces $q\in\PiN_{m-1}$ y la ortogonalidad daría
+$\langle p_m,q\rangle_w=0$, contradicción.
+Luego $k=m$. Un polinomio de grado $m$ con $m$ cambios de signo interiores
+tiene exactamente $m$ raíces simples, todas en $(a,b)$.
+\end{frame}
+
+\begin{frame}{Teorema de construcción de Gauss}
+\begin{thm}
+Sean $x_1,\ldots,x_m$ los ceros de $p_m$, y $L_j$ las bases de Lagrange
+para esos nodos. Los pesos
+\[\lambda_j=\int_a^b w(x)L_j(x)\,dx\]
+definen una regla exacta en $\PiN_{2m-1}$.
+\end{thm}
+\textbf{Demostración.} Si $p\in\PiN_{2m-1}$, divida
+$p=qp_m+r$, con $\deg q,\deg r\leq m-1$.
+Por ortogonalidad $I_w(qp_m)=0$. En los nodos $p(x_j)=r(x_j)$.
+La regla interpolatoria integra $r$, de modo que $G_m(p)=I_w(r)=I_w(p)$.
+\end{frame}
+
+\begin{frame}{Positividad y suma de los pesos}
+\begin{thm}
+Los pesos de Gauss son positivos y satisfacen
+\[\lambda_j>0,\qquad\sum_{j=1}^m\lambda_j=\int_a^b w(x)\,dx=\mu_0.\]
+\end{thm}
+\textbf{Demostración.} Como $L_j^2\in\PiN_{2m-2}$, la exactitud implica
+\[\lambda_j=G_m(L_j^2)=I_w(L_j^2)>0.\]
+La suma se obtiene aplicando la regla a la constante $1$.
+Si $|\delta_j|\leq\eta$, entonces $|\Delta G_m|\leq\mu_0\eta$.
+\end{frame}
+
+\begin{frame}{Teorema del error de Gauss}
+\begin{thm}
+Sea $\omega_m(x)=\prod_{j=1}^m(x-x_j)$ el polinomio mónico de los nodos.
+Si $f\in C^{2m}[a,b]$, existe $\xi\in(a,b)$ tal que
+\[I_w(f)-G_m(f)=\frac{f^{(2m)}(\xi)}{(2m)!}
+\int_a^b w(x)\omega_m(x)^2\,dx.\]
+\end{thm}
+El factor integral depende del peso, del intervalo y de los nodos.
+No se omite al construir una cota.
+La fórmula se obtiene integrando el error del interpolante de Hermite que
+iguala valores y derivadas en los nodos, de grado $\leq2m-1$.
+\end{frame}
+
+\begin{frame}{Gauss--Legendre con dos nodos}
+En $[-1,1]$, el peso es $w=1$. Por simetría buscamos nodos $\pm z$
+y pesos iguales $\lambda$.
+\[2\lambda=\int_{-1}^1 1\,dx=2,\qquad
+2\lambda z^2=\int_{-1}^1x^2\,dx=\frac23.\]
+Por tanto,
+\[\boxed{G_2(f)=f(-1/\sqrt3)+f(1/\sqrt3).}\]
+Los momentos impares se anulan por simetría. La regla es exacta hasta grado $3$.
+Por ejemplo, $G_2(x^4)=2/9\ne2/5$.
+\end{frame}
+
+\begin{frame}{Transformación a un intervalo general}
+Con
+\[x=\frac{a+b}{2}+\frac{b-a}{2}z,\qquad dx=\frac{b-a}{2}\,dz,\]
+se obtiene
+\[\int_a^b f(x)\,dx\approx\frac{b-a}{2}
+\sum_{j=1}^m\lambda_j f\left(\frac{a+b}{2}+\frac{b-a}{2}z_j\right).\]
+Los $z_j,\lambda_j$ se calculan para $[-1,1]$.
+En el intervalo original, los pesos suman $b-a$.
+Olvidar el factor $(b-a)/2$ cambia la integral que se está calculando.
+\end{frame}
+
+\begin{frame}{El mismo excedente, ahora con Gauss}
+Para $p(q)=50/(1+q/10)$, $I=500\log3$ y $EC=I-1000/3$:
+\begin{center}\begin{tabular}{rrrr}\toprule
+Nodos $m$&$G_m$&$|I-G_m|$&$EC$ aproximado\\\midrule
+2&545.4545454545&3.8515988795&212.1212121212\\
+4&549.2851768247&0.0209675094&215.9518434913\\
+8&549.3061437596&$5.745\times10^{-7}$&215.9728104263\\
+12&549.3061443340&$\approx10^{-11}$&215.9728110007\\\bottomrule
+\end{tabular}\end{center}
+El costo básico es $m$ evaluaciones de $p$.
+La comparación con Newton--Cotes debe contar evaluaciones, no solo el parámetro de la regla.
+\end{frame}
+
+\begin{frame}[fragile]{Gauss--Legendre en NumPy}
+\begin{lstlisting}
+import numpy as np
+from numpy.polynomial.legendre import leggauss
+
+def gauss_legendre(f, a, b, m):
+    z, w = leggauss(m)
+    x = (a+b)/2 + (b-a)/2*z
+    return (b-a)/2*np.dot(w, f(x))
+
+p = lambda q: 50/(1+q/10)
+I = gauss_legendre(p, 0., 20., 8)
+EC = I - 20*p(20.)
+\end{lstlisting}
+Los nodos y pesos se pueden reutilizar para otras funciones en el mismo intervalo.
+\end{frame}
+
+\begin{frame}[fragile]{Verificación por momentos}
+\begin{lstlisting}
+z, w = leggauss(4)
+assert np.all(w > 0)
+assert np.isclose(w.sum(), 2.)
+for k in range(8):
+    exacta = 0. if k % 2 else 2/(k+1)
+    assert abs(np.dot(w, z**k)-exacta) < 1e-12
+\end{lstlisting}
+
+Estas pruebas verifican constantes, momentos pares y simetría.
+Una prueba con una sola función no comprueba el grado completo de exactitud.
+\end{frame}
+
+\begin{frame}{Golub--Welsch: matriz de Jacobi}
+Para polinomios ortonormales con coeficientes principales positivos,
+\[x p_k(x)=b_{k+1}p_{k+1}(x)+a_kp_k(x)+b_kp_{k-1}(x),\qquad b_k>0.\]
+Se forma la matriz simétrica tridiagonal
+\[J_m=\begin{pmatrix}
+a_0&b_1&&\\b_1&a_1&\ddots&\\&\ddots&\ddots&b_{m-1}\\&&b_{m-1}&a_{m-1}
+\end{pmatrix}.\]
+\begin{block}{Nodos y pesos}
+Si $J_mv_j=z_jv_j$ y $\norm{v_j}_2=1$, entonces
+$x_j=z_j$ y $\lambda_j=\mu_0(v_j)_1^2$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Golub--Welsch para Legendre}
+En este caso,
+\[a_k=0,\qquad b_k=\frac{k}{\sqrt{(2k-1)(2k+1)}},\qquad\mu_0=2.\]
+La recurrencia relaciona el determinante de $xI-J_m$ con el polinomio ortogonal
+mónico: sus ceros son los valores propios.
+Los pesos se recuperan de la primera componente de cada vector propio.
+\begin{block}{Conexión con sistemas lineales}
+La cuadratura conduce a un problema de valores y vectores propios de una
+matriz tridiagonal simétrica. Se aprovecha esa estructura.
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Implementación de Golub--Welsch}
+\begin{lstlisting}
+from scipy.linalg import eigh_tridiagonal
+
+def golub_welsch_legendre(m):
+    k = np.arange(1., m)
+    d = np.zeros(m)
+    e = k/np.sqrt(4*k*k-1)
+    z, V = eigh_tridiagonal(d, e)
+    w = 2*V[0, :]**2
+    return z, w
+
+z, w = golub_welsch_legendre(8)
+\end{lstlisting}
+Compare con \texttt{leggauss(8)}, verificando nodos y pesos, no el signo de los vectores propios.
+\end{frame}
+
+\begin{frame}{Cuadratura para una esperanza normal}
+Si $Z\sim N(0,1)$, una regla de Gauss--Hermite puede escribirse como
+\[\mathbb E[g(Z)]\approx\sum_{j=1}^m p_jg(z_j),\qquad\sum_jp_j=1.\]
+Para $X=\mu+\sigma Z$,
+\[\mathbb E[g(X)]\approx\sum_jp_jg(\mu+\sigma z_j).\]
+En esta normalización, la matriz de Jacobi tiene diagonal cero y
+fuera de diagonal $b_k=\sqrt{k}$.
+Los pesos son $p_j=(v_j)_1^2$ porque la masa del peso normalizado es $1$.
+\end{frame}
+
+\begin{frame}{Polinomios de Hermite normalizados}
+Bajo el producto interno $\langle f,g\rangle=\mathbb E[f(Z)g(Z)]$,
+\[H_{-1}=0,\quad H_0=1,\quad
+H_{k+1}(z)=\frac z{\sqrt{k+1}}H_k(z)-\sqrt{\frac{k}{k+1}}H_{k-1}(z).\]
+Se cumple $H_k'(z)=\sqrt{k}H_{k-1}(z)$.
+Si los $z_j$ son los ceros de $H_m$, los pesos normalizados son
+\[p_j=\frac1{mH_{m-1}(z_j)^2},\qquad\sum_jp_j=1.\]
+Estas fórmulas corresponden a la normal estándar, no al peso $e^{-z^2}$.
+\end{frame}
+
+\begin{frame}{Dos convenciones de Gauss--Hermite}
+\small
+\begin{center}\begin{tabular}{lll}\toprule
+Rutina de NumPy&Peso integrado&Conversión a normal estándar\\\midrule
+\texttt{hermgauss}&$e^{-z^2}$&$Z=\sqrt2z$, pesos $w/\sqrt\pi$\\
+\texttt{hermegauss}&$e^{-z^2/2}$&$Z=z$, pesos $w/\sqrt{2\pi}$\\\bottomrule
+\end{tabular}\end{center}
+\[\mathbb E[g(Z)]\approx\frac1{\sqrt{2\pi}}\sum_jw_jg(z_j)
+\quad\text{con \texttt{hermegauss}}.\]
+Compruebe $\sum p_j=1$, $\sum p_jz_j=0$ y $\sum p_jz_j^2=1$.
+Mezclar las convenciones modifica la varianza de la distribución integrada.
+\end{frame}
+
+\begin{frame}{Utilidad con consumo lognormal}
+Suponga $C=\exp(\mu+\sigma Z)$, $Z\sim N(0,1)$, $\mu=0.5$, $\sigma=0.4$.
+Para $u(C)=-1/C$,
+\[\mathbb E[u(C)]=-\exp(-\mu+\sigma^2/2)=-0.657046819815.\]
+\begin{center}\begin{tabular}{rrr}\toprule
+Nodos&Gauss--Hermite&Error absoluto\\\midrule
+2&$-0.655703538888$&$1.3433\times10^{-3}$\\
+4&$-0.657046574205$&$2.4561\times10^{-7}$\\
+8&$-0.657046819815$&$\approx3\times10^{-16}$\\\bottomrule
+\end{tabular}\end{center}
+Es un modelo didáctico. La expresión exacta permite auditar la integración.
+\end{frame}
+
+\begin{frame}[fragile]{Esperanza normal en Python}
+\begin{lstlisting}
+from numpy.polynomial.hermite_e import hermegauss
+mu, sigma = .5, .4
+z, w = hermegauss(8)
+pesos = w/np.sqrt(2*np.pi)
+utilidad = -np.exp(-(mu + sigma*z))
+EU = np.dot(pesos, utilidad)
+assert np.isclose(pesos.sum(), 1.)
+assert np.isclose(np.dot(pesos, z*z), 1.)
+\end{lstlisting}
+La regla de ocho nodos se reutilizará al compararla con Montecarlo en la siguiente clase.
+\end{frame}
+
+\begin{frame}{Complemento: Gauss--Chebyshev}
+Para el peso $w(z)=1/\sqrt{1-z^2}$ en $(-1,1)$,
+\[\int_{-1}^1\frac{g(z)}{\sqrt{1-z^2}}\,dz
+\approx\frac\pi m\sum_{j=1}^m g(z_j),\qquad
+z_j=\cos\frac{(2j-1)\pi}{2m}.\]
+Se conocen explícitamente los nodos y pesos.
+Para una integral sin ese peso, tras el cambio afín $x=\phi(z)$ se usaría
+\[g(z)=f(\phi(z))\sqrt{1-z^2}.\]
+Ese factor puede reducir la regularidad en los extremos; conviene elegir
+una familia cuyo peso coincida con el problema.
+\end{frame}
+
+\begin{frame}{Complemento: Gauss--Laguerre}
+Para el peso $e^{-z}$ en $[0,\infty)$,
+\[\int_0^\infty e^{-z}g(z)\,dz\approx\sum_jw_jg(z_j).\]
+La matriz de Jacobi tiene diagonal $1,3,5,\ldots,2m-1$
+y fuera de diagonal $1,2,\ldots,m-1$.
+Si $X\sim\operatorname{Exp}(\lambda)$, el cambio $z=\lambda x$ da
+\[\mathbb E[g(X)]=\int_0^\infty e^{-z}g(z/\lambda)\,dz
+\approx\sum_jw_jg(z_j/\lambda).\]
+El cambio de escala evita introducir factores exponenciales adicionales.
+\end{frame}
+
+\begin{frame}{Complemento: otras formas de Laguerre}
+La misma cuadratura puede usarse en las identidades
+\[\lambda\int_a^\infty e^{-\lambda x}f(x)\,dx
+\approx\lambda e^{-\lambda a}\sum_jw_je^{(1-\lambda)z_j}f(z_j+a),\]
+\[\int_0^\infty f(x)\,dx\approx\sum_jw_je^{z_j}f(z_j).\]
+Se requieren integrales convergentes y valores numéricos manejables.
+Las reponderaciones con exponenciales grandes pueden ser inestables;
+si hay una distribución conocida, se prefiere transformar a su peso natural.
+\end{frame}
+
+\begin{frame}{Integración en dos dimensiones}
+La cubicación aproxima
+\[\iint_R f(x,y)\,dA.\]
+En una región rectangular, se puede integrar el interpolante bilineal de
+cada celda. En una región triangulada, se integra el interpolante afín.
+Estas construcciones son las versiones en dos dimensiones de integrar
+el interpolante de una variable.
+También se pueden formar productos de reglas de Gauss de una dimensión.
+\end{frame}
+
+\begin{frame}{Trapecio en una celda rectangular}
+Para $R_{ij}=[x_i,x_{i+1}]\times[y_j,y_{j+1}]$, de lados $h,k$,
+\[\iint_{R_{ij}}f(x,y)\,dA\approx\frac{hk}{4}
+[f_{ij}+f_{i+1,j}+f_{i+1,j+1}+f_{i,j+1}].\]
+Es la integral exacta del interpolante bilineal de sus cuatro vértices.
+Al sumar celdas en una malla rectangular uniforme,
+\[Q(f)=hk\sum_{i=0}^n\sum_{j=0}^m a_i b_j f_{ij},\]
+donde $a_0=a_n=b_0=b_m=1/2$ y los demás coeficientes valen $1$.
+\end{frame}
+
+\begin{frame}{Pesos de la regla rectangular compuesta}
+La forma equivalente del material anterior es
+\[Q(f)=\frac{hk}{4}\left[
+\sum_{\text{esquinas}}f_{ij}+2\sum_{\text{bordes sin esquinas}}f_{ij}
++4\sum_{\text{interiores}}f_{ij}\right].\]
+Las esquinas pertenecen a una celda, los puntos de borde a dos
+y los interiores a cuatro.
+La suma de pesos debe ser $(b-a)(d-c)$.
+Para una regla de Gauss producto con $m$ nodos por eje, se necesitan $m^2$
+evaluaciones; en dimensión $d$, $m^d$.
+\end{frame}
+
+\begin{frame}{Región triangulada}
+Sea un triángulo con vértices $p_i,p_j,p_k$, área $A_\Delta$ y valores $f_i,f_j,f_k$.
+La integral del interpolante afín es
+\[Q_\Delta(f)=\frac{A_\Delta}{3}(f_i+f_j+f_k).\]
+Si
+\[D=\det\begin{pmatrix}1&x_i&y_i\\1&x_j&y_j\\1&x_k&y_k\end{pmatrix},\]
+entonces $A_\Delta=|D|/2$ y $Q_\Delta=|D|(f_i+f_j+f_k)/6$.
+La fórmula es exacta para funciones afines; la integral de una región poligonal
+se aproxima sumando los triángulos de la malla.
+\end{frame}
+
+\begin{frame}{Actividad y fuentes}
+\small
+\begin{enumerate}
+\item Compare ocho nodos de Gauss con trapecio y Simpson a costo similar.
+\item Compruebe la suma de pesos antes y después de transformar el intervalo.
+\item Calcule una esperanza normal con ambas convenciones de Hermite.
+\end{enumerate}
+\vfill
+Material del curso: capítulo 7 y notas \textit{Cuadratura Gaussiana en la Práctica}
+(atribuidas a Paul Klein en \texttt{golub.tex}).
+\href{https://dlmf.nist.gov/3.5}{NIST DLMF 3.5}; Golub y Welsch (1969).
+Documentación: \href{https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html}{leggauss},
+\href{https://numpy.org/doc/stable/reference/generated/numpy.polynomial.hermite_e.hermegauss.html}{hermegauss},
+\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh_tridiagonal.html}{eigh\_tridiagonal}.
+\end{frame}
+
+\end{document}
