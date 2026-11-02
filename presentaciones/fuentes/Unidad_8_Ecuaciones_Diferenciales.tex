@@ -35,7 +35,7 @@ keepspaces=true,showstringspaces=false,breaklines=true}
 \item Comparación del error y aplicación a una trayectoria de capital.
 \end{enumerate}
 \medskip
-Al terminar: deducir las fórmulas, calcular un paso y comprobar qué ocurre al reducir $h$.
+Al terminar: deducir las fórmulas, demostrar la consistencia de Euler y comparar errores al reducir $h$.
 \fuente{Secuencia del capítulo 8 de las notas del curso.}
 \end{frame}
 
@@ -166,6 +166,32 @@ Se actualiza con $y_k$, antes de avanzar al siguiente nodo.
 \end{frame}
 
 % 11
+\begin{frame}{Consistencia de un método de un paso}
+Al sustituir la solución exacta en $y_{k+1}=y_k+h\phi(t_k,y_k;h)$, definimos
+\[d_{k+1}=y(t_{k+1})-y(t_k)-h\phi(t_k,y(t_k);h),\]
+\[\boxed{\tau_{k+1}=\frac{d_{k+1}}h
+=\frac{y(t_{k+1})-y(t_k)}h-\phi(t_k,y(t_k);h).}\]
+El método es \concepto{consistente} si, para cada solución suficientemente regular,
+\[\max_{0\leq k<n}|\tau_{k+1}|\longrightarrow0\quad
+\text{cuando }h=(b-a)/n\longrightarrow0.\]
+Orden de consistencia $p$: $\max_k|\tau_{k+1}|=O(h^p)$;
+equivale a un defecto $O(h^{p+1})$.
+\end{frame}
+
+% 12
+\begin{frame}{Consistencia de Euler: demostración}
+Euler usa $\phi(t,y;h)=f(t,y)$. Si $y\in C^2[a,b]$, Taylor da
+\[y(t_{k+1})=y(t_k)+hy'(t_k)+\frac{h^2}{2}y''(\xi_k).\]
+Como $y'(t_k)=f(t_k,y(t_k))$,
+\[\tau_{k+1}=\frac{y(t_{k+1})-y(t_k)}h-f(t_k,y(t_k))
+=\frac h2y''(\xi_k).\]
+Con $M=\max_{[a,b]}|y''|$,
+\[\boxed{\max_k|\tau_{k+1}|\leq\frac M2h\longrightarrow0.}\]
+Euler es \resultado{consistente de primer orden}: $\tau=O(h)$ y $d=h\tau=O(h^2)$.
+El error global exige además controlar la propagación de errores.
+\end{frame}
+
+% 13
 \begin{frame}{Error local y error global de Euler}
 El \concepto{defecto local} parte del valor exacto en un paso:
 \[d_{k+1}=y(t_{k+1})-y(t_k)-hf(t_k,y(t_k))
@@ -178,7 +204,7 @@ Con dato inicial exacto y $L>0$,
 \small Para $L=0$, la cota es $M(b-a)h/2$. El defecto aquí no se divide por $h$.
 \end{frame}
 
-% 12
+% 14
 \begin{frame}{Regla del trapecio: fórmula implícita}
 La cuadratura trapezoidal sugiere
 \[\int_{t_k}^{t_{k+1}}f(s,y(s))\,ds\approx
@@ -192,7 +218,7 @@ El método resultante es
 \end{itemize}
 \end{frame}
 
-% 13
+% 15
 \begin{frame}{Heun: predictor de Euler y corrección}
 Primero predecimos el valor final:
 \[y_{k+1}^{\mathrm{pred}}=y_k+hf(t_k,y_k).\]
@@ -205,7 +231,7 @@ f(t_k+h,y_k+hf(t_k,y_k))\right].}\]
 Una sola corrección con el predictor no resuelve exactamente la ecuación del trapecio implícito.
 \end{frame}
 
-% 14
+% 16
 \begin{frame}{Ejemplo: un paso de Heun}
 Para $f(t,y)=y-t^2+1$, $t_0=0$, $y_0=0.5$ y $h=0.2$:
 \begin{align*}
@@ -220,7 +246,7 @@ La referencia exacta es $0.8292986209$.
 \textbf{Comparación:} el trapecio implícito da $y_1=0.8288888889$.
 \end{frame}
 
-% 15
+% 17
 \begin{frame}{Euler mejorado: punto medio explícito}
 Las notas llaman \concepto{Euler mejorado} al siguiente RK de dos etapas:
 \[k_1=f(t_k,y_k),\qquad
@@ -234,7 +260,7 @@ La pendiente del punto medio se evalúa en un estado aproximado.
 Usaremos el nombre \textbf{punto medio explícito} para identificar la fórmula.
 \end{frame}
 
-% 16
+% 18
 \begin{frame}{Dos métodos de orden dos}
 \begin{center}
 \begin{tabular}{lcc}\toprule
@@ -251,7 +277,7 @@ Ambos tienen defecto local $O(h^3)$ y error global $O(h^2)$, bajo suficiente sua
 El mismo orden no implica el mismo error ni la misma trayectoria.
 \end{frame}
 
-% 17
+% 19
 \begin{frame}{Runge--Kutta explícito: forma general}
 Con la notación $a_i,b_{i\ell},c_i$ del capítulo 8:
 \begin{align*}
@@ -265,7 +291,7 @@ Cada etapa usa solamente pendientes ya calculadas.
 Los $k_i$ son pendientes: el factor $h$ aparece en los incrementos.
 \end{frame}
 
-% 18
+% 20
 \begin{frame}{Coeficientes y consistencia}
 Se suele imponer
 \[a_1=0,\qquad a_i=\sum_{\ell<i}b_{i\ell}.\]
@@ -281,7 +307,7 @@ Para orden dos se exige además $\sum_i c_i a_i=1/2$.
 El número de etapas por sí solo no determina el orden del método.
 \end{frame}
 
-% 19
+% 21
 \begin{frame}{Tablas de coeficientes de las notas}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{.46\textwidth}
@@ -306,7 +332,7 @@ El número de etapas por sí solo no determina el orden del método.
 \textbf{En pizarra:} compruebe $\sum c_i=1$ y $\sum c_i a_i=1/2$.
 \end{frame}
 
-% 20
+% 22
 \begin{frame}{Runge--Kutta clásico de cuarto orden}
 \begin{align*}
 k_1&=f(t_k,y_k),\\
@@ -319,7 +345,7 @@ Cuatro evaluaciones por paso. Bajo suficiente suavidad y Lipschitz,
 el defecto local es $O(h^5)$ y el error global es $O(h^4)$.
 \end{frame}
 
-% 21
+% 23
 \begin{frame}{Ejemplo: las cuatro etapas de RK4}
 Con $h=0.2$ y $(t_0,y_0)=(0,0.5)$:
 \begin{align*}
@@ -333,7 +359,7 @@ k_4&=f(0.2,0.8308)=1.7908.
 Error absoluto del primer paso: $5.29\times10^{-6}$.
 \end{frame}
 
-% 22
+% 24
 \begin{frame}{Orden y costo por trayectoria}
 \begin{center}
 \begin{tabular}{lccc}\toprule
@@ -351,7 +377,7 @@ La comparación debe considerar el paso, la precisión requerida y el costo de e
 Una etapa adicional no exige derivar $f$ analíticamente.
 \end{frame}
 
-% 23
+% 25
 \begin{frame}{Comparación numérica con solución exacta}
 \[E_h=\max_{0\leq k\leq n}|y(t_k)-y_k|,\qquad h=2/n.\]
 \begin{center}\small\input{\datos/tabla_errores.tex}\end{center}
@@ -361,7 +387,7 @@ Se usa el mismo PVI $y'=y-t^2+1$, $y(0)=0.5$, hasta $t=2$.
 Son errores máximos sobre la malla; no constituyen una cota entre nodos.
 \end{frame}
 
-% 24
+% 26
 \begin{frame}{Refinamiento y orden observado}
 Si $E_h\approx Ch^p$, entonces
 \[\frac{E_h}{E_{h/2}}\approx2^p,\qquad
@@ -371,7 +397,7 @@ p_{\mathrm{obs}}=\log_2\!\left(\frac{E_h}{E_{h/2}}\right).\]
 Con mallas demasiado gruesas o errores próximos al redondeo, el cociente puede no mostrar el orden teórico.
 \end{frame}
 
-% 25
+% 27
 \begin{frame}{Trayectorias en una misma malla}
 \begin{center}
 \begin{tikzpicture}
@@ -393,7 +419,7 @@ tick label style={font=\small},label style={font=\small}]
 \small $n=10$, $h=0.2$. Las tablas permiten comparar diferencias poco visibles en la figura.
 \end{frame}
 
-% 26
+% 28
 \begin{frame}{Actividad: 80 evaluaciones de la función}
 Suponga que dispone de \textbf{80 evaluaciones de $f$} para llegar a $t=2$.
 \begin{enumerate}
@@ -407,7 +433,7 @@ Después, sin usar la solución exacta, proponga una comparación entre dos mall
 \small Trabaje primero en parejas; contraste los resultados con el cuaderno.
 \end{frame}
 
-% 27
+% 29
 \begin{frame}{Aplicación: acumulación de capital}
 Retomamos el modelo hipotético de la clase de integración:
 \[K'(t)=I(t)-\delta K(t),\qquad K(0)=10,\]
@@ -418,7 +444,7 @@ La referencia exacta es
 No cambia la estructura del método: evaluamos $f(t,K)=I(t)-\delta K$ en cada etapa.
 \end{frame}
 
-% 28
+% 30
 \begin{frame}{Capital: Heun y comparación de resultados}
 El predictor y la corrección son
 \[K_{k+1}^{\mathrm{pred}}=K_k+h[I(t_k)-\delta K_k],\]
@@ -435,7 +461,7 @@ RK4&23.6330808293&$9.137\times10^{-9}$\\\bottomrule
 \end{tabular}\end{center}
 \end{frame}
 
-% 29
+% 31
 \begin{frame}{Sistemas: las mismas fórmulas, con vectores}
 Una ecuación de segundo orden también puede escribirse como sistema:
 \[u''=-u,\quad u(0)=1,\quad u'(0)=0,\qquad
@@ -449,7 +475,7 @@ Todas las componentes se actualizan desde el \textbf{mismo estado anterior}.
 En RK4, cada $\mathbf k_i$ es un vector de pendientes.
 \end{frame}
 
-% 30
+% 32
 \begin{frame}{Complemento: paso y estabilidad}
 Para $y'=\lambda y$, $\lambda<0$, la solución exacta decae y
 \[y_{k+1}=R(z)y_k,\qquad z=h\lambda.\]
@@ -466,7 +492,7 @@ Ambos amplifican, aunque Heun sea de orden dos.
 Este diagnóstico amplía el contenido básico del capítulo.
 \end{frame}
 
-% 31
+% 33
 \begin{frame}{Preguntas de cierre}
 \begin{enumerate}
 \item Obtenga Euler y Heun a partir de la identidad integral de un paso.
@@ -479,7 +505,7 @@ Este diagnóstico amplía el contenido básico del capítulo.
 Para verificar una trayectoria: condición inicial, fórmula de paso, refinamiento y error respecto de una referencia disponible.
 \end{frame}
 
-% 32
+% 34
 \begin{frame}{Lectura y trabajo posterior}
 \begin{itemize}
 \item \textbf{Notas del curso, capítulo 8}: problema de Cauchy, métodos de un paso,

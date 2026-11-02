@@ -19,7 +19,7 @@ Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 - [Métodos Numéricos - notas 2026-2](notas/Metodos_Numericos_2026-2.pdf)
 
 Las notas reúnen el material central del curso. Esta edición fue recompilada el
-1 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
+2 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
 capítulo 1 incorpora grafos computacionales como representación visual de la
 composición de funciones elementales y de la propagación de errores de entrada
 y redondeo. El capítulo 2 contiene la formulación revisada de convergencia para
@@ -27,7 +27,9 @@ sucesiones escalares y vectoriales, convergencia lineal, superlineal y
 cuadrática, y criterios de parada. El capítulo 8 incorpora las correcciones de
 trapecio implícito y Heun, las etapas y los pesos de Runge–Kutta, las condiciones
 de consistencia y el algoritmo de Euler con un número entero de pasos. Su
-notación y sus fórmulas son consistentes con la nueva clase de EDO.
+notación y sus fórmulas son consistentes con la nueva clase de EDO. Incluye la
+definición de consistencia mediante el residuo normalizado y una demostración
+de la consistencia de primer orden de Euler, con una cota uniforme sobre la malla.
 
 ### Presentaciones
 
@@ -49,8 +51,9 @@ notación y sus fórmulas son consistentes con la nueva clase de EDO.
 
 La Unidad 8 sigue el capítulo 8 de las notas: problema de Cauchy, equivalencia
 integral, Euler, trapecio implícito, Heun, punto medio explícito y RK4. Incluye
-ejemplos resueltos, refinamiento de mallas, comparación de costo y error,
-acumulación de capital y sistemas. La clase consta de 32 diapositivas para
+la definición de consistencia, su demostración para Euler, ejemplos resueltos,
+refinamiento de mallas, comparación de costo y error, acumulación de capital y
+sistemas. La clase consta de 34 diapositivas para
 aproximadamente 115 minutos; la estabilidad se presenta como complemento.
 Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_8_Ecuaciones_Diferenciales.tex),
@@ -166,8 +169,9 @@ representación, truncamiento, redondeo, cancelación, propagación de errores y
 comparación de algoritmos.
 
 El cuaderno de ecuaciones diferenciales requiere solo NumPy y conserva una
-ejecución completa de sus seis celdas de código. Verifica los pasos manuales,
-los órdenes observados, un modelo hipotético de capital y un sistema vectorial.
+ejecución completa de sus siete celdas de código. Verifica los pasos manuales,
+los órdenes del residuo normalizado y del defecto local de Euler, los órdenes
+globales observados, un modelo hipotético de capital y un sistema vectorial.
 El script genera tablas LaTeX, datos y un registro JSON en
 `resultados_edo_2026-2/`, junto al archivo ejecutado.
 

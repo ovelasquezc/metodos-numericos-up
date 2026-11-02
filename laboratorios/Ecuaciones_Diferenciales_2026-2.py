@@ -69,6 +69,23 @@ for nombre, paso in METODOS.items():
     print(f"{nombre:12s}: y1 = {paso(f, 0., .5, .2):.10f}")
 print(f"{'Exacta':12s}: y(0.2) = {exacta(.2):.10f}")
 
+# %% Consistencia de Euler: residuo y defecto de un paso
+# Para y'=y, y(0)=1, la solución exacta es exp(t).
+# Se parte de un dato exacto en t=0; no se calcula el error global.
+pasos_locales = np.array([.2, .1, .05, .025])
+defectos_locales = np.expm1(pasos_locales) - pasos_locales
+residuos_locales = defectos_locales / pasos_locales
+print("\nConsistencia de Euler en t=0 para y'=y, y(0)=1")
+print("   h          tau=d/h          d")
+for h_local, tau_local, d_local in zip(pasos_locales, residuos_locales, defectos_locales):
+    print(f"{h_local:7.3f} {tau_local:16.8e} {d_local:16.8e}")
+p_tau = float(np.log2(residuos_locales[-2] / residuos_locales[-1]))
+p_defecto = float(np.log2(defectos_locales[-2] / defectos_locales[-1]))
+print(f"Orden observado de tau: {p_tau:.6f}; del defecto: {p_defecto:.6f}")
+print("Experimento en un punto; la prueba de las notas usa una cota uniforme en toda la malla.")
+assert abs(p_tau - 1) < .05 and abs(p_defecto - 2) < .05
+assert np.all(residuos_locales <= .5 * np.exp(pasos_locales) * pasos_locales)
+
 # %% Refinamiento y orden observado
 filas = []
 for n in [10, 20, 40, 80]:
