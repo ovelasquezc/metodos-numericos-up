@@ -1,0 +1,494 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\usepackage{tikz,pgfplots,listings}
+\pgfplotsset{compat=1.18}
+\lstset{language=Python,basicstyle=\ttfamily\footnotesize,columns=fullflexible,
+keepspaces=true,showstringspaces=false,breaklines=true}
+\newcommand{\R}{\mathbb R}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\datos}{datos/edo}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+\title{Ecuaciones diferenciales ordinarias}
+\subtitle{Problemas de valor inicial y métodos de un paso}
+\begin{document}
+
+% 1
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.73\textwidth}
+\vspace{.55cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.3cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{.8cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.22\textwidth}\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}\end{column}
+\end{columns}
+\end{frame}
+
+% 2
+\begin{frame}{Ruta de la clase}
+\begin{enumerate}
+\item Problema de Cauchy y equivalencia con una ecuación integral.
+\item Métodos de un paso: Euler, trapecio y Heun.
+\item Euler mejorado (punto medio) y Runge--Kutta clásico.
+\item Comparación del error y aplicación a una trayectoria de capital.
+\end{enumerate}
+\medskip
+Al terminar: deducir las fórmulas, calcular un paso y comprobar qué ocurre al reducir $h$.
+\fuente{Secuencia del capítulo 8 de las notas del curso.}
+\end{frame}
+
+% 3
+\begin{frame}{El problema de Cauchy}
+Buscamos una función $\mathbf y(t)\in\R^d$ tal que
+\[\boxed{\mathbf y'(t)=\mathbf f(t,\mathbf y(t)),\qquad
+\mathbf y(t_0)=\mathbf y_0.}\]
+En las notas, $\mathbf f:\Omega\subset\R\times\R^d\to\R^d$ es continua,
+con $\Omega$ abierto y convexo.
+\begin{itemize}
+\item La ecuación fija la velocidad de cambio; el dato inicial selecciona la trayectoria.
+\item Continuidad y Lipschitz local en $\mathbf y$ aseguran existencia y unicidad local.
+\item Trabajaremos en $[a,b]$, suponiendo que la solución existe en todo el intervalo.
+\end{itemize}
+\end{frame}
+
+% 4
+\begin{frame}{Equivalencia con la ecuación integral}
+\begin{block}{Lema del capítulo 8}
+Para $\mathbf f$ continua, una función continua $\mathbf y$ satisface
+\[\mathbf y(t)=\mathbf y_0+\int_{t_0}^t\mathbf f(s,\mathbf y(s))\,ds\]
+si y solo si es solución del problema de Cauchy.
+\end{block}
+En un paso:
+\[\boxed{\mathbf y(t_{k+1})=\mathbf y(t_k)+
+\int_{t_k}^{t_{k+1}}\mathbf f(s,\mathbf y(s))\,ds.}\]
+La cuadratura del capítulo anterior permite construir métodos para la EDO.
+\end{frame}
+
+% 5
+\begin{frame}{Demostración del lema}
+\textbf{De la EDO a la integral.} Integramos y aplicamos el teorema fundamental:
+\[\mathbf y(t)-\mathbf y(t_0)=\int_{t_0}^t\mathbf y'(s)\,ds
+=\int_{t_0}^t\mathbf f(s,\mathbf y(s))\,ds.\]
+Usamos $\mathbf y(t_0)=\mathbf y_0$.
+\medskip
+
+\textbf{De la integral a la EDO.} El integrando es continuo, luego
+\[\frac{d}{dt}\left[\mathbf y_0+\int_{t_0}^t\mathbf f(s,\mathbf y(s))\,ds\right]
+=\mathbf f(t,\mathbf y(t)).\]
+Al sustituir $t=t_0$ recuperamos la condición inicial.
+\end{frame}
+
+% 6
+\begin{frame}{Malla temporal y métodos de un paso}
+Elegimos $n\in\mathbb N$, $h=(b-a)/n$ y
+\[t_k=a+kh,\qquad k=0,\ldots,n.\]
+En la notación de las notas, $\mathbf y_k\approx\mathbf y(t_k)$ y
+\[\boxed{\mathbf y_{k+1}=\mathbf y_k+
+h\boldsymbol\phi(t_k,\mathbf y_k;h),\qquad \mathbf y_0=\mathbf y(a).}\]
+\begin{itemize}
+\item $\boldsymbol\phi$: pendiente efectiva del paso.
+\item Un paso usa el estado $\mathbf y_k$; puede evaluar varias pendientes intermedias.
+\item En las deducciones siguientes usamos el caso escalar; las fórmulas se aplican a vectores.
+\end{itemize}
+\end{frame}
+
+% 7
+\begin{frame}{Euler: rectángulo izquierdo}
+Partimos de la identidad exacta
+\[y(t_{k+1})=y(t_k)+\int_{t_k}^{t_k+h}f(s,y(s))\,ds.\]
+Aproximamos el integrando por su valor en el extremo izquierdo:
+\[\int_{t_k}^{t_k+h}f(s,y(s))\,ds\approx h f(t_k,y(t_k)).\]
+Sustituimos el valor exacto por el aproximado:
+\[\boxed{y_{k+1}=y_k+h f(t_k,y_k).}\]
+Es explícito y necesita una evaluación de $f$ por paso.
+\end{frame}
+
+% 8
+\begin{frame}{Euler: Taylor e interpretación geométrica}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.54\textwidth}
+Si $y\in C^2$,
+\[y(t_k+h)=y(t_k)+hy'(t_k)
++\frac{h^2}{2}y''(\xi_k).\]
+Como $y'=f(t,y)$, Euler conserva los dos primeros términos.
+\medskip
+
+Avanza sobre la recta tangente calculada en el estado actual.
+\end{column}
+\begin{column}{.42\textwidth}
+\begin{tikzpicture}[scale=1.05]
+\draw[->] (0,0)--(4.4,0) node[right] {$t$};
+\draw[->] (0,0)--(0,3.6) node[above] {$y$};
+\draw[upazul,thick,domain=.35:3.65,samples=60] plot (\x,{.65+.13*(\x)^2+.2*\x});
+\draw[updorado,very thick] (1,.98)--(3,1.90);
+\draw[dashed] (1,0) node[below] {$t_k$}--(1,.98);
+\draw[dashed] (3,0) node[below] {$t_k+h$}--(3,2.42);
+\fill[upazul] (1,.98) circle (2pt);
+\fill[updorado] (3,1.9) circle (2pt) node[right] {$y_{k+1}$};
+\fill[upazul] (3,2.42) circle (2pt);
+\node[upazul] at (2.3,3.2) {solución exacta};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% 9
+\begin{frame}{Ejemplo para toda la clase}
+\[y'=y-t^2+1,\qquad y(0)=\tfrac12,\qquad 0\leq t\leq2.\]
+La solución exacta, para verificar los cálculos, es
+\[y(t)=(t+1)^2-\tfrac12 e^t.\]
+Con $h=0.2$, Euler da
+\[f(0,0.5)=1.5,\qquad y_1=0.5+0.2(1.5)=\boxed{0.8}.\]
+La referencia es $y(0.2)=0.8292986209$.
+\medskip
+
+\textbf{En pizarra:} calcule $y_2$. Recuerde evaluar $f$ en $(t_1,y_1)$.
+\end{frame}
+
+% 10
+\begin{frame}[fragile]{Algoritmo de Euler}
+\begin{lstlisting}
+import numpy as np
+
+def euler(f, a, b, y0, n):
+    h = (b-a)/n             # n entero positivo
+    t = np.linspace(a, b, n+1)
+    y = np.empty(n+1)
+    y[0] = y0
+    for k in range(n):
+        y[k+1] = y[k] + h*f(t[k], y[k])
+    return t, y
+\end{lstlisting}
+Fijamos $n$ para que la malla llegue exactamente a $b$.
+Se actualiza con $y_k$, antes de avanzar al siguiente nodo.
+\end{frame}
+
+% 11
+\begin{frame}{Error local y error global de Euler}
+El \concepto{defecto local} parte del valor exacto en un paso:
+\[d_{k+1}=y(t_{k+1})-y(t_k)-hf(t_k,y(t_k))
+=\frac{h^2}{2}y''(\xi_k).\]
+Si $|y''|\leq M$ y $f$ es Lipschitz en $y$ con constante $L$,
+\[|e_{k+1}|\leq(1+hL)|e_k|+\frac M2h^2,
+\qquad e_k=y(t_k)-y_k.\]
+Con dato inicial exacto y $L>0$,
+\[\max_k|e_k|\leq\frac{Mh}{2L}\bigl(e^{L(b-a)}-1\bigr)=O(h).\]
+\small Para $L=0$, la cota es $M(b-a)h/2$. El defecto aquí no se divide por $h$.
+\end{frame}
+
+% 12
+\begin{frame}{Regla del trapecio: fórmula implícita}
+La cuadratura trapezoidal sugiere
+\[\int_{t_k}^{t_{k+1}}f(s,y(s))\,ds\approx
+\frac h2[f(t_k,y(t_k))+f(t_{k+1},y(t_{k+1}))].\]
+El método resultante es
+\[\boxed{y_{k+1}=y_k+\frac h2[f(t_k,y_k)+f(t_{k+1},y_{k+1})].}\]
+\begin{itemize}
+\item $y_{k+1}$ aparece también dentro de $f$: en general hay que resolver una ecuación.
+\item Si $f$ es lineal en $y$, se puede despejar el nuevo valor.
+\item El capítulo 8 realiza una predicción adicional para obtener un método explícito.
+\end{itemize}
+\end{frame}
+
+% 13
+\begin{frame}{Heun: predictor de Euler y corrección}
+Primero predecimos el valor final:
+\[y_{k+1}^{\mathrm{pred}}=y_k+hf(t_k,y_k).\]
+Evaluamos la pendiente en ese punto y promediamos:
+\[\boxed{y_{k+1}=y_k+\frac h2\left[f(t_k,y_k)+
+f(t_k+h,y_k+hf(t_k,y_k))\right].}\]
+\concepto{Heun o trapecio explícito}: dos evaluaciones de $f$ por paso.
+\medskip
+
+Una sola corrección con el predictor no resuelve exactamente la ecuación del trapecio implícito.
+\end{frame}
+
+% 14
+\begin{frame}{Ejemplo: un paso de Heun}
+Para $f(t,y)=y-t^2+1$, $t_0=0$, $y_0=0.5$ y $h=0.2$:
+\begin{align*}
+k_1&=f(0,0.5)=1.5,\\
+y_1^{\mathrm{pred}}&=0.5+0.2(1.5)=0.8,\\
+k_2&=f(0.2,0.8)=0.8-0.04+1=1.76,\\
+y_1&=0.5+\frac{0.2}{2}(1.5+1.76)=\boxed{0.826}.
+\end{align*}
+La referencia exacta es $0.8292986209$.
+\medskip
+
+\textbf{Comparación:} el trapecio implícito da $y_1=0.8288888889$.
+\end{frame}
+
+% 15
+\begin{frame}{Euler mejorado: punto medio explícito}
+Las notas llaman \concepto{Euler mejorado} al siguiente RK de dos etapas:
+\[k_1=f(t_k,y_k),\qquad
+k_2=f\!\left(t_k+\frac h2,y_k+\frac h2k_1\right),\]
+\[\boxed{y_{k+1}=y_k+h k_2.}\]
+Para el mismo primer paso,
+\[k_2=f(0.1,0.65)=1.64,\qquad y_1=\boxed{0.828}.\]
+La pendiente del punto medio se evalúa en un estado aproximado.
+\medskip
+
+Usaremos el nombre \textbf{punto medio explícito} para identificar la fórmula.
+\end{frame}
+
+% 16
+\begin{frame}{Dos métodos de orden dos}
+\begin{center}
+\begin{tabular}{lcc}\toprule
+&Punto medio&Heun\\\midrule
+Tiempo de la segunda etapa&$t_k+h/2$&$t_k+h$\\[2mm]
+Pesos de $k_1,k_2$&$0,1$&$1/2,1/2$\\[2mm]
+Primer paso del ejemplo&$0.828$&$0.826$\\[2mm]
+Evaluaciones por paso&2&2\\\bottomrule
+\end{tabular}
+\end{center}
+Ambos tienen defecto local $O(h^3)$ y error global $O(h^2)$, bajo suficiente suavidad y Lipschitz.
+\medskip
+
+El mismo orden no implica el mismo error ni la misma trayectoria.
+\end{frame}
+
+% 17
+\begin{frame}{Runge--Kutta explícito: forma general}
+Con la notación $a_i,b_{i\ell},c_i$ del capítulo 8:
+\begin{align*}
+k_1&=f(t_k,y_k),\\
+k_i&=f\!\left(t_k+a_i h,\ y_k+h\sum_{\ell=1}^{i-1}b_{i\ell}k_\ell\right),
+\quad i=2,\ldots,m,\\
+\phi(t_k,y_k;h)&=\sum_{i=1}^m c_i k_i,\\
+y_{k+1}&=y_k+h\sum_{i=1}^m c_i k_i.
+\end{align*}
+Cada etapa usa solamente pendientes ya calculadas.
+Los $k_i$ son pendientes: el factor $h$ aparece en los incrementos.
+\end{frame}
+
+% 18
+\begin{frame}{Coeficientes y consistencia}
+Se suele imponer
+\[a_1=0,\qquad a_i=\sum_{\ell<i}b_{i\ell}.\]
+Así, las etapas usan desplazamientos temporales y de estado compatibles.
+\medskip
+
+Para integrar exactamente $y'=1$, todas las pendientes son $k_i=1$ y
+\[y_{k+1}=y_k+h\sum_i c_i.\]
+Por tanto, necesitamos \concepto{$\sum_i c_i=1$}.
+Para orden dos se exige además $\sum_i c_i a_i=1/2$.
+\medskip
+
+El número de etapas por sí solo no determina el orden del método.
+\end{frame}
+
+% 19
+\begin{frame}{Tablas de coeficientes de las notas}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.46\textwidth}
+\centering\textbf{Punto medio}
+\[\begin{array}{c|cc}0&0&0\\1/2&1/2&0\\\hline &0&1\end{array}\]
+\textbf{Heun}
+\[\begin{array}{c|cc}0&0&0\\1&1&0\\\hline &1/2&1/2\end{array}\]
+\end{column}
+\begin{column}{.48\textwidth}
+\centering\textbf{RK4 clásico}
+\[\begin{array}{c|cccc}
+0&0&0&0&0\\
+1/2&1/2&0&0&0\\
+1/2&0&1/2&0&0\\
+1&0&0&1&0\\\hline
+&1/6&1/3&1/3&1/6
+\end{array}\]
+\raggedright\small Columna izquierda: $a_i$. Interior: $b_{i\ell}$. Fila inferior: $c_i$.
+\end{column}
+\end{columns}
+\medskip
+\textbf{En pizarra:} compruebe $\sum c_i=1$ y $\sum c_i a_i=1/2$.
+\end{frame}
+
+% 20
+\begin{frame}{Runge--Kutta clásico de cuarto orden}
+\begin{align*}
+k_1&=f(t_k,y_k),\\
+k_2&=f(t_k+h/2,y_k+hk_1/2),\\
+k_3&=f(t_k+h/2,y_k+hk_2/2),\\
+k_4&=f(t_k+h,y_k+hk_3).
+\end{align*}
+\[\boxed{y_{k+1}=y_k+\frac h6(k_1+2k_2+2k_3+k_4).}\]
+Cuatro evaluaciones por paso. Bajo suficiente suavidad y Lipschitz,
+el defecto local es $O(h^5)$ y el error global es $O(h^4)$.
+\end{frame}
+
+% 21
+\begin{frame}{Ejemplo: las cuatro etapas de RK4}
+Con $h=0.2$ y $(t_0,y_0)=(0,0.5)$:
+\begin{align*}
+k_1&=1.5,\\
+k_2&=f(0.1,0.65)=1.64,\\
+k_3&=f(0.1,0.664)=1.654,\\
+k_4&=f(0.2,0.8308)=1.7908.
+\end{align*}
+\[y_1=0.5+\frac{0.2}{6}(1.5+2(1.64)+2(1.654)+1.7908)
+=\boxed{0.8292933333}.\]
+Error absoluto del primer paso: $5.29\times10^{-6}$.
+\end{frame}
+
+% 22
+\begin{frame}{Orden y costo por trayectoria}
+\begin{center}
+\begin{tabular}{lccc}\toprule
+Método&Defecto local&Error global&Evaluaciones\\\midrule
+Euler&$O(h^2)$&$O(h)$&$n$\\[1mm]
+Punto medio&$O(h^3)$&$O(h^2)$&$2n$\\[1mm]
+Heun&$O(h^3)$&$O(h^2)$&$2n$\\[1mm]
+RK4&$O(h^5)$&$O(h^4)$&$4n$\\\bottomrule
+\end{tabular}
+\end{center}
+Órdenes para una solución suficientemente suave, en un intervalo fijo.
+\medskip
+
+La comparación debe considerar el paso, la precisión requerida y el costo de evaluar $f$.
+Una etapa adicional no exige derivar $f$ analíticamente.
+\end{frame}
+
+% 23
+\begin{frame}{Comparación numérica con solución exacta}
+\[E_h=\max_{0\leq k\leq n}|y(t_k)-y_k|,\qquad h=2/n.\]
+\begin{center}\small\input{\datos/tabla_errores.tex}\end{center}
+Se usa el mismo PVI $y'=y-t^2+1$, $y(0)=0.5$, hasta $t=2$.
+\medskip
+
+Son errores máximos sobre la malla; no constituyen una cota entre nodos.
+\end{frame}
+
+% 24
+\begin{frame}{Refinamiento y orden observado}
+Si $E_h\approx Ch^p$, entonces
+\[\frac{E_h}{E_{h/2}}\approx2^p,\qquad
+p_{\mathrm{obs}}=\log_2\!\left(\frac{E_h}{E_{h/2}}\right).\]
+\begin{center}\input{\datos/tabla_ordenes.tex}\end{center}
+\small Se comparan $n=40$ y $n=80$.
+Con mallas demasiado gruesas o errores próximos al redondeo, el cociente puede no mostrar el orden teórico.
+\end{frame}
+
+% 25
+\begin{frame}{Trayectorias en una misma malla}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=.88\textwidth,height=.67\textheight,
+xlabel={$t$},ylabel={$y$},xmin=0,xmax=2,grid=major,
+legend style={font=\footnotesize,at={(.03,.97)},anchor=north west},
+tick label style={font=\small},label style={font=\small}]
+\addplot[black,thick,domain=0:2,samples=100] {(x+1)^2-.5*exp(x)};
+\addlegendentry{Exacta}
+\addplot[uprojo,mark=o] table[x=t,y=Euler] {\datos/trayectorias.dat};
+\addlegendentry{Euler}
+\addplot[upverde,mark=triangle*] table[x=t,y=Heun] {\datos/trayectorias.dat};
+\addlegendentry{Heun}
+\addplot[upazul,only marks,mark=+,mark size=3] table[x=t,y=RK4] {\datos/trayectorias.dat};
+\addlegendentry{RK4}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\small $n=10$, $h=0.2$. Las tablas permiten comparar diferencias poco visibles en la figura.
+\end{frame}
+
+% 26
+\begin{frame}{Actividad: 80 evaluaciones de la función}
+Suponga que dispone de \textbf{80 evaluaciones de $f$} para llegar a $t=2$.
+\begin{enumerate}
+\item Determine $n$ y $h$ para Euler, punto medio, Heun y RK4.
+\item Use las tablas o el cuaderno para comparar los errores.
+\item Explique por qué punto medio y Heun pueden producir errores distintos.
+\end{enumerate}
+\medskip
+Después, sin usar la solución exacta, proponga una comparación entre dos mallas para estimar el error final.
+\medskip
+\small Trabaje primero en parejas; contraste los resultados con el cuaderno.
+\end{frame}
+
+% 27
+\begin{frame}{Aplicación: acumulación de capital}
+Retomamos el modelo hipotético de la clase de integración:
+\[K'(t)=I(t)-\delta K(t),\qquad K(0)=10,\]
+\[I(t)=2e^{0.02t},\qquad\delta=0.05,\qquad0\leq t\leq10.\]
+$K$ se mide en unidades de capital, $t$ en años e $I$ en unidades de capital por año.
+La referencia exacta es
+\[K(t)=10e^{-0.05t}+\frac{2}{0.07}\left(e^{0.02t}-e^{-0.05t}\right).\]
+No cambia la estructura del método: evaluamos $f(t,K)=I(t)-\delta K$ en cada etapa.
+\end{frame}
+
+% 28
+\begin{frame}{Capital: Heun y comparación de resultados}
+El predictor y la corrección son
+\[K_{k+1}^{\mathrm{pred}}=K_k+h[I(t_k)-\delta K_k],\]
+\[K_{k+1}=K_k+\frac h2\bigl[I(t_k)-\delta K_k+
+I(t_{k+1})-\delta K_{k+1}^{\mathrm{pred}}\bigr].\]
+Con $n=20$ y $h=0.5$, $K(10)=23.6330808385$:
+\begin{center}\small
+\begin{tabular}{lrr}\toprule
+Método&Aproximación de $K(10)$&Error absoluto\\\midrule
+Euler&23.6791486574&$4.607\times10^{-2}$\\
+Punto medio&23.6326201571&$4.607\times10^{-4}$\\
+Heun&23.6328425105&$2.383\times10^{-4}$\\
+RK4&23.6330808293&$9.137\times10^{-9}$\\\bottomrule
+\end{tabular}\end{center}
+\end{frame}
+
+% 29
+\begin{frame}{Sistemas: las mismas fórmulas, con vectores}
+Una ecuación de segundo orden también puede escribirse como sistema:
+\[u''=-u,\quad u(0)=1,\quad u'(0)=0,\qquad
+\mathbf y=\begin{pmatrix}u\\v\end{pmatrix},\quad
+\mathbf f(t,\mathbf y)=\begin{pmatrix}v\\-u\end{pmatrix}.\]
+Con Euler y $h=0.1$,
+\[\mathbf y_1=\begin{pmatrix}1\\0\end{pmatrix}
++0.1\begin{pmatrix}0\\-1\end{pmatrix}
+=\begin{pmatrix}1\\-0.1\end{pmatrix}.\]
+Todas las componentes se actualizan desde el \textbf{mismo estado anterior}.
+En RK4, cada $\mathbf k_i$ es un vector de pendientes.
+\end{frame}
+
+% 30
+\begin{frame}{Complemento: paso y estabilidad}
+Para $y'=\lambda y$, $\lambda<0$, la solución exacta decae y
+\[y_{k+1}=R(z)y_k,\qquad z=h\lambda.\]
+\[R_{\mathrm E}(z)=1+z,\qquad
+R_{\mathrm H}(z)=1+z+z^2/2.\]
+Si $|R(z)|>1$, las perturbaciones crecen de un paso al siguiente.
+\medskip
+
+Para $y'=-4y$, con $h=0.75$, Euler tiene $R=-2$ y Heun $R=2.5$.
+Ambos amplifican, aunque Heun sea de orden dos.
+\medskip
+
+\small En el eje real negativo, ambos satisfacen $|R(z)|<1$ para $-2<z<0$.
+Este diagnóstico amplía el contenido básico del capítulo.
+\end{frame}
+
+% 31
+\begin{frame}{Preguntas de cierre}
+\begin{enumerate}
+\item Obtenga Euler y Heun a partir de la identidad integral de un paso.
+\item Distinga el predictor $y_{k+1}^{\mathrm{pred}}$ del valor corregido.
+\item Escriba las cuatro etapas de RK4 e identifique dónde interviene $h$.
+\item Si al dividir $h$ por dos el error baja aproximadamente por un factor 16,
+\textquestiondown qué orden sugiere el experimento?
+\end{enumerate}
+\medskip
+Para verificar una trayectoria: condición inicial, fórmula de paso, refinamiento y error respecto de una referencia disponible.
+\end{frame}
+
+% 32
+\begin{frame}{Lectura y trabajo posterior}
+\begin{itemize}
+\item \textbf{Notas del curso, capítulo 8}: problema de Cauchy, métodos de un paso,
+Euler, trapecio y Runge--Kutta explícitos.
+\item \textbf{Capítulo 7}: reglas de cuadratura utilizadas en la construcción.
+\item \textbf{Cuaderno de esta clase}: pasos manuales, refinamiento, capital y sistemas.
+\end{itemize}
+\medskip
+Trabajo: repita la comparación para $y'=y$, $y(0)=1$, hasta $t=2$.
+Explique por qué punto medio y Heun coinciden en este problema, aunque sus fórmulas sean diferentes.
+\end{frame}
+\end{document}

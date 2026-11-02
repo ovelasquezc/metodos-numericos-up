@@ -19,12 +19,15 @@ Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 - [Métodos Numéricos - notas 2026-2](notas/Metodos_Numericos_2026-2.pdf)
 
 Las notas reúnen el material central del curso. Esta edición fue recompilada el
-20 de agosto de 2026 y se encuentra en revisión y modernización progresiva. El
+1 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
 capítulo 1 incorpora grafos computacionales como representación visual de la
 composición de funciones elementales y de la propagación de errores de entrada
 y redondeo. El capítulo 2 contiene la formulación revisada de convergencia para
 sucesiones escalares y vectoriales, convergencia lineal, superlineal y
-cuadrática, y criterios de parada.
+cuadrática, y criterios de parada. El capítulo 8 incorpora las correcciones de
+trapecio implícito y Heun, las etapas y los pesos de Runge–Kutta, las condiciones
+de consistencia y el algoritmo de Euler con un número entero de pasos. Su
+notación y sus fórmulas son consistentes con la nueva clase de EDO.
 
 ### Presentaciones
 
@@ -42,6 +45,17 @@ cuadrática, y criterios de parada.
 - [Unidad 7A: Integración numérica, Newton–Cotes, trapecio y Simpson](presentaciones/Unidad_7A_Integracion_Newton_Cotes.pdf)
 - [Unidad 7B: Cuadratura de Gauss y esperanzas](presentaciones/Unidad_7B_Integracion_Gauss.pdf)
 - [Unidad 7C: Ecuaciones integrales, EDO y Montecarlo](presentaciones/Unidad_7C_Integrales_EDO_Montecarlo.pdf)
+- [Unidad 8: Ecuaciones diferenciales ordinarias y métodos de un paso](presentaciones/Unidad_8_Ecuaciones_Diferenciales.pdf)
+
+La Unidad 8 sigue el capítulo 8 de las notas: problema de Cauchy, equivalencia
+integral, Euler, trapecio implícito, Heun, punto medio explícito y RK4. Incluye
+ejemplos resueltos, refinamiento de mallas, comparación de costo y error,
+acumulación de capital y sistemas. La clase consta de 32 diapositivas para
+aproximadamente 115 minutos; la estabilidad se presenta como complemento.
+Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_8_Ecuaciones_Diferenciales.tex),
+con las tablas y los datos de la figura en
+[`presentaciones/fuentes/datos/edo`](presentaciones/fuentes/datos/edo).
 
 La Unidad 7A desarrolla la construcción de cuadraturas mediante interpolación,
 las reglas del trapecio y Simpson, sus errores y versiones compuestas. Explica
@@ -138,6 +152,8 @@ evaluaciones del ciclo 2026-2.
 
 ### Laboratorios
 
+- [Ecuaciones diferenciales: Euler, punto medio, Heun y RK4](laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Script Python](laboratorios/Ecuaciones_Diferenciales_2026-2.py)
+
 - [Laboratorio de aproximación lineal y mínimos cuadrados con QR](laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb)
 
 - [Laboratorio 1: punto flotante, error y estabilidad](laboratorios/Lab_Unidad_1_Punto_Flotante.ipynb)
@@ -148,6 +164,12 @@ Los cuadernos utilizan Python y las bibliotecas indicadas en
 `requirements.txt`. El laboratorio 1 incluye experimentos sobre
 representación, truncamiento, redondeo, cancelación, propagación de errores y
 comparación de algoritmos.
+
+El cuaderno de ecuaciones diferenciales requiere solo NumPy y conserva una
+ejecución completa de sus seis celdas de código. Verifica los pasos manuales,
+los órdenes observados, un modelo hipotético de capital y un sistema vectorial.
+El script genera tablas LaTeX, datos y un registro JSON en
+`resultados_edo_2026-2/`, junto al archivo ejecutado.
 
 El laboratorio de aproximación lineal incluye 24 datos simulados de ventas,
 un catálogo de ocho funciones base, construcción de la matriz de diseño y
