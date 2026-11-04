@@ -222,7 +222,7 @@ jupyter lab
 ```
 
 Para ejecutar los ejemplos de Pyomo, instale también las dependencias de esa
-unidad con \`python -m pip install pyomo highspy\`.
+unidad con `python -m pip install pyomo highspy`.
 
 Luego abra el cuaderno elegido dentro de `laboratorios/` y ejecute las celdas
 en orden. Los laboratorios anteriores conservan una ejecución completa de referencia.
