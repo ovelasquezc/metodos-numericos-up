@@ -167,7 +167,13 @@ evaluaciones del ciclo 2026-2.
 
 ### Laboratorios
 
-- Programación lineal · [Símplex revisado y SciPy](laboratorios/Programacion_Lineal_2026-2.py) · [LAD y MAD con Pyomo y HiGHS](laboratorios/Programacion_Lineal_Pyomo_2026-2.py)
+- [Cuaderno de demostración de la Unidad 9A](laboratorios/Programacion_Lineal_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Programacion_Lineal_2026-2.ipynb)
+
+El cuaderno de programación lineal reúne los tres ejemplos de clase. Incluye la
+región factible y los pivotes de BIM, la sensibilidad del margen al plástico,
+la comparación de LAD con mínimos cuadrados y el cambio de riesgo y pesos de
+una cartera MAD. En Colab, ejecuta todas las celdas desde el menú Entorno de
+ejecución. La primera celda instala las bibliotecas.
 
 - [Ecuaciones diferenciales: Euler, punto medio, Heun y RK4](laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Script Python](laboratorios/Ecuaciones_Diferenciales_2026-2.py)
 
@@ -220,9 +226,6 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 jupyter lab
 ```
-
-Para ejecutar los ejemplos de Pyomo, instale también las dependencias de esa
-unidad con `python -m pip install pyomo highspy`.
 
 Luego abra el cuaderno elegido dentro de `laboratorios/` y ejecute las celdas
 en orden. Los laboratorios anteriores conservan una ejecución completa de referencia.

@@ -7,6 +7,8 @@
 
 \newcommand{\libroPL}[2]{%
   \href{https://mobook.github.io/MO-book/notebooks/02/#1}{\textcolor{upazul}{#2}}}
+\newcommand{\colabPL}[1]{%
+  \href{https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Programacion_Lineal_2026-2.ipynb}{\textcolor{upazul}{#1}}}
 \newcommand{\figuraPL}[2]{%
   \resizebox{!}{#2}{\input{figuras/tikz/#1}}}
 \newcommand{\fragmentoPyomo}[1]{%
@@ -301,16 +303,16 @@ y el de los marginales al interpretar el máximo.
 \fuente{\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html}{\textcolor{upazul}{Documentación de linprog}}}
 \end{frame}
 
-\begin{frame}[fragile]{Demostración en Python}
-Desde la raíz del proyecto, con NumPy y SciPy instalados, ejecutar
-\begin{lstlisting}[language={}]
-python3 laboratorios/Programacion_Lineal_2026-2.py
-\end{lstlisting}
-El programa imprime la base y el margen en cada iteración.
+\begin{frame}{Demostración en Python}
+\colabPL{Abre el cuaderno en Colab} y selecciona
+\textbf{Entorno de ejecución $\to$ Ejecutar todas}.
+\medskip
+
+En la sección BIM del cuaderno:
 \begin{enumerate}
-\item Ejecutar el símplex revisado desde la base de holguras.
-\item Comparar el plan final y el margen con HiGHS.
-\item Aumentar en una unidad el límite de plástico y volver a resolver.
+\item Sigue los pivotes del símplex en la región factible.
+\item Compara el plan final y el margen con HiGHS.
+\item Revisa el gráfico del margen al variar la disponibilidad de plástico.
 \end{enumerate}
 \medskip
 
@@ -320,13 +322,12 @@ y el certificado dual?
 \end{frame}
 
 \begin{frame}[fragile]{Instalación de Pyomo y HiGHS}
-Pyomo expresa el modelo con variables, restricciones y objetivo.
-HiGHS calcula la solución. El paquete \texttt{highspy} permite invocarlo desde Python.
+La primera celda del \colabPL{cuaderno de Colab} instala las bibliotecas.
+Pyomo expresa el modelo y HiGHS calcula la solución.
 \begin{lstlisting}[language={}]
-python3 -m pip install pyomo highspy
-python3 laboratorios/Programacion_Lineal_Pyomo_2026-2.py
+%pip install -q numpy scipy matplotlib pyomo highspy
 \end{lstlisting}
-En Jupyter o Colab, instalar con \texttt{\%pip install pyomo highspy}.
+La sección LAD verifica la disponibilidad de HiGHS desde Pyomo.
 \fragmentoPyomo{CREAR_SOLVER}
 \fuente{\href{https://mobook.github.io/MO-book/notebooks/appendix/installing-pyomo-and-solvers.html}{\textcolor{upazul}{Instalación y solvers del libro}}}
 \end{frame}
@@ -440,6 +441,8 @@ Optimización para Machine Learning basado en Bazaraa, Jarvis y Sherali.
 \quad \libroPL{06-bim-dual.html}{Dual de BIM}
 \quad \libroPL{02-lad-regression.html}{Regresión LAD}
 \quad \libroPL{03-mad-portfolio-optimization.html}{Cartera MAD}
+\par\medskip
+\colabPL{Cuaderno de demostración en Colab}
 \end{frame}
 
 \end{document}
