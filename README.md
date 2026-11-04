@@ -19,7 +19,7 @@ Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 - [Métodos Numéricos - notas 2026-2](notas/Metodos_Numericos_2026-2.pdf)
 
 Las notas reúnen el material central del curso. Esta edición fue recompilada el
-2 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
+4 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
 capítulo 1 incorpora grafos computacionales como representación visual de la
 composición de funciones elementales y de la propagación de errores de entrada
 y redondeo. El capítulo 2 contiene la formulación revisada de convergencia para
@@ -30,6 +30,11 @@ de consistencia y el algoritmo de Euler con un número entero de pasos. Su
 notación y sus fórmulas son consistentes con la nueva clase de EDO. Incluye la
 definición de consistencia mediante el residuo normalizado y una demostración
 de la consistencia de primer orden de Euler, con una cota uniforme sobre la malla.
+
+El capítulo 9 incluye una sección de programación lineal con geometría de la
+región factible, símplex revisado, dualidad y precios sombra. Presenta un
+problema de producción resuelto con NumPy y SciPy y dos aplicaciones con
+Pyomo y HiGHS, regresión LAD y cartera MAD.
 
 ### Presentaciones
 
@@ -48,6 +53,13 @@ de la consistencia de primer orden de Euler, con una cota uniforme sobre la mall
 - [Unidad 7B: Cuadratura de Gauss y esperanzas](presentaciones/Unidad_7B_Integracion_Gauss.pdf)
 - [Unidad 7C: Ecuaciones integrales, EDO y Montecarlo](presentaciones/Unidad_7C_Integrales_EDO_Montecarlo.pdf)
 - [Unidad 8: Ecuaciones diferenciales ordinarias y métodos de un paso](presentaciones/Unidad_8_Ecuaciones_Diferenciales.pdf)
+- [Unidad 9A: Programación lineal, símplex y precios sombra](presentaciones/Unidad_9A_Programacion_Lineal.pdf)
+
+La Unidad 9A desarrolla el problema de producción de BIM, sus pivotes y
+la interpretación de los precios sombra. Incluye el código de los modelos
+LAD y MAD. Está disponible la
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_9A_Programacion_Lineal.tex)
+con las figuras que utiliza.
 
 La Unidad 8 sigue el capítulo 8 de las notas: problema de Cauchy, equivalencia
 integral, Euler, trapecio implícito, Heun, punto medio explícito y RK4. Incluye
@@ -155,6 +167,8 @@ evaluaciones del ciclo 2026-2.
 
 ### Laboratorios
 
+- Programación lineal · [Símplex revisado y SciPy](laboratorios/Programacion_Lineal_2026-2.py) · [LAD y MAD con Pyomo y HiGHS](laboratorios/Programacion_Lineal_Pyomo_2026-2.py)
+
 - [Ecuaciones diferenciales: Euler, punto medio, Heun y RK4](laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Script Python](laboratorios/Ecuaciones_Diferenciales_2026-2.py)
 
 - [Laboratorio de aproximación lineal y mínimos cuadrados con QR](laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Lab_Aproximacion_Lineal_QR_2026-2.ipynb)
@@ -206,6 +220,9 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 jupyter lab
 ```
+
+Para ejecutar los ejemplos de Pyomo, instale también las dependencias de esa
+unidad con \`python -m pip install pyomo highspy\`.
 
 Luego abra el cuaderno elegido dentro de `laboratorios/` y ejecute las celdas
 en orden. Los laboratorios anteriores conservan una ejecución completa de referencia.

@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=0.92cm,y=0.92cm,>=Latex]
+  \fill[blue!10] (0,0)--(7.8,0)--(7.8,6.9)--(2,4)--(0,2)--cycle;
+  \draw[thick,blue!65!black] (0,2)--(2,4);
+  \draw[thick,blue!65!black,->] (2,4)--(7.8,6.9)
+    node[above left] {$d_2=(2,1)$};
+  \draw[orange!85!black,thick,densely dotted] (0,2)--(1.15,6.6)
+    node[above right] {\small $4x_1-x_2=-2$};
+  \draw[->] (-0.25,0)--(8.35,0) node[right] {$x_1$};
+  \draw[->] (0,-0.25)--(0,7.1) node[above] {$x_2$};
+  \draw[blue!65!black,thick,->] (0,0)--(7.8,0)
+    node[above left] {$d_1=(1,0)$};
+  \fill[blue!65!black] (0,0) circle (1.5pt) node[below left] {$(0,0)$};
+  \fill[blue!65!black] (0,2) circle (1.5pt) node[left] {$(0,2)$};
+  \fill[blue!65!black] (2,4) circle (1.5pt) node[above left] {$(2,4)$};
+  \node[blue!65!black] at (4.1,2.4) {\small región factible};
+\end{tikzpicture}

@@ -1,0 +1,445 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\usepackage{tikz,listings}
+\usetikzlibrary{arrows.meta,babel}
+\lstset{language=Python,basicstyle=\ttfamily\small,columns=fullflexible,
+  keepspaces=true,showstringspaces=false,keywordstyle=\color{upazul}\bfseries}
+
+\newcommand{\libroPL}[2]{%
+  \href{https://mobook.github.io/MO-book/notebooks/02/#1}{\textcolor{upazul}{#2}}}
+\newcommand{\figuraPL}[2]{%
+  \resizebox{!}{#2}{\input{figuras/tikz/#1}}}
+\newcommand{\fragmentoPyomo}[1]{%
+  \lstinputlisting[basicstyle=\ttfamily\footnotesize,aboveskip=4pt,belowskip=5pt,%
+    rangeprefix={\#\ },linerange={#1_BEGIN-#1_END},includerangemarker=false]%
+    {../../laboratorios/Programacion_Lineal_Pyomo_2026-2.py}}
+
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+\title{Programación lineal}
+\subtitle{Geometría, método del símplex y precios sombra}
+
+\begin{document}
+
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.73\textwidth}
+\vspace{.55cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.3cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{.8cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.22\textwidth}
+\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{El plan de producción de BIM}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.46\textwidth}
+BIM fabrica dos tipos de chips. Cada chip de tipo 1 deja un margen de $12$
+y cada chip de tipo 2 deja un margen de $9$.
+\medskip
+
+Los insumos son limitados. Un chip de tipo 1 usa el doble de cobre que
+uno de tipo 2.
+\medskip
+
+\concepto{\textquestiondown{}Qué mezcla maximiza el margen total?}
+\end{column}
+\begin{column}{.51\textwidth}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Insumo & Tipo 1 & Tipo 2 & Límite\\
+\midrule
+Silicio   & 1 & 0 & $1000$\\
+Germanio  & 0 & 1 & $1500$\\
+Plástico  & 1 & 1 & $1750$\\
+Cobre     & 4 & 2 & $4800$\\
+\bottomrule
+\end{tabular}
+\medskip
+
+\raggedright Los coeficientes indican el consumo por chip en las unidades
+de cada insumo.
+\end{column}
+\end{columns}
+\fuente{\libroPL{01-bim.html}{Postek et al. (2025), cuaderno 2.1}}
+\end{frame}
+
+\begin{frame}{Variables, objetivo y restricciones}
+$x_1,x_2$ son las cantidades de chips de cada tipo. El modelo continuo es
+\[
+\begin{aligned}
+\max \quad &12x_1+9x_2\\
+\text{sujeto a}\quad
+ & x_1\le 1000 &&\text{(silicio)},\\
+ & x_2\le 1500 &&\text{(germanio)},\\
+ & x_1+x_2\le 1750 &&\text{(plástico)},\\
+ & 4x_1+2x_2\le 4800 &&\text{(cobre)},\\
+ & x_1,x_2\ge 0 .
+\end{aligned}
+\]
+En forma matricial, $\max\{c^\top x:Ax\le b,\ x\ge 0\}$.
+La holgura $b_i-(Ax)_i$ mide cuánto queda del insumo $i$.
+\end{frame}
+
+\begin{frame}{Región factible y rectas de igual margen}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.47\textwidth}
+Cada restricción conserva un semiplano. Su intersección es el polígono sombreado.
+\medskip
+
+La recta $12x_1+9x_2=z$ se desplaza hacia valores mayores de $z$.
+El último contacto ocurre donde se agotan el plástico y el cobre.
+\medskip
+
+\[
+\begin{aligned}
+x^*&=(650,1100),\\
+z^*&=17\,700 .
+\end{aligned}
+\]
+\end{column}
+\begin{column}{.51\textwidth}
+\centering
+\figuraPL{pl_bim_region}{5.8cm}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Vértices óptimos y empates}
+En un polígono factible acotado, cada plan es un promedio ponderado
+de los vértices. El objetivo lineal toma el mismo promedio de sus valores.
+\[
+x=\sum_i\theta_i v_i,\qquad
+c^\top x=\sum_i\theta_i\,c^\top v_i,\qquad
+\theta_i\ge 0,\quad \sum_i\theta_i=1 .
+\]
+\concepto{Al menos un vértice es óptimo.}
+\medskip
+
+Si el objetivo de BIM fuera $\max(x_1+x_2)$, cualquier punto de la arista
+entre $(250,1500)$ y $(650,1100)$ alcanzaría $1750$.
+En ambos extremos y entre ellos se agota el plástico.
+\end{frame}
+
+\begin{frame}{Regiones no acotadas}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.50\textwidth}
+La región satisface $x_1,x_2\ge0$, $-x_1+x_2\le2$ y $-x_1+2x_2\le6$.
+Sus dos rayos permiten avanzar indefinidamente.
+\medskip
+
+\textbf{Minimizar $x_1-3x_2$.} Cada paso en $(2,1)$ reduce el costo en $1$.
+\medskip
+
+\textbf{Minimizar $4x_1-x_2$.} Ambos rayos aumentan el costo. El mínimo
+vale $-2$ en $(0,2)$.
+\end{column}
+\begin{column}{.48\textwidth}
+\centering
+\figuraPL{pl_recesion}{4.6cm}
+\end{column}
+\end{columns}
+\fuente{Adaptado del ejemplo 3.1 del material \emph{Método del Simplex: Fundamentos y Pseudocódigo}.}
+\end{frame}
+
+\begin{frame}{Forma estándar y base inicial}
+Para el símplex usaremos una minimización con igualdades y variables no negativas.
+\[
+\min_{w\ge0}\ \tilde c^\top w
+\qquad \text{sujeto a}\qquad
+\tilde A w=b .
+\]
+Para BIM, agregamos holguras $s=b-Ax$ y cambiamos el signo del objetivo.
+\[
+ w=(x,s),\qquad \tilde A=[A\mid I],\qquad \tilde c=(-c,0).
+\]
+\begin{block}{Plan inicial}
+Con $x=0$, las holguras valen $s=b$. Las columnas de $I$ forman
+la base inicial y el plan corresponde al origen.
+\end{block}
+\end{frame}
+
+\begin{frame}{Soluciones básicas factibles}
+Supongamos que $\tilde A$ tiene $m$ filas linealmente independientes.
+Elegimos $m$ columnas independientes para formar $B$.
+\[
+ w_{\mathcal N}=0,\qquad B w_{\mathcal B}=b.
+\]
+\begin{itemize}
+\item Si $w_{\mathcal B}\ge0$, el punto es una \concepto{solución básica factible}.
+\item Estas soluciones son los vértices de la región factible.
+\item Si alguna variable básica vale cero, el punto es degenerado.
+Un pivote puede cambiar la base en el mismo vértice.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Costos reducidos y variable entrante}
+Si una variable no básica $w_j$ sube de $0$ a $t$, las básicas deben
+ajustarse para conservar $\tilde A w=b$.
+\[
+ B\bar b=b,\qquad Bu=a_j,\qquad
+ w_{\mathcal B}(t)=\bar b-tu .
+\]
+El cambio en el objetivo es $t\bar c_j$, donde
+\[
+ B^\top y=\tilde c_{\mathcal B},\qquad
+ \boxed{\bar c_j=\tilde c_j-a_j^\top y.}
+\]
+Si $\bar c_j<0$, cualquier paso positivo factible reduce el costo.
+Si todos los costos reducidos son no negativos, la solución básica es óptima.
+\end{frame}
+
+\begin{frame}{Cociente mínimo y primer pivote de BIM}
+La variable que sale es la primera básica que llega a cero.
+\[
+ t_*=\min_{i:u_i>0}\frac{\bar b_i}{u_i}.
+\]
+En BIM, con $B=I$, los costos reducidos de $x_1,x_2$ son $-12$ y $-9$.
+La regla de Bland elige $x_1$, el menor índice con costo reducido negativo.
+\medskip
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Insumo que se consume & Silicio & Plástico & Cobre\\
+\midrule
+Cociente & $1000/1$ & $1750/1$ & $4800/4$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\medskip
+
+El silicio se agota primero. Entra $x_1$ y sale su holgura.
+\end{frame}
+
+\begin{frame}{Los tres pivotes de BIM}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.55\textwidth}
+\begin{tabular}{clr}
+\toprule
+Paso & Plan $(x_1,x_2)$ & Margen\\
+\midrule
+0 & $(0,0)$ & $0$\\
+1 & $(1000,0)$ & $12\,000$\\
+2 & $(1000,400)$ & $15\,600$\\
+3 & $(650,1100)$ & $17\,700$\\
+\bottomrule
+\end{tabular}
+\medskip
+
+En el tercer pivote, reducir $x_1$ en uno libera cobre para aumentar
+$x_2$ en dos. El margen sube en $2(9)-12=6$ por sustitución,
+hasta agotar el plástico.
+\end{column}
+\begin{column}{.43\textwidth}
+\centering
+\figuraPL{pl_bim_pivotes}{5.35cm}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Algoritmo del símplex revisado}
+\begin{enumerate}
+\item Resolver $B\bar b=b$ y $B^\top y=\tilde c_{\mathcal B}$.
+\item Calcular los costos reducidos. Si todos son no negativos,
+      devolver la solución básica.
+\item Elegir un $\bar c_j<0$ y resolver $Bu=a_j$. Si $u\le0$,
+      el objetivo puede disminuir indefinidamente.
+\item Aplicar el cociente mínimo, cambiar la columna de la base y repetir.
+\end{enumerate}
+\medskip
+
+\textbf{Regla de Bland.} Elegir el menor índice elegible para entrar
+y el menor índice básico si hay empate al salir.
+\medskip
+
+\textbf{Fase I.} Si falta una base factible, se minimiza la suma de
+variables artificiales. Un mínimo positivo certifica infactibilidad.
+\end{frame}
+
+\begin{frame}{Certificado dual y precios sombra}
+Si $\lambda\ge0$ y $A^\top\lambda\ge c$, cada plan factible de BIM cumple
+\[
+ c^\top x\le\lambda^\top Ax\le b^\top\lambda .
+\]
+El dual minimiza $b^\top\lambda$ sobre estos valores unitarios.
+\medskip
+
+Para BIM, $\lambda=(0,0,6,1.5)$ da la cota
+$6(1750)+1.5(4800)=17\,700$. El plan $(650,1100)$ alcanza esa cota.
+\begin{block}{Una unidad adicional de plástico}
+Con $b_3=1751$, el nuevo plan es $(649,1102)$ y el margen sube a
+$17\,706$. El precio sombra de $6$ mide ese aumento local.
+\end{block}
+\fuente{\libroPL{06-bim-dual.html}{Postek et al. (2025), cuaderno 2.6}}
+\end{frame}
+
+\begin{frame}[fragile]{BIM con \texttt{linprog} y HiGHS}
+\begin{lstlisting}
+from scipy.optimize import linprog
+
+A = [[1, 0], [0, 1], [1, 1], [4, 2]]
+b = [1000, 1500, 1750, 4800]
+res = linprog([-12, -9], A_ub=A, b_ub=b,
+              bounds=(0, None), method="highs")
+if not res.success:
+    raise RuntimeError(res.message)
+
+print(res.x, -res.fun)         # [650. 1100.] 17700.0
+print(-res.ineqlin.marginals)   # [0. 0. 6. 1.5]
+\end{lstlisting}
+\medskip
+
+SciPy minimiza. Se cambia el signo del objetivo al ingresar los datos
+y el de los marginales al interpretar el máximo.
+\fuente{\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html}{\textcolor{upazul}{Documentación de linprog}}}
+\end{frame}
+
+\begin{frame}[fragile]{Demostración en Python}
+Desde la raíz del proyecto, con NumPy y SciPy instalados, ejecutar
+\begin{lstlisting}[language={}]
+python3 laboratorios/Programacion_Lineal_2026-2.py
+\end{lstlisting}
+El programa imprime la base y el margen en cada iteración.
+\begin{enumerate}
+\item Ejecutar el símplex revisado desde la base de holguras.
+\item Comparar el plan final y el margen con HiGHS.
+\item Aumentar en una unidad el límite de plástico y volver a resolver.
+\end{enumerate}
+\medskip
+
+\concepto{Para discutir.} Si se añade una unidad de silicio al modelo original,
+\textquestiondown{}cambia el margen máximo? \textquestiondown{}Cómo se puede comprobar con las holguras
+y el certificado dual?
+\end{frame}
+
+\begin{frame}[fragile]{Instalación de Pyomo y HiGHS}
+Pyomo expresa el modelo con variables, restricciones y objetivo.
+HiGHS calcula la solución. El paquete \texttt{highspy} permite invocarlo desde Python.
+\begin{lstlisting}[language={}]
+python3 -m pip install pyomo highspy
+python3 laboratorios/Programacion_Lineal_Pyomo_2026-2.py
+\end{lstlisting}
+En Jupyter o Colab, instalar con \texttt{\%pip install pyomo highspy}.
+\fragmentoPyomo{CREAR_SOLVER}
+\fuente{\href{https://mobook.github.io/MO-book/notebooks/appendix/installing-pyomo-and-solvers.html}{\textcolor{upazul}{Instalación y solvers del libro}}}
+\end{frame}
+
+\begin{frame}{Resolución y lectura de resultados}
+\fragmentoPyomo{RESOLVER}
+\begin{itemize}
+\item \texttt{load\_solutions=False} permite revisar cómo terminó el solver
+antes de cargar valores, incluso si el modelo es infactible.
+\item \texttt{assert\_optimal\_termination} detiene la ejecución si el solver
+no reporta un óptimo para estos problemas lineales.
+\item Tras cargar la solución, usar \texttt{pyo.value(...)} para consultar
+variables, expresiones u objetivos.
+\end{itemize}
+\medskip
+Antes de resolver, \texttt{modelo.pprint()} muestra los componentes del modelo.
+\end{frame}
+
+\begin{frame}{Regresión LAD}
+LAD (\emph{Least Absolute Deviation}) es la regresión de mínima suma de
+desviaciones absolutas. Para el hogar $i$, $y_i$ es el gasto y $z_i$ es
+el vector de regresores.
+\[
+\begin{aligned}
+\min\quad &\sum_i(p_i+q_i)\\
+\text{sujeto a}\quad
+ &\alpha+z_i^\top\beta+p_i-q_i=y_i \quad (\text{cada } i),\\
+ &p_i,q_i\ge0,\qquad \alpha,\beta_j\text{ libres}.
+\end{aligned}
+\]
+En el óptimo, $p_i$ y $q_i$ son las partes positiva y negativa del residuo.
+Si ambas fueran positivas, se podrían reducir por igual manteniendo el ajuste.
+Con solo un intercepto, el ajuste LAD estima una mediana.
+\fuente{\libroPL{02-lad-regression.html\#model}{Postek et al. (2025), cuaderno 2.2}}
+\end{frame}
+
+\begin{frame}{LAD en Pyomo. Datos y variables}
+Cinco observaciones sintéticas de ingreso $z$ y gasto $y$.
+La observación central tiene un gasto atípico de $15$.
+\fragmentoPyomo{LAD_VAR}
+\texttt{RangeSet} incluye ambos extremos. \texttt{Reals} deja libres
+el intercepto y la pendiente. Las desviaciones son no negativas.
+\end{frame}
+
+\begin{frame}{LAD en Pyomo. Ajuste y resultado}
+\fragmentoPyomo{LAD_REST}
+\fragmentoPyomo{LAD_SOL}
+\concepto{Resultado.} $\hat y=1+2z$. Solo el dato con $z=2$ deja un residuo de $15-5=10$.
+\end{frame}
+
+\begin{frame}{Cartera MAD}
+MAD (\emph{Mean Absolute Deviation}) significa desviación absoluta media.
+\smallskip
+
+$w_j$ es el peso del activo $j$, $r_{tj}$ su retorno observado en $t$ y
+$\bar r_j$ su retorno medio muestral.
+\[
+\begin{aligned}
+\min\quad &\frac1T\sum_{t=1}^T(p_t+q_t)\\
+\text{sujeto a}\quad
+ &p_t-q_t=\sum_j(r_{tj}-\bar r_j)w_j \quad(\text{cada }t),\\
+ &\sum_j\bar r_jw_j\ge R,\qquad \sum_j w_j=1,\\
+ &0\le w_j\le u_j,\qquad p_t,q_t\ge0.
+\end{aligned}
+\]
+Se minimiza el MAD de los retornos de la cartera respecto de su media.
+$R$ fija el retorno medio mínimo y $u_j$ limita el peso del activo $j$.
+\fuente{\libroPL{03-mad-portfolio-optimization.html\#mean-absolute-deviation-mad-portfolio-optimization}{Postek et al. (2025), cuaderno 2.3}}
+\end{frame}
+
+\begin{frame}{MAD en Pyomo. Datos, pesos y meta}
+Retornos sintéticos de dos activos. En Python, \texttt{0.03} representa $3\%$.
+\fragmentoPyomo{MAD_VAR}
+\texttt{mutable=True} permite cambiar $R$. Con el tope de peso, el retorno
+medio máximo es $0.8(4\%)+0.2(2\%)=3.6\%$. Una meta de $4\%$ es infactible.
+\end{frame}
+
+\begin{frame}{MAD en Pyomo. Restricciones y objetivo}
+\fragmentoPyomo{MAD_REST}
+El decorador genera una igualdad por período.
+\end{frame}
+
+\begin{frame}{MAD en Pyomo. Cambio de la meta}
+\fragmentoPyomo{MAD_SOL}
+\centering
+\small
+\begin{tabular}{rrrr}
+\toprule
+Meta $R$ & Peso A & Peso B & MAD (puntos porcentuales)\\
+\midrule
+$3.0\%$ & $50\%$ & $50\%$ & $0.750$\\
+$3.5\%$ & $75\%$ & $25\%$ & $1.875$\\
+\bottomrule
+\end{tabular}
+\par\medskip
+\raggedright
+Al subir el peso de A, se compensan menos las variaciones de ambos activos.
+\end{frame}
+
+\begin{frame}{Material de consulta}
+\begin{itemize}
+\item Notas de Métodos Numéricos, capítulo 9, sección de programación lineal.
+\item \emph{Método del Simplex: Fundamentos y Pseudocódigo}, material del curso
+Optimización para Machine Learning basado en Bazaraa, Jarvis y Sherali.
+\item Postek, Zocca, Gromicho y Kantor (2025).
+\emph{Hands-On Mathematical Optimization with Python}. Cambridge University Press.
+\end{itemize}
+\medskip
+
+\libroPL{01-bim.html}{Producción BIM}
+\quad \libroPL{06-bim-dual.html}{Dual de BIM}
+\quad \libroPL{02-lad-regression.html}{Regresión LAD}
+\quad \libroPL{03-mad-portfolio-optimization.html}{Cartera MAD}
+\end{frame}
+
+\end{document}

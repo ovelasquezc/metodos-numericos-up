@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=0.40cm,y=0.40cm,>=Latex]
+  \filldraw[fill=blue!8,draw=blue!45] (0,0)--(10,0)--(10,4)--(6.5,11)--(2.5,15)--(0,15)--cycle;
+  \draw[->] (-0.4,0)--(12,0) node[right] {$x_1$};
+  \draw[->] (0,-0.4)--(0,16.6) node[above] {$x_2$};
+  \draw[orange!85!black,very thick,->] (0,0)--(9.88,0);
+  \draw[orange!85!black,very thick,->] (10,0)--(10,3.88);
+  \draw[orange!85!black,very thick,->] (10,4)--(6.56,10.88);
+  \fill (0,0) circle (1.5pt) node[below left] {\small $(0,0)$};
+  \fill (10,0) circle (1.5pt) node[below] {\small $(1000,0)$};
+  \fill (10,4) circle (1.5pt) node[right] {\small $(1000,400)$};
+  \fill (6.5,11) circle (1.5pt) node[right] {\small $(650,1100)$};
+  \node[below,orange!85!black] at (5,0) {\small 1};
+  \node[right,orange!85!black] at (10,2) {\small 2};
+  \node[right,orange!85!black] at (8.25,7.5) {\small 3};
+\end{tikzpicture}

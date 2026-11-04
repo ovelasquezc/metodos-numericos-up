@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=0.46cm,y=0.46cm,>=Latex]
+  \fill[blue!10] (0,0)--(10,0)--(10,4)--(6.5,11)--(2.5,15)--(0,15)--cycle;
+  \draw[gray!90!black] (10,0)--(10,19.5) node[above] {\small silicio};
+  \draw[gray!90!black] (0,15)--(17.5,15) node[right] {\small germanio};
+  \draw[blue!65!black] (0,17.5)--(17.5,0);
+  \draw[teal!65!black] (1.75,20.5)--(12,0);
+  \node[above right,blue!65!black] at (14.4,3.1) {\small plástico};
+  \node[right,teal!65!black] at (10.95,2.1) {\small cobre};
+  \draw[orange!85!black,densely dashed] (0,12)--(9,0);
+  \draw[orange!85!black,thick,densely dashed] (0,19.6667)--(14.75,0);
+  \draw[orange!85!black,thick,->] (12.4,7.2)--(14.8,9)
+    node[above] {\small mayor margen};
+  \draw[thick,blue!55!black] (0,0)--(10,0)--(10,4)--(6.5,11)--(2.5,15)--(0,15)--cycle;
+  \draw[->] (-0.4,0)--(18.25,0) node[right] {$x_1$};
+  \draw[->] (0,-0.4)--(0,21) node[above] {$x_2$};
+  \foreach \pos/\etiqueta in {5/500,10/1000,15/1500} {
+    \draw (\pos,0.13)--(\pos,-0.13) node[below] {\small \etiqueta};
+    \draw (0.13,\pos)--(-0.13,\pos) node[left] {\small \etiqueta};
+  }
+  \node[below left] at (0,0) {\small $0$};
+  \foreach \p in {(0,0),(10,0),(10,4),(6.5,11),(2.5,15),(0,15)}
+    \fill[blue!60!black] \p circle (1.4pt);
+  \node[below left,blue!60!black] at (6.5,11) {$x^*$};
+  \node[orange!85!black,left] at (0,19.6667) {\small $z=17\,700$};
+  \node[orange!85!black,below left] at (6.9,2.8) {\small $z=10\,800$};
+\end{tikzpicture}
