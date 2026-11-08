@@ -85,8 +85,8 @@ $x_1,x_2$ son las cantidades de chips de cada tipo. El modelo continuo es
  & x_1,x_2\ge 0 .
 \end{aligned}
 \]
-En forma matricial, $\max\{c^\top x:Ax\le b,\ x\ge 0\}$.
-La holgura $b_i-(Ax)_i$ mide cuánto queda del insumo $i$.
+En forma matricial, $\max\{c_0^\top x:A_0x\le b,\ x\ge 0\}$.
+La holgura $b_i-(A_0x)_i$ mide cuánto queda del insumo $i$.
 \end{frame}
 
 \begin{frame}{Región factible y rectas de igual margen}
@@ -118,7 +118,7 @@ En un polígono factible acotado, cada plan es un promedio ponderado
 de los vértices. El objetivo lineal toma el mismo promedio de sus valores.
 \[
 x=\sum_i\theta_i v_i,\qquad
-c^\top x=\sum_i\theta_i\,c^\top v_i,\qquad
+c_0^\top x=\sum_i\theta_i\,c_0^\top v_i,\qquad
 \theta_i\ge 0,\quad \sum_i\theta_i=1 .
 \]
 \concepto{Al menos un vértice es óptimo.}
@@ -151,73 +151,77 @@ vale $-2$ en $(0,2)$.
 \end{frame}
 
 \begin{frame}{Forma estándar y base inicial}
-Para el símplex usaremos una minimización con igualdades y variables no negativas.
+En la notación de Bazaraa, la forma estándar es
 \[
-\min_{w\ge0}\ \tilde c^\top w
-\qquad \text{sujeto a}\qquad
-\tilde A w=b .
+\min_{x\ge0}\ c^\top x \qquad \text{sujeto a}\qquad Ax=b,
+\qquad A\in\mathbb R^{m\times n},\quad \operatorname{rang}(A)=m.
 \]
-Para BIM, agregamos holguras $s=b-Ax$ y cambiamos el signo del objetivo.
+Para BIM, $x_1,x_2$ son los niveles de producción y $x_3,\ldots,x_6$
+son las holguras de silicio, germanio, plástico y cobre, en ese orden.
 \[
- w=(x,s),\qquad \tilde A=[A\mid I],\qquad \tilde c=(-c,0).
+ A=[A_0\mid I],\qquad c=\begin{pmatrix}-c_0\\0\end{pmatrix}.
 \]
 \begin{block}{Plan inicial}
-Con $x=0$, las holguras valen $s=b$. Las columnas de $I$ forman
-la base inicial y el plan corresponde al origen.
+Con $x_1=x_2=0$, las holguras valen $b$. La matriz básica inicial es
+$B=[a_3\mid a_4\mid a_5\mid a_6]=I$, donde $a_j$ es la columna $j$ de $A$.
 \end{block}
 \end{frame}
 
 \begin{frame}{Soluciones básicas factibles}
-Supongamos que $\tilde A$ tiene $m$ filas linealmente independientes.
-Elegimos $m$ columnas independientes para formar $B$.
+Reordenamos las columnas de $A$ para reunir en $B$ las $m$ columnas
+elegidas, con $B$ invertible. Las demás forman $N$.
 \[
- w_{\mathcal N}=0,\qquad B w_{\mathcal B}=b.
+ A=[B\mid N],\qquad Bx_B+Nx_N=b,\qquad
+ x_N=0\ \Longrightarrow\ x_B=B^{-1}b .
 \]
-\begin{itemize}
-\item Si $w_{\mathcal B}\ge0$, el punto es una \concepto{solución básica factible}.
-\item Estas soluciones son los vértices de la región factible.
-\item Si alguna variable básica vale cero, el punto es degenerado.
-Un pivote puede cambiar la base en el mismo vértice.
-\end{itemize}
+Las variables de $x_B$ son \concepto{básicas}. Las de $x_N$ son
+\concepto{no básicas}. La solución básica es factible si $x_B\ge0$.
+Las soluciones básicas factibles son los vértices. Si alguna básica vale
+cero, el vértice es degenerado.
+\begin{block}{Ejemplo 3.2}
+Con $x_1+x_2+x_3=6$ y $x_2+x_4=3$, elegir $B=[a_1\mid a_2]$
+fija $x_3=x_4=0$. Se obtiene $x=(3,3,0,0)$, que se proyecta en el
+vértice $(3,3)$ del plano $(x_1,x_2)$.
+\end{block}
 \end{frame}
 
 \begin{frame}{Costos reducidos y variable entrante}
-Si una variable no básica $w_j$ sube de $0$ a $t$, las básicas deben
-ajustarse para conservar $\tilde A w=b$.
+Desde la solución básica factible $x_B=B^{-1}b$, $x_N=0$,
+despejamos las básicas al permitir que cambie $x_N$.
 \[
- B\bar b=b,\qquad Bu=a_j,\qquad
- w_{\mathcal B}(t)=\bar b-tu .
+ Bx_B+Nx_N=b
+ \quad\Longrightarrow\quad x_B=B^{-1}b-B^{-1}Nx_N .
 \]
-El cambio en el objetivo es $t\bar c_j$, donde
+Al sustituir en el objetivo, con $R$ el conjunto de índices no básicos,
 \[
- B^\top y=\tilde c_{\mathcal B},\qquad
- \boxed{\bar c_j=\tilde c_j-a_j^\top y.}
+\begin{aligned}
+ z&=c_B^\top x_B+c_N^\top x_N
+   =z_0+\sum_{j\in R}\bar c_jx_j,\\
+ z_0&=c_B^\top B^{-1}b,\qquad
+ z_j=c_B^\top B^{-1}a_j,\qquad \boxed{\bar c_j=c_j-z_j}.
+\end{aligned}
 \]
-Si $\bar c_j<0$, cualquier paso positivo factible reduce el costo.
-Si todos los costos reducidos son no negativos, la solución básica es óptima.
+El costo reducido $\bar c_j$ mide el cambio por unidad de $x_j$.
+Si $\bar c_j<0$, conviene aumentar $x_j$ siempre que el paso sea factible.
+Si $\bar c_j\ge0$ para todo $j\in R$, la solución básica actual es óptima.
 \end{frame}
 
 \begin{frame}{Cociente mínimo y primer pivote de BIM}
-La variable que sale es la primera básica que llega a cero.
+Al aumentar solo la entrante $x_k$, la básica de la fila $i$ queda en
 \[
- t_*=\min_{i:u_i>0}\frac{\bar b_i}{u_i}.
+ x_{B_i}=\bar b_i-y_{ik}x_k,\qquad \bar b=B^{-1}b,\qquad
+ y_{ik}=(B^{-1}a_k)_i.
 \]
-En BIM, con $B=I$, los costos reducidos de $x_1,x_2$ son $-12$ y $-9$.
-La regla de Bland elige $x_1$, el menor índice con costo reducido negativo.
-\medskip
-
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-Insumo que se consume & Silicio & Plástico & Cobre\\
-\midrule
-Cociente & $1000/1$ & $1750/1$ & $4800/4$\\
-\bottomrule
-\end{tabular}
-\end{center}
-\medskip
-
-El silicio se agota primero. Entra $x_1$ y sale su holgura.
+Solo disminuyen las básicas con $y_{ik}>0$. Para conservar $x_B\ge0$,
+\[
+ 0\le x_k\le \bar x_k=\min_{i:y_{ik}>0}\frac{\bar b_i}{y_{ik}} .
+\]
+En BIM, $\bar c_1=-12$ y $\bar c_2=-9$. Bland elige $k=1$.
+Como $B=I$, $B^{-1}a_1=(1,0,1,4)^\top$ y
+\[
+ \bar x_1=\min\{1000/1,\ 1750/1,\ 4800/4\}=1000 .
+\]
+El mínimo está en la fila $r=1$. Sale $x_3$ y $a_1$ sustituye a $a_3$ en $B$.
 \end{frame}
 
 \begin{frame}{Los tres pivotes de BIM}
@@ -235,6 +239,9 @@ Paso & Plan $(x_1,x_2)$ & Margen\\
 \end{tabular}
 \medskip
 
+En el primer pivote, la nueva base es $[a_1\mid a_4\mid a_5\mid a_6]$.
+\medskip
+
 En el tercer pivote, reducir $x_1$ en uno libera cobre para aumentar
 $x_2$ en dos. El margen sube en $2(9)-12=6$ por sustitución,
 hasta agotar el plástico.
@@ -248,12 +255,12 @@ hasta agotar el plástico.
 
 \begin{frame}{Algoritmo del símplex revisado}
 \begin{enumerate}
-\item Resolver $B\bar b=b$ y $B^\top y=\tilde c_{\mathcal B}$.
-\item Calcular los costos reducidos. Si todos son no negativos,
-      devolver la solución básica.
-\item Elegir un $\bar c_j<0$ y resolver $Bu=a_j$. Si $u\le0$,
-      el objetivo puede disminuir indefinidamente.
-\item Aplicar el cociente mínimo, cambiar la columna de la base y repetir.
+\item Resolver $B\bar b=b$ y calcular $\bar c_j=c_j-z_j$ para $j\in R$.
+\item Si todos los $\bar c_j\ge0$, devolver la solución básica actual.
+\item Elegir $k$ con $\bar c_k<0$. Obtener $y_{ik}=(B^{-1}a_k)_i$.
+      Si todos los $y_{ik}\le0$, el costo puede disminuir sin límite.
+\item Calcular $\bar x_k$ y la fila saliente $r$. Sustituir $a_{B_r}$
+      por $a_k$ en $B$ y repetir. Si $\bar x_k=0$, el punto no se mueve.
 \end{enumerate}
 \medskip
 
@@ -263,12 +270,16 @@ y el menor índice básico si hay empate al salir.
 
 \textbf{Fase I.} Si falta una base factible, se minimiza la suma de
 variables artificiales. Un mínimo positivo certifica infactibilidad.
+\medskip
+
+El código evalúa las expresiones con $B^{-1}$ mediante sistemas lineales.
 \end{frame}
 
 \begin{frame}{Certificado dual y precios sombra}
-Si $\lambda\ge0$ y $A^\top\lambda\ge c$, cada plan factible de BIM cumple
+Volvemos al máximo original de BIM. Si $\lambda\ge0$ y $A_0^\top\lambda\ge c_0$,
+cada plan factible satisface
 \[
- c^\top x\le\lambda^\top Ax\le b^\top\lambda .
+ c_0^\top x\le\lambda^\top A_0x\le b^\top\lambda .
 \]
 El dual minimiza $b^\top\lambda$ sobre estos valores unitarios.
 \medskip
