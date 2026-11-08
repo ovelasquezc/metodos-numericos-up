@@ -133,7 +133,8 @@ En ambos extremos y entre ellos se agota el plástico.
 \begin{columns}[c,onlytextwidth]
 \begin{column}{.50\textwidth}
 La región satisface $x_1,x_2\ge0$, $-x_1+x_2\le2$ y $-x_1+2x_2\le6$.
-Sus dos rayos permiten avanzar indefinidamente.
+Sus dos \hyperlink{teoria-rayos}{\concepto{rayos de recesión}}
+permiten avanzar indefinidamente.
 \medskip
 
 \textbf{Minimizar $x_1-3x_2$.} Cada paso en $(2,1)$ reduce el costo en $1$.
@@ -176,8 +177,9 @@ elegidas, con $B$ invertible. Las demás forman $N$.
 \]
 Las variables de $x_B$ son \concepto{básicas}. Las de $x_N$ son
 \concepto{no básicas}. La solución básica es factible si $x_B\ge0$.
-Las soluciones básicas factibles son los vértices. Si alguna básica vale
-cero, el vértice es degenerado.
+Las soluciones básicas factibles son los vértices
+(\hyperlink{teoria-sbf}{\concepto{demostración}}).
+Si alguna básica vale cero, la solución es degenerada.
 \begin{block}{Ejemplo 3.2}
 Con $x_1+x_2+x_3=6$ y $x_2+x_4=3$, elegir $B=[a_1\mid a_2]$
 fija $x_3=x_4=0$. Se obtiene $x=(3,3,0,0)$, que se proyecta en el
@@ -203,7 +205,8 @@ Al sustituir en el objetivo, con $R$ el conjunto de índices no básicos,
 \]
 El costo reducido $\bar c_j$ mide el cambio por unidad de $x_j$.
 Si $\bar c_j<0$, conviene aumentar $x_j$ siempre que el paso sea factible.
-Si $\bar c_j\ge0$ para todo $j\in R$, la solución básica actual es óptima.
+Si $\bar c_j\ge0$ para todo $j\in R$, la solución básica actual es óptima
+(\hyperlink{teoria-certificados}{\concepto{demostración}}).
 \end{frame}
 
 \begin{frame}{Cociente mínimo y primer pivote de BIM}
@@ -221,7 +224,8 @@ Como $B=I$, $B^{-1}a_1=(1,0,1,4)^\top$ y
 \[
  \bar x_1=\min\{1000/1,\ 1750/1,\ 4800/4\}=1000 .
 \]
-El mínimo está en la fila $r=1$. Sale $x_3$ y $a_1$ sustituye a $a_3$ en $B$.
+El mínimo está en la fila $r=1$. Sale $x_3$ y $a_1$ sustituye a $a_3$ en $B$
+(\hyperlink{teoria-pivote}{\concepto{justificación}}).
 \end{frame}
 
 \begin{frame}{Los tres pivotes de BIM}
@@ -264,11 +268,11 @@ hasta agotar el plástico.
 \end{enumerate}
 \medskip
 
-\textbf{Regla de Bland.} Elegir el menor índice elegible para entrar
+\hyperlink{teoria-terminacion}{\concepto{Regla de Bland.}} Elegir el menor índice elegible para entrar
 y el menor índice básico si hay empate al salir.
 \medskip
 
-\textbf{Fase I.} Si falta una base factible, se minimiza la suma de
+\hyperlink{teoria-fase1}{\concepto{Fase I.}} Si falta una base factible, se minimiza la suma de
 variables artificiales. Un mínimo positivo certifica infactibilidad.
 \medskip
 
@@ -454,6 +458,257 @@ Optimización para Machine Learning basado en Bazaraa, Jarvis y Sherali.
 \quad \libroPL{03-mad-portfolio-optimization.html}{Cartera MAD}
 \par\medskip
 \colabPL{Cuaderno de demostración en Colab}
+\quad
+\hyperlink{teoria-convexidad}{\concepto{Fundamentos del símplex}}
+\end{frame}
+
+\section{Fundamentos del símplex}
+
+\begin{frame}[label=teoria-convexidad]{Convexidad y puntos extremos}
+En forma estándar, $P=\{x\in\mathbb R^n:Ax=b,\ x\ge0\}$ es convexo.
+Si $u,v\in P$ y $0\le\lambda\le1$, entonces
+\[
+ A\bigl(\lambda u+(1-\lambda)v\bigr)=b,\qquad
+ \lambda u+(1-\lambda)v\ge0.
+\]
+Un \concepto{punto extremo} de $P$ no puede escribirse como
+$\lambda u+(1-\lambda)v$ con $u,v\in P$, $u\ne v$ y $0<\lambda<1$.
+\medskip
+
+La \concepto{envolvente convexa} $\operatorname{conv}(S)$ reúne las
+combinaciones finitas $\sum_i\lambda_i x^i$ de puntos de $S$ con
+$\lambda_i\ge0$ y $\sum_i\lambda_i=1$.
+\begin{block}{Teorema de Carathéodory}
+En $\mathbb R^n$, basta combinar a lo sumo $n+1$ puntos de $S$ para
+representar un punto de $\operatorname{conv}(S)$.
+\end{block}
+\end{frame}
+
+\begin{frame}[label=teoria-rayos]{Dirección factible y recesión}
+Fijemos $x\in P$. Una \concepto{dirección factible} $d$ permite
+$x+\theta d\in P$ para todo $\theta\in[0,\varepsilon]$ con algún
+$\varepsilon>0$. En forma estándar esto equivale a
+\[
+ Ad=0,\qquad d_i\ge0 \text{ cuando }x_i=0.
+\]
+En efecto, $Ad=0$ conserva la igualdad y una componente positiva
+puede disminuir durante un intervalo corto. Si $d_i<0$, la cota
+$\theta\le x_i/(-d_i)$ evita que esa componente se vuelva negativa.
+\medskip
+
+Una \concepto{dirección de recesión} admite todo $\theta\ge0$.
+Cuando $P\ne\varnothing$, su cono de recesión es
+\[
+ \operatorname{rec}(P)=\{d:Ad=0,\ d\ge0\}.
+\]
+Si $c^\top d<0$ en ese cono, el costo $c^\top x+\theta c^\top d$
+tiende a $-\infty$.
+\end{frame}
+
+\begin{frame}{Descomposición del poliedro y óptimo finito}
+Para $P$ no vacío en forma estándar, sean $x^1,\ldots,x^p$ sus vértices
+y $d^1,\ldots,d^q$ sus direcciones extremas de recesión. Todo
+punto factible tiene una representación de la forma
+\[
+ x=\sum_{i=1}^p\lambda_i x^i+\sum_{j=1}^q\mu_j d^j,\qquad
+ \lambda_i,\mu_j\ge0,\qquad \sum_{i=1}^p\lambda_i=1 .
+\]
+Al aplicar $c^\top$, la primera suma es un promedio de costos de vértices.
+\begin{itemize}
+\item Si algún $c^\top d^j<0$, se puede aumentar $\mu_j$ sin límite y
+      el problema es no acotado inferiormente.
+\item Si todos los $c^\top d^j\ge0$, la segunda suma aporta un costo
+      no negativo. Cualquier vértice de menor costo alcanza el mínimo.
+\end{itemize}
+\medskip
+
+Así, con un óptimo finito, \concepto{existe al menos un vértice óptimo}.
+Una arista de costo constante puede contener otros óptimos.
+\end{frame}
+
+\begin{frame}[label=teoria-sbf]{De solución básica factible a vértice}
+Sea $x$ una solución básica factible con $x_B=B^{-1}b$ y $x_N=0$.
+Supongamos que
+\[
+ x=\lambda u+(1-\lambda)v,\qquad
+ u,v\in P,\qquad 0<\lambda<1.
+\]
+Las componentes no básicas satisfacen
+\[
+ 0=\lambda u_N+(1-\lambda)v_N.
+\]
+Como $u_N,v_N\ge0$ y ambos pesos son positivos, se tiene $u_N=v_N=0$.
+La factibilidad de $u$ y $v$ exige entonces
+\[
+ Bu_B=b=Bv_B.
+\]
+La matriz $B$ es invertible, de modo que $u_B=v_B=B^{-1}b$.
+Por tanto, $u=v=x$. Esto prueba que $x$ es un punto extremo.
+\end{frame}
+
+\begin{frame}{De vértice a solución básica factible}
+Sea $x$ un vértice y sea $J=\{j:x_j>0\}$. Si las columnas $a_j$
+con $j\in J$ fueran dependientes, habría $\gamma\ne0$ tal que
+\[
+ A\gamma=0,\qquad \gamma_j=0 \text{ para } j\notin J.
+\]
+Para $\varepsilon>0$ suficientemente pequeño,
+$x+\varepsilon\gamma$ y $x-\varepsilon\gamma$ serían factibles.
+Son puntos distintos con promedio $x$, lo cual contradice que
+$x$ sea extremo.
+\medskip
+
+Las columnas asociadas a las componentes positivas son, por tanto,
+independientes. Como $\operatorname{rang}(A)=m$, se pueden completar
+con otras columnas de $A$ hasta formar una base $B$. Las variables
+añadidas valen cero. Todas las no básicas también valen cero, así que
+\[
+ x_N=0,\qquad Bx_B=b,\qquad x_B\ge0 .
+\]
+\end{frame}
+
+\begin{frame}{Existencia de una solución básica factible}
+Partimos de cualquier $x\in P$. Si las columnas correspondientes a
+$x_j>0$ son dependientes, tomamos $\gamma\ne0$ con $A\gamma=0$ y
+$\gamma_j=0$ donde $x_j=0$. Elegimos su signo para que alguna
+$\gamma_j>0$.
+\[
+ \lambda=\min_{j:\gamma_j>0}\frac{x_j}{\gamma_j},\qquad
+ x'=x-\lambda\gamma .
+\]
+\begin{itemize}
+\item $Ax'=b$ porque $A\gamma=0$.
+\item $x'\ge0$ por la elección del cociente mínimo.
+\item Al menos una componente positiva se hace cero. Las que ya
+      valían cero siguen en cero.
+\end{itemize}
+\medskip
+
+Al repetir, disminuye el número de componentes positivas. Cuando sus
+columnas son independientes, se completan hasta una base de $m$ columnas
+como en la demostración anterior. Así, $P\ne\varnothing$ implica que existe
+una solución básica factible.
+\end{frame}
+
+\begin{frame}[label=teoria-certificados]{Certificados de optimalidad y no acotación}
+Para cualquier punto factible, el mismo despeje de la base da
+\[
+ z-z_0=\sum_{j\in R}\bar c_j x_j.
+\]
+Si todos los $\bar c_j\ge0$, la suma es no negativa porque $x_j\ge0$.
+La solución básica actual alcanza $z_0$ y es óptima en toda la región.
+\medskip
+
+Si $\bar c_k<0$ y todos los $y_{ik}\le0$, definimos una dirección $d$
+con $d_k=1$, $d_j=0$ para $j\in R\setminus\{k\}$ y
+$d_B=-B^{-1}a_k$. Entonces
+\[
+ Ad=Bd_B+a_k=0,\qquad d\ge0,\qquad
+ c^\top d=c_k-c_B^\top B^{-1}a_k=\bar c_k<0.
+\]
+Es una dirección de recesión que reduce el costo sin límite.
+Si algún $y_{ik}>0$, el cociente acota este desplazamiento y puede dar
+un paso de longitud cero.
+\end{frame}
+
+\begin{frame}[label=teoria-pivote]{Factibilidad y cambio de base en el pivote}
+Con una entrante $k$ tal que $\bar c_k<0$, la prueba del cociente
+da $\bar x_k=\bar b_r/y_{rk}$ y $y_{rk}>0$. Al tomar $x_k=\bar x_k$,
+se conserva $x\ge0$ y la básica $x_{B_r}$ se hace cero.
+\medskip
+
+Sea $B'$ la matriz obtenida al reemplazar la columna $r$ de $B$
+por $a_k$. La matriz $B^{-1}B'$ es la identidad con su columna $r$
+reemplazada por $B^{-1}a_k$. Por tanto,
+\[
+ \det(B^{-1}B')=y_{rk}\ne0
+ \quad\Longrightarrow\quad B' \text{ es invertible}.
+\]
+Las nuevas no básicas valen cero, incluida $x_{B_r}$, que acaba de salir.
+El punto es, por tanto, una solución básica factible para $B'$.
+Como solo cambió una de las variables que eran no básicas,
+\[
+ z_{\mathrm{nuevo}}=z_0+\bar c_k\bar x_k .
+\]
+Hay descenso estricto cuando $\bar x_k>0$. Con $\bar x_k=0$,
+cambia la base en el mismo punto.
+\end{frame}
+
+\begin{frame}{Degeneración y regla de Bland}
+Consideremos $x_1+x_2+x_3=3$ y $x_2+x_4=3$, con $x\ge0$.
+El mismo vértice $x=(0,3,0,0)$ admite las bases
+\[
+ B=[a_1\mid a_2]\qquad\text{y}\qquad B'=[a_3\mid a_2].
+\]
+En la primera, $x_1$ es básica y vale cero. En la segunda,
+$x_3$ es básica y vale cero. En ambas, el vector $x$ es el mismo.
+\medskip
+
+Si en una fila $\bar b_i=0$ y $y_{ik}>0$, el cociente es cero.
+El pivote cambia de base sin reducir $z$. Una sucesión de estos cambios
+puede regresar a una base anterior.
+\begin{block}{Regla de Bland}
+Entre las no básicas con $\bar c_j<0$, entra la de menor índice.
+En un empate del cociente, sale la básica de menor índice original.
+En aritmética exacta, esta regla evita el ciclaje.
+\end{block}
+\end{frame}
+
+\begin{frame}[label=teoria-terminacion]{Por qué termina el símplex}
+Cada pivote produce otra base factible y hay a lo sumo
+$\binom{n}{m}$ conjuntos de columnas que pueden formar una base.
+\begin{itemize}
+\item Con pasos positivos, el costo baja estrictamente. Volver a
+      la misma base devolvería el mismo punto y el mismo costo.
+\item En un ciclo, el costo tendría que quedar constante. Como
+      $\bar c_k<0$ en cada iteración, todos los pasos del ciclo
+      tendrían que ser cero. El teorema de Bland excluye ese ciclo.
+\end{itemize}
+Así, en aritmética exacta y con una base inicial factible, el algoritmo
+termina con una solución óptima o una dirección de costo no acotado.
+\begin{block}{Una base degenerada en un punto óptimo}
+En $\min\{-x_2:x_1+x_2=0,\ x\ge0\}$, con $B=[a_1]$ se tiene
+$\bar c_2=-1$, pero $\bar x_2=0$. El único punto es $(0,0)$.
+Tras el pivote, $B'=[a_2]$ certifica el mismo punto con $\bar c_1=1$.
+\end{block}
+\end{frame}
+
+\begin{frame}[label=teoria-fase1]{Fase I y fase II}
+Si no conocemos una base factible, primero ajustamos los signos de las
+filas para que $b\ge0$. Agregamos un vector de variables artificiales $a$
+y resolvemos
+\[
+ \min\ \mathbf 1^\top a
+ \qquad\text{sujeto a}\qquad Ax+a=b,\quad x,a\ge0.
+\]
+Las columnas de las artificiales forman la base inicial, con $x=0$ y
+$a=b$.
+\begin{itemize}
+\item Si el mínimo de fase I es positivo, $Ax=b,\ x\ge0$ es infactible.
+      Un punto factible del sistema original permitiría tomar $a=0$.
+\item Si el mínimo es cero, todas las artificiales valen cero.
+      Las artificiales básicas que queden se retiran con pivotes de
+      paso cero o eliminando filas redundantes.
+\end{itemize}
+\medskip
+
+Con una base del sistema original, la \concepto{fase II} restaura
+el objetivo $c^\top x$ y continúa con el símplex.
+\end{frame}
+
+\begin{frame}{Fase I en un sistema pequeño}
+Consideremos $x_1-x_2=1$, con $x\ge0$. Al agregar una artificial,
+la fase I comienza en $(x_1,x_2,a_1)=(0,0,1)$.
+\[
+ \min a_1,\qquad x_1-x_2+a_1=1,\qquad x_1,x_2,a_1\ge0 .
+\]
+Manteniendo $x_2=0$, aumentar $x_1$ de $0$ a $1$ reduce $a_1$ de $1$
+a $0$. Entra $x_1$ y sale $a_1$. La fase II parte de $(x_1,x_2)=(1,0)$.
+\medskip
+
+En cambio, para $-x_1=1$ con $x_1\ge0$, la fila auxiliar es
+$-x_1+a_1=1$. Esto obliga a $a_1=1+x_1\ge1$, de modo que el
+mínimo de fase I es $1$ y el sistema original es infactible.
 \end{frame}
 
 \end{document}
