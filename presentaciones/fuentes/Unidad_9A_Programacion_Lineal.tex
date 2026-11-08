@@ -228,6 +228,62 @@ El mínimo está en la fila $r=1$. Sale $x_3$ y $a_1$ sustituye a $a_3$ en $B$
 (\hyperlink{teoria-pivote}{\concepto{justificación}}).
 \end{frame}
 
+% Los dos pivotes detallados se intercalan sin renumerar las diapositivas del guion.
+\begingroup
+\let\numeropivoteBIM\insertframenumber
+\renewcommand{\insertframenumber}{\numeropivoteBIM a}
+\begin{frame}[noframenumbering]{Segundo pivote de BIM}
+\[
+ B=[a_1\mid a_4\mid a_5\mid a_6],\qquad
+ \bar b=B^{-1}b=(1000,1500,750,800)^\top,\qquad R=\{2,3\}.
+\]
+\concepto{Entrante.} Calculamos $c_B^\top B^{-1}=(-12,0,0,0)$.
+\[
+ z_j=c_B^\top B^{-1}a_j,\qquad (z_2,z_3)=(0,-12),\qquad
+ (\bar c_2,\bar c_3)=(-9,12).
+\]
+Solo $x_2$ tiene costo reducido negativo. Entra $x_2$ ($k=2$).
+\medskip
+
+\concepto{Saliente.} Solo las filas con $y_{i2}>0$ limitan el paso.
+\[
+ B^{-1}a_2=(0,1,1,2)^\top,\qquad
+ \bar x_2=\min\left\{\frac{1500}{1},\frac{750}{1},\frac{800}{2}\right\}=400.
+\]
+El mínimo está en la fila $r=4$. Sale $x_6$, la holgura de cobre.
+\medskip
+
+\concepto{Nueva base.} $B'=[a_1\mid a_4\mid a_5\mid a_2]$.
+Plan $(1000,400)$ con margen de $15\,600$.
+\end{frame}
+
+\renewcommand{\insertframenumber}{\numeropivoteBIM b}
+\begin{frame}[noframenumbering]{Tercer pivote de BIM}
+\[
+ B=[a_1\mid a_4\mid a_5\mid a_2],\qquad
+ \bar b=B^{-1}b=(1000,1100,350,400)^\top,\qquad R=\{3,6\}.
+\]
+\concepto{Entrante.} Calculamos $c_B^\top B^{-1}=(6,0,0,-4.5)$.
+\[
+ z_j=c_B^\top B^{-1}a_j,\qquad (z_3,z_6)=(6,-4.5),\qquad
+ (\bar c_3,\bar c_6)=(-6,4.5).
+\]
+Solo $x_3$ tiene costo reducido negativo. Entra $x_3$ ($k=3$), la holgura de silicio.
+\medskip
+
+\concepto{Saliente.} La fila de $x_2$ tiene $y_{43}=-2$, así que $x_2$ aumenta.
+\[
+ B^{-1}a_3=(1,2,1,-2)^\top,\qquad
+ \bar x_3=\min\left\{\frac{1000}{1},\frac{1100}{2},\frac{350}{1}\right\}=350.
+\]
+El mínimo está en la fila $r=3$. Sale $x_5$, la holgura de plástico.
+\medskip
+
+\concepto{Nueva base.} $B'=[a_1\mid a_4\mid a_3\mid a_2]$.
+Plan $(650,1100)$ con margen de $17\,700$.
+\end{frame}
+\endgroup
+
 \begin{frame}{Los tres pivotes de BIM}
 \begin{columns}[c,onlytextwidth]
 \begin{column}{.55\textwidth}
@@ -243,7 +299,8 @@ Paso & Plan $(x_1,x_2)$ & Margen\\
 \end{tabular}
 \medskip
 
-En el primer pivote, la nueva base es $[a_1\mid a_4\mid a_5\mid a_6]$.
+Con la base final, $\bar c_5=6$ y $\bar c_6=1.5$.
+Ambos costos reducidos son positivos, así que el plan es óptimo.
 \medskip
 
 En el tercer pivote, reducir $x_1$ en uno libera cobre para aumentar
