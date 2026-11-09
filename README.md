@@ -19,7 +19,7 @@ Repositorio docente del curso **Métodos Numéricos (130146-A)** de la
 - [Métodos Numéricos - notas 2026-2](notas/Metodos_Numericos_2026-2.pdf)
 
 Las notas reúnen el material central del curso. Esta edición fue recompilada el
-4 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
+8 de noviembre de 2026 y se encuentra en revisión y modernización progresiva. El
 capítulo 1 incorpora grafos computacionales como representación visual de la
 composición de funciones elementales y de la propagación de errores de entrada
 y redondeo. El capítulo 2 contiene la formulación revisada de convergencia para
@@ -31,10 +31,11 @@ notación y sus fórmulas son consistentes con la nueva clase de EDO. Incluye la
 definición de consistencia mediante el residuo normalizado y una demostración
 de la consistencia de primer orden de Euler, con una cota uniforme sobre la malla.
 
-El capítulo 9 incluye una sección de programación lineal con geometría de la
-región factible, símplex revisado, dualidad y precios sombra. Presenta un
-problema de producción resuelto con NumPy y SciPy y dos aplicaciones con
-Pyomo y HiGHS, regresión LAD y cartera MAD.
+El capítulo 9 incluye una sección de programación lineal con gráficos en 2D y
+3D de los vértices, aristas y caras óptimas. Desarrolla los tres pivotes de BIM
+con la notación de Bazaraa y estudia la dualidad y los precios sombra.
+Presenta BIM con NumPy y SciPy y dos aplicaciones con Pyomo y HiGHS,
+regresión LAD y cartera MAD.
 
 ### Presentaciones
 
@@ -56,7 +57,8 @@ Pyomo y HiGHS, regresión LAD y cartera MAD.
 - [Unidad 9A: Programación lineal, símplex y precios sombra](presentaciones/Unidad_9A_Programacion_Lineal.pdf)
 
 La Unidad 9A desarrolla el problema de producción de BIM, sus pivotes y
-la interpretación de los precios sombra. Incluye el código de los modelos
+la interpretación de los precios sombra. Las diapositivas 5a y 5b muestran
+la recta de soporte en 2D y el plano de soporte en 3D. Incluye el código de los modelos
 LAD y MAD. Está disponible la
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_9A_Programacion_Lineal.tex)
 con las figuras que utiliza.

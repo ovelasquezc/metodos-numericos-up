@@ -1,0 +1,38 @@
+\begin{tikzpicture}[x={(.64cm,-.30cm)},y={(-.48cm,.38cm)},z={(0cm,.74cm)},
+    >=Latex, arista/.style={draw=blue!55!black,thick}]
+  \foreach \panel in {0,1} {
+    \begin{scope}[xshift=\panel*6.75cm]
+      \coordinate (O) at (0,0,0);
+      \coordinate (X) at (4,0,0);
+      \coordinate (Y) at (0,4,0);
+      \coordinate (Z) at (0,0,4);
+      \path[arista,fill=blue!18] (O)--(X)--(Y)--cycle;
+      \ifnum\panel=0
+        \path[arista,fill=blue!8] (X)--(Y)--(Z)--cycle;
+      \else
+        \path[draw=orange!70!black,fill=orange!24,very thick] (X)--(Y)--(Z)--cycle;
+      \fi
+      \draw[blue!55!black,densely dashed] (O)--(Z);
+      \draw[->,gray!80!black] (X)--(5.05,0,0) node[right] {$x_1$};
+      \draw[->,gray!80!black] (Y)--(0,5.0,0) node[left] {$x_2$};
+      \draw[->,gray!80!black] (Z)--(0,0,4.6) node[above] {$x_3$};
+      \fill[blue!55!black] (O) circle (1.6pt) node[below] {$0$};
+      \ifnum\panel=0
+        % Los cuatro puntos de esta porción del plano tienen nivel 8.
+        \path[fill=orange!12,fill opacity=.65,draw=orange!70!black,densely dashed,thick]
+          (4.9,-.9,-.9)--(4,.9,-.9)--(3.1,.9,.9)--(4,-.9,.9)--cycle;
+        \foreach \v in {Y,Z} \fill[blue!55!black] (\v) circle (1.65pt);
+        \fill[orange!70!black] (X) circle (2.4pt);
+        \node[font=\bfseries] at (0cm,4.25cm) {Óptimo único};
+        \node[orange!70!black] at (2.52cm,1.60cm) {$2x_1+x_2+x_3=8$};
+        \draw[orange!70!black] (2.36cm,1.37cm)--(2.05cm,-.24cm);
+      \else
+        \foreach \v in {X,Y,Z} \fill[orange!70!black] (\v) circle (2.4pt);
+        \draw[orange!70!black,fill=white,thick] ({4/3},{4/3},{4/3}) circle (2.15pt);
+        \node[font=\bfseries] at (0cm,4.25cm) {Cara óptima};
+        \node[orange!70!black] at (2.38cm,1.58cm) {$x_1+x_2+x_3=4$};
+        \draw[orange!70!black] (1.83cm,1.35cm)--(.88cm,1.12cm);
+      \fi
+    \end{scope}
+  }
+\end{tikzpicture}

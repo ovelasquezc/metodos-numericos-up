@@ -129,6 +129,32 @@ entre $(250,1500)$ y $(650,1100)$ alcanzaría $1750$.
 En ambos extremos y entre ellos se agota el plástico.
 \end{frame}
 
+% Las figuras amplían la diapositiva 5 sin cambiar la numeración del guion.
+\begingroup
+\let\numerooptimoPL\insertframenumber
+\renewcommand{\insertframenumber}{\numerooptimoPL a}
+\begin{frame}[noframenumbering]{La recta de soporte en 2D}
+\centering
+Región factible $x_1,x_2\ge0$, $x_1+x_2\le4$.
+\par\smallskip
+\figuraPL{pl_optimos_2d}{5.05cm}
+\par\medskip
+Al maximizar, la última recta de nivel toca $(4,0)$ o toda la arista.
+El punto $(2,2)$ también es óptimo en el panel derecho.
+\end{frame}
+
+\renewcommand{\insertframenumber}{\numerooptimoPL b}
+\begin{frame}[noframenumbering]{El plano de soporte en 3D}
+\centering
+Región factible $x_1,x_2,x_3\ge0$, $x_1+x_2+x_3\le4$.
+\par\smallskip
+\figuraPL{pl_optimos_3d}{5.05cm}
+\par\medskip
+El plano de soporte toca $(4,0,0)$ o toda la cara triangular,
+incluidos sus tres vértices.
+\end{frame}
+\endgroup
+
 \begin{frame}{Regiones no acotadas}
 \begin{columns}[c,onlytextwidth]
 \begin{column}{.50\textwidth}

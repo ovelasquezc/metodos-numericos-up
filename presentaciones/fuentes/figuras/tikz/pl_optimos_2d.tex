@@ -1,0 +1,34 @@
+\begin{tikzpicture}[x=.81cm,y=.77cm,>=Latex,
+    factible/.style={draw=blue!55!black,fill=blue!8,thick},
+    soporte/.style={draw=orange!70!black,densely dashed,thick}]
+  \foreach \panel in {0,1} {
+    \begin{scope}[xshift=\panel*5.85cm]
+      \path[factible] (0,0)--(4,0)--(0,4)--cycle;
+      \draw[->,gray!80!black] (-.15,0)--(5.4,0) node[right] {$x_1$};
+      \draw[->,gray!80!black] (0,-.15)--(0,5.1) node[above] {$x_2$};
+      \node[below left] at (0,0) {$0$};
+      \node[below] at (4,0) {$4$};
+      \node[left] at (0,4) {$4$};
+      \foreach \v in {(0,0),(4,0),(0,4)}
+        \fill[blue!55!black] \v circle (1.65pt);
+      \ifnum\panel=0
+        \node[font=\bfseries] at (2.7,5.55) {Óptimo único};
+        \draw[gray,densely dashed] (0,3)--(1.65,-.3);
+        \draw[soporte] (1.65,4.7)--(4.2,-.4);
+        \fill[orange!70!black] (4,0) circle (2.4pt);
+        \node[orange!70!black,right] at (2.32,3.72) {$2x_1+x_2=8$};
+        \draw[->,thick,orange!70!black] (2.0,2.3)--(2.86,2.73);
+      \else
+        \node[font=\bfseries] at (2.7,5.55) {Arista óptima};
+        \draw[gray,densely dashed] (-.08,2.08)--(2.08,-.08);
+        \draw[soporte] (-.28,4.28)--(4.45,-.45);
+        \draw[orange!70!black,very thick] (0,4)--(4,0);
+        \foreach \v in {(4,0),(0,4)}
+          \fill[orange!70!black] \v circle (2.4pt);
+        \draw[orange!70!black,fill=white,thick] (2,2) circle (2.15pt);
+        \node[orange!70!black,right] at (2.16,2.48) {$x_1+x_2=4$};
+        \draw[->,thick,orange!70!black] (2.94,1.57)--(3.50,2.13);
+      \fi
+    \end{scope}
+  }
+\end{tikzpicture}
