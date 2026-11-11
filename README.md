@@ -37,6 +37,10 @@ con la notación de Bazaraa y estudia la dualidad y los precios sombra.
 Presenta BIM con NumPy y SciPy y dos aplicaciones con Pyomo y HiGHS,
 regresión LAD y cartera MAD.
 
+La segunda sección desarrolla la optimización sin restricciones. Presenta
+la demostración de convergencia de Wegner para el descenso con paso fijo,
+el retroceso de Armijo y la búsqueda de Powell–Wolfe.
+
 ### Presentaciones
 
 - [Unidad 1: Fundamentos del análisis numérico](presentaciones/Unidad_1_Fundamentos_Analisis_Numerico.pdf)
@@ -55,6 +59,7 @@ regresión LAD y cartera MAD.
 - [Unidad 7C: Ecuaciones integrales, EDO y Montecarlo](presentaciones/Unidad_7C_Integrales_EDO_Montecarlo.pdf)
 - [Unidad 8: Ecuaciones diferenciales ordinarias y métodos de un paso](presentaciones/Unidad_8_Ecuaciones_Diferenciales.pdf)
 - [Unidad 9A: Programación lineal, símplex y precios sombra](presentaciones/Unidad_9A_Programacion_Lineal.pdf)
+- [Unidad 9B: Optimización sin restricciones y descenso del gradiente](presentaciones/Unidad_9B_Optimizacion_Sin_Restricciones.pdf)
 
 La Unidad 9A desarrolla el problema de producción de BIM, sus pivotes y
 la interpretación de los precios sombra. Las diapositivas 5a y 5b muestran
@@ -62,6 +67,11 @@ la recta de soporte en 2D y el plano de soporte en 3D. Incluye el código de los
 LAD y MAD. Está disponible la
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_9A_Programacion_Lineal.tex)
 con las figuras que utiliza.
+
+La Unidad 9B relaciona suavidad y convexidad fuerte con la convergencia
+del descenso con paso fijo. Los gráficos muestran qué pasos aceptan Armijo y
+Powell–Wolfe. Está disponible su
+[fuente LaTeX editable](presentaciones/fuentes/Unidad_9B_Optimizacion_Sin_Restricciones.tex).
 
 La Unidad 8 sigue el capítulo 8 de las notas: problema de Cauchy, equivalencia
 integral, Euler, trapecio implícito, Heun, punto medio explícito y RK4. Incluye
@@ -176,6 +186,11 @@ región factible y los pivotes de BIM, la sensibilidad del margen al plástico,
 la comparación de LAD con mínimos cuadrados y el cambio de riesgo y pesos de
 una cartera MAD. En Colab, ejecuta todas las celdas desde el menú Entorno de
 ejecución. La primera celda instala las bibliotecas.
+
+- [Laboratorio de la Unidad 9B](laboratorios/Optimizacion_Descenso_Gradiente_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Optimizacion_Descenso_Gradiente_2026-2.ipynb)
+
+El laboratorio compara las tres reglas de paso en un ajuste de demanda con
+datos simulados y en la función de Rosenbrock.
 
 - [Ecuaciones diferenciales: Euler, punto medio, Heun y RK4](laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Ecuaciones_Diferenciales_2026-2.ipynb) · [Script Python](laboratorios/Ecuaciones_Diferenciales_2026-2.py)
 

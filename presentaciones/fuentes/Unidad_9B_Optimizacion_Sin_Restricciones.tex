@@ -1,0 +1,404 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+\input{estilo_up_2026}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{babel}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\wegner}{\href{https://doi.org/10.1007/978-3-662-68697-3}{Wegner, \emph{Mathematische Einführung in Data Science}, cap. 17}}
+\pgfplotsset{recta/.style={
+  width=\linewidth,height=5.35cm, xmin=0,xmax=2.45, xlabel={$\alpha$},
+  xtick={0,0.5,1,1.6,2.4}, xticklabels={$0$,$0.5$,$1$,$1.6$,$2.4$},
+  axis lines=left, grid=major, grid style={upgris!15}, tick label style={font=\scriptsize},
+  label style={font=\small}, legend style={font=\scriptsize,draw=none,fill=white},
+  legend pos=north west, samples=121, clip mode=individual
+}}
+\title{Optimización sin restricciones}
+\subtitle{Descenso del gradiente y búsqueda lineal}
+\author{Oswaldo José Velásquez Castañón}
+\institute{Universidad del Pacífico}
+\date{Métodos Numéricos -- 2026-2}
+
+\begin{document}
+
+\begin{frame}[plain]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.73\textwidth}
+\vspace{.55cm}{\usebeamerfont{title}\color{upazul}\inserttitle\par}
+\vspace{.3cm}{\usebeamerfont{subtitle}\color{upgris}\insertsubtitle\par}
+\vspace{.8cm}{\large\insertauthor\par}{\normalsize\insertdate\par}
+\end{column}
+\begin{column}{.22\textwidth}
+\vspace{.55cm}\includegraphics[width=\linewidth]{UPlogo.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Dirección de descenso}
+
+\begin{frame}{Dirección y longitud de paso}
+Buscamos minimizar una función diferenciable $f\colon\R^n\to\R$.
+\[
+g_k=\nabla f(x_k), \qquad
+x_{k+1}=x_k+\alpha_k p_k,\qquad \alpha_k>0.
+\]
+Si $g_k^{\mathsf T}p_k<0$, un desplazamiento suficientemente corto en
+dirección $p_k$ reduce $f$.
+\begin{block}{Descenso del gradiente}
+Con $p_k=-g_k$, la derivada direccional es $-\norm{g_k}^2$.
+La dirección normalizada es la de descenso más rápido en norma euclidiana.
+\end{block}
+Estudiaremos primero un paso constante $\alpha$ y luego cómo elegir
+$\alpha_k$ en cada iteración.
+\end{frame}
+
+\begin{frame}{Convexidad y optimalidad}
+La convexidad exige que para $0\le t\le 1$,
+\[
+f((1-t)x+ty)\le (1-t)f(x)+tf(y).
+\]
+Si $f$ es diferenciable, equivale a que todo plano tangente sea soporte inferior.
+\[
+ f(y)\ge f(x)+\nabla f(x)^{\mathsf T}(y-x).
+\]
+\begin{block}{Consecuencia}
+En una función convexa diferenciable, $\nabla f(x^*)=0$ caracteriza un
+mínimo global. En general, un mínimo local diferenciable solo exige
+estacionariedad como condición necesaria.
+\end{block}
+\end{frame}
+
+\begin{frame}{El tamaño de paso en una cuadrática}
+Para $f(x)=x^2$, el descenso satisface $x_{k+1}=(1-2\alpha)x_k$.
+Con $x_0\ne 0$ y paso constante,
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Paso & Comportamiento \\
+\midrule
+$0<\alpha<1$ & Converge a $0$ \\
+$\alpha=1$ & Alterna entre $x_0$ y $-x_0$ \\
+$\alpha>1$ & Diverge en magnitud \\
+\bottomrule
+\end{tabular}
+\end{center}
+\medskip
+También puede fallar un paso variable que disminuye muy rápido.
+Con $\alpha_k=1/[2(k+2)^2]$, el producto de los factores
+$1-2\alpha_k$ tiende a $1/2$.
+\fuente{\wegner}
+\end{frame}
+
+\section{Convergencia con paso fijo}
+
+\begin{frame}{Suavidad y modelo cuadrático superior}
+El gradiente es $L$-Lipschitz si
+$\norm{\nabla f(y)-\nabla f(x)}\le L\norm{y-x}$.
+Con $s=y-x$, integramos la derivada sobre el segmento.
+\[
+ f(x+s)-f(x)-\nabla f(x)^{\mathsf T}s
+ =\int_0^1[\nabla f(x+ts)-\nabla f(x)]^{\mathsf T}s\,dt
+ \le \tfrac L2\norm{s}^2 .
+\]
+\begin{block}{Descenso con paso fijo}
+Al usar $s=-\alpha\nabla f(x)$,
+\[
+ f(x+s)\le f(x)-\alpha(1-L\alpha/2)\norm{\nabla f(x)}^2 .
+\]
+Para $0<\alpha<2/L$ hay descenso cuando $\nabla f(x)\ne 0$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Convexidad y suavidad combinadas}
+Si $f$ es convexa y $L$-suave,
+\[
+ f(u)-f(v)-\nabla f(v)^{\mathsf T}(u-v)
+ \ge \frac{1}{2L}\norm{\nabla f(u)-\nabla f(v)}^2.
+\]
+\begin{block}{Demostración}
+Sea $h(z)=f(z)-\nabla f(v)^{\mathsf T}z$. Es convexa y $v$ la minimiza.
+El modelo superior con paso $1/L$ da
+\[
+ h(v)\le h\bigl(u-\nabla h(u)/L\bigr)
+       \le h(u)-\frac{1}{2L}\norm{\nabla h(u)}^2 .
+\]
+\end{block}
+Al sustituir $h$ se obtiene la desigualdad.
+\fuente{\wegner}
+\end{frame}
+
+\begin{frame}{Convergencia sublineal con paso \texorpdfstring{$1/L$}{1/L}}
+Supongamos que $f$ es convexa y $L$-suave y que existe $x^*$.
+Sea $\delta_k=f(x_k)-f(x^*)$ y $R=\norm{x_0-x^*}$.
+\begin{enumerate}
+\item Al expandir $\norm{x_k-x^*-g_k/L}^2$ y aplicar la desigualdad anterior
+con $u=x^*$, la distancia a $x^*$ decrece en sentido no estricto.
+\item Por convexidad, $\delta_k\le R\norm{g_k}$. Por suavidad,
+$\delta_k-\delta_{k+1}\ge\norm{g_k}^2/(2L)$.
+\item Mientras $\delta_{k+1}>0$, esto da
+$1/\delta_{k+1}-1/\delta_k\ge 1/(2LR^2)$.
+\end{enumerate}
+\[
+\delta_k\le \frac{2LR^2}{k},\qquad k\ge 1.
+\]
+Una subsucesión acotada converge a un minimizador. La distancia a ese
+minimizador decrece, de modo que converge toda la sucesión.
+\fuente{\wegner}
+\end{frame}
+
+\begin{frame}{Convexidad fuerte y suavidad}
+$f$ es $\mu$-fuertemente convexa si $f(x)-\mu\norm{x}^2/2$ es convexa
+para $\mu>0$. Junto con la suavidad se obtiene
+\[
+ \tfrac\mu2\norm{y-x}^2
+ \le f(y)-f(x)-\nabla f(x)^{\mathsf T}(y-x)
+ \le \tfrac L2\norm{y-x}^2 .
+\]
+\begin{itemize}
+\item La cota inferior implica coercividad y, por continuidad, existe un mínimo.
+La convexidad estricta garantiza que sea único.
+\item Ambas cotas implican $\mu\le L$.
+Si $f$ es $C^2$, equivalen a $\mu I\preceq\nabla^2f(x)\preceq LI$.
+\end{itemize}
+El cociente $\kappa=L/\mu$ compara la curvatura máxima con la mínima.
+\fuente{\wegner}
+\end{frame}
+
+\begin{frame}{Desigualdad de interpolación de Wegner}
+Con $s=y-x$ y $d=\nabla f(y)-\nabla f(x)$,
+\[
+ d^{\mathsf T}s\ge
+ \frac{\mu L}{\mu+L}\norm{s}^2+\frac{1}{\mu+L}\norm{d}^2 .
+\]
+Para $L>\mu$, $h(x)=f(x)-\mu\norm{x}^2/2$ es convexa y su modelo
+superior tiene constante $L-\mu$. Aplicamos la desigualdad anterior
+a $h$ en ambos órdenes y sumamos.
+\[
+ (d-\mu s)^{\mathsf T}s\ge\frac{\norm{d-\mu s}^2}{L-\mu}.
+\]
+Al desarrollar el cuadrado se obtiene el resultado.
+Si $L=\mu$, las cotas coinciden y $d=\mu s$.
+\fuente{\wegner, lema 17.22.}
+\end{frame}
+
+\begin{frame}{El paso que cancela el término del gradiente}
+Sea $e_k=x_k-x^*$ y $g_k=\nabla f(x_k)$. Como $\nabla f(x^*)=0$,
+la desigualdad anterior aplicada a $x^*$ y $x_k$ da
+\[
+\begin{aligned}
+ \norm{e_{k+1}}^2
+ &= \norm{e_k}^2-2\alpha g_k^{\mathsf T}e_k+\alpha^2\norm{g_k}^2\\
+ &\le \left(1-\frac{2\alpha\mu L}{\mu+L}\right)\norm{e_k}^2
+      +\left(\alpha^2-\frac{2\alpha}{\mu+L}\right)\norm{g_k}^2.
+\end{aligned}
+\]
+\begin{block}{Elección de Wegner}
+Con $\alpha=2/(\mu+L)$ desaparece el último término y queda
+\[
+ \norm{e_{k+1}}\le q\norm{e_k},\qquad q=\frac{L-\mu}{L+\mu}.
+\]
+\end{block}
+\fuente{\wegner}
+\end{frame}
+
+\begin{frame}{Tasa lineal y condicionamiento}
+\[
+ \norm{x_k-x^*}\le q^k\norm{x_0-x^*},\qquad
+ f(x_k)-f(x^*)\le\tfrac L2 q^{2k}\norm{x_0-x^*}^2 .
+\]
+La segunda cota usa el modelo superior en $x^*$.
+\begin{center}
+\begin{tabular}{rcc}
+\toprule
+$\kappa=L/\mu$ & $q$ en distancia & $q^2$ en la cota del objetivo \\
+\midrule
+$2$ & $1/3$ & $1/9$ \\
+$8$ & $7/9$ & $49/81$ \\
+$100$ & $99/101$ & $(99/101)^2$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\medskip
+Con $\kappa$ grande, la garantía de reducción por iteración es pequeña.
+¿Cómo elegir el paso cuando $\mu$ y $L$ son difíciles de estimar?
+\end{frame}
+
+\section{Búsqueda lineal}
+
+\begin{frame}{La función sobre la dirección de descenso}
+En la iteración actual fijamos $x$ y $p$, con $\nabla f(x)^{\mathsf T}p<0$.
+\[
+ \phi(\alpha)=f(x+\alpha p), \qquad
+ \phi'(\alpha)=\nabla f(x+\alpha p)^{\mathsf T}p.
+\]
+Una búsqueda lineal inexacta evalúa candidatos hasta encontrar un paso
+que cumpla las condiciones de aceptación.
+\begin{block}{Ejemplo para las dos condiciones}
+Tomamos $\phi(\alpha)=(\alpha-1)^2$, con $\phi(0)=1$,
+$\phi'(0)=-2$ y mínimo en $\alpha=1$.
+\end{block}
+\end{frame}
+
+\begin{frame}{Armijo y disminución suficiente}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.50\textwidth}
+Para $0<c_1<1$ se exige
+\[
+ \phi(\alpha)\le\phi(0)+c_1\alpha\phi'(0).
+\]
+Con $c_1=0.2$, la recta de aceptación es $1-0.4\alpha$.
+\medskip
+
+El gráfico sombrea los pasos positivos que cumplen Armijo.
+Aquí, $0<\alpha\le 1.6$.
+\end{column}
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[recta,ymin=-.12,ymax=2.35,ylabel={Valor},ytick={0,0.5,1,1.5,2}]
+\fill[upverde!18] (axis cs:0,-.12) rectangle (axis cs:1.6,2.35);
+\addplot[upazul,very thick,domain=0:2.42] {(x-1)^2};
+\addlegendentry{$\phi(\alpha)$}
+\addplot[uprojo,dashed,thick,domain=0:2.42] {1-0.4*x};
+\addlegendentry{Cota de Armijo}
+\addplot[only marks,mark=*,upverde,mark size=2.2pt] coordinates {(1.6,0.36)};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Retroceso de Armijo}
+Se fija un paso de prueba $\bar\alpha>0$ y un factor $0<\rho<1$.
+Se prueban $\bar\alpha,\rho\bar\alpha,\rho^2\bar\alpha,\ldots$ hasta
+que se cumpla Armijo.
+\[
+ \phi(\alpha)-\phi(0)-c_1\alpha\phi'(0)
+   =(1-c_1)\alpha\phi'(0)+o(\alpha).
+\]
+Como $\phi'(0)<0$, los pasos positivos suficientemente pequeños se aceptan.
+\begin{exampleblock}{En el gráfico anterior}
+Con $\bar\alpha=2.4$ y $\rho=1/2$, se rechaza $2.4$ y se acepta $1.2$.
+También se aceptaría $0.25$ si fuera el primer candidato.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Powell--Wolfe y condición de curvatura}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.50\textwidth}
+Con $0<c_1<c_2<1$, se pide Armijo y además
+\[
+ \phi'(\alpha)\ge c_2\phi'(0).
+\]
+Para $c_2=0.5$, se requiere $2(\alpha-1)\ge-1$.
+La pendiente en $0.25$ es $-1.5$ y falla la segunda condición.
+\medskip
+
+\concepto{Ambas se cumplen en $[0.5,1.6]$.}
+\end{column}
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[recta,ymin=-2.15,ymax=3.25,ylabel={Pendiente},ytick={-2,-1,0,1,2,3}]
+\fill[upverde!18] (axis cs:.5,-2.15) rectangle (axis cs:1.6,3.25);
+\addplot[upazul,very thick,domain=0:2.42] {2*(x-1)};
+\addlegendentry{$\phi'(\alpha)$}
+\addplot[uprojo,dashed,thick,domain=0:2.42] {-1};
+\addlegendentry{Umbral $c_2\phi'(0)$}
+\addplot[only marks,mark=*,upverde,mark size=2.2pt] coordinates {(.5,-1)};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Expansión y bisección para Powell--Wolfe}
+\begin{enumerate}
+\item Si el candidato cumple las dos condiciones, se acepta.
+\item Si cumple Armijo pero la pendiente sigue por debajo del umbral,
+se guarda como extremo inferior. Mientras falte un extremo superior,
+se duplica el paso.
+\item Si falla Armijo, se guarda como extremo superior. Con ambos
+extremos, el próximo candidato es el punto medio. El extremo inferior
+puede empezar en $0$.
+\end{enumerate}
+\begin{exampleblock}{Con $\bar\alpha=2.4$ en el ejemplo}
+$2.4$ falla Armijo. La bisección de $[0,2.4]$ prueba $1.2$, que cumple ambas.
+\end{exampleblock}
+La prueba de curvatura requiere evaluar el gradiente.
+El laboratorio registra ese costo y limita el número de intentos.
+\end{frame}
+
+\section{Laboratorio}
+
+\begin{frame}{Ajuste de una curva de demanda}
+\begin{columns}[c,onlytextwidth]
+\begin{column}{.53\textwidth}
+Con precios $P_i$ y cantidades $Q_i$ simulados, estimamos
+$\widehat Q(P)=a+b(P-10)$.
+\[
+ \min_{a,b\in\R}\frac1{10}
+   \sum_{i=1}^{5}\bigl[a+b(P_i-10)-Q_i\bigr]^2 .
+\]
+En $P=10$ la demanda ajustada es $a^*=48$.
+Una unidad adicional de precio se asocia con $3.6$ unidades menos de demanda.
+\end{column}
+\begin{column}{.46\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=5.35cm,xmin=5,xmax=15,ymin=27,ymax=69,
+  xlabel={Precio},ylabel={Cantidad},xtick={6,8,10,12,14},grid=major,
+  grid style={upgris!15},tick label style={font=\scriptsize},label style={font=\small}]
+\addplot[upazul,very thick,domain=6:14] {48-3.6*(x-10)};
+\addplot[only marks,mark=*,mark size=2.6pt,updorado] coordinates
+  {(6,63) (8,53) (10,49) (12,43) (14,32)};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{El paso fijo en el ajuste de demanda}
+Los precios centrados tienen media $0$ y segundo momento $8$. Por ello,
+\[
+ H=\begin{pmatrix}1&0\\0&8\end{pmatrix},\qquad
+ \mu=1,\quad L=8,\quad \alpha=2/9.
+\]
+Con el paso fijo, el error en $a$ se multiplica por $7/9$ y el error en
+$b$ por $-7/9$. La pendiente estimada alterna alrededor de $b^*=-3.6$.
+\begin{block}{Comparación en el cuaderno}
+Desde $(a_0,b_0)=(44,-1)$, se compara la distancia al ajuste de
+referencia y el costo de las tres reglas de paso.
+\end{block}
+\end{frame}
+
+\begin{frame}{Rosenbrock y protocolo de comparación}
+\[
+ f(x,y)=(1-x)^2+100(y-x^2)^2.
+\]
+El mínimo global está en $(1,1)$. El valle curvo permite observar un
+comportamiento distinto al de la cuadrática de demanda.
+\begin{itemize}
+\item En cada problema se mantiene el mismo punto inicial y criterio
+de parada para los tres métodos.
+\item El cuaderno registra $f(x_k)-f(x^*)$, $\norm{\nabla f(x_k)}$ y las
+evaluaciones de función y gradiente.
+\item Los contornos muestran cuánto avanza cada trayectoria dentro del
+mismo presupuesto de iteraciones.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Material de laboratorio y referencias}
+\begin{itemize}
+\item Cuaderno \texttt{Optimizacion\_Descenso\_Gradiente\_2026-2.ipynb}.
+  Incluye las dos gráficas de búsqueda lineal, el ajuste de demanda y
+  la comparación en Rosenbrock.
+\item \wegner. Descenso con paso fijo para funciones convexas.
+\item \href{https://doi.org/10.2140/pjm.1966.16.1}{Armijo (1966)},
+  \emph{Minimization of functions having Lipschitz continuous first partial derivatives}.
+\item \href{https://doi.org/10.1137/1011036}{Wolfe (1969)},
+  \emph{Convergence Conditions for Ascent Methods}.
+\end{itemize}
+\end{frame}
+
+\end{document}
