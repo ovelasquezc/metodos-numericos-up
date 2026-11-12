@@ -166,6 +166,14 @@ ejercicio de regularización. Añade ejemplos y complementos sobre escala, SVD,
 ponderación y ajuste en logaritmos. Está disponible su
 [fuente LaTeX editable](presentaciones/fuentes/Unidad_5B_Minimos_Cuadrados_QR.tex).
 
+### Trabajo grupal de optimización
+
+- [Optimización con restricciones aplicada a la economía, con rúbrica](evaluaciones/Trabajo_Grupal_Optimizacion_Restringida_2026-2.pdf)
+
+Cada grupo de cuatro resuelve en Python uno de los cinco casos con datos
+de fuentes públicas y lo explica en un video de máximo 10 minutos.
+El PDF incluye las figuras de intuición geométrica y la rúbrica.
+
 ### Repaso del examen parcial
 
 - [Lista de repaso en PDF](repaso/Lista_Repaso_Parciales_2026-2.pdf)
@@ -252,5 +260,5 @@ El laboratorio de aproximación lineal se entrega sin salidas para ejecutar en C
 
 Este repositorio contiene las versiones vigentes para el periodo 2026-2 y una
 selección de preguntas de evaluaciones anteriores para el repaso del parcial.
-Las evaluaciones del ciclo actual y los archivos internos de preparación no
+Las demás evaluaciones del ciclo actual y los archivos internos de preparación no
 forman parte de esta publicación.
