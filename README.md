@@ -185,6 +185,16 @@ y dos ejercicios complementarios de un examen final y una práctica calificada
 de 2025-2, con su procedencia y notas sobre erratas. No incluye soluciones ni
 evaluaciones del ciclo 2026-2.
 
+### Repaso del examen final
+
+- [Lista de 19 ejercicios en PDF](repaso/Lista_Preparacion_Examen_Final_2026-2.pdf)
+- [Solucionario con demostraciones y código en Python](repaso/Solucionario_Examen_Final_2026-2.pdf)
+
+El repaso cubre mínimos cuadrados, interpolación, cuadratura, ecuaciones
+diferenciales, optimización sin restricciones y programación lineal. El
+ejercicio sobre dualidad aplica el modelo del consumidor para relacionar
+las demandas walrasiana e hicksiana con el multiplicador del presupuesto.
+
 ### Laboratorios
 
 - [Cuaderno de demostración de la Unidad 9A](laboratorios/Programacion_Lineal_2026-2.ipynb) · [Abrir en Colab](https://colab.research.google.com/github/ovelasquezc/metodos-numericos-up/blob/main/laboratorios/Programacion_Lineal_2026-2.ipynb)
@@ -258,7 +268,7 @@ El laboratorio de aproximación lineal se entrega sin salidas para ejecutar en C
 
 ## Estado del material
 
-Este repositorio contiene las versiones vigentes para el periodo 2026-2 y una
-selección de preguntas de evaluaciones anteriores para el repaso del parcial.
+Este repositorio contiene las versiones vigentes para el periodo 2026-2 y los
+materiales de repaso para el parcial y el final.
 Las demás evaluaciones del ciclo actual y los archivos internos de preparación no
 forman parte de esta publicación.
