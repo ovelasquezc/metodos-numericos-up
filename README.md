@@ -188,7 +188,6 @@ evaluaciones del ciclo 2026-2.
 ### Repaso del examen final
 
 - [Lista de 19 ejercicios en PDF](repaso/Lista_Preparacion_Examen_Final_2026-2.pdf)
-- [Solucionario con demostraciones y código en Python](repaso/Solucionario_Examen_Final_2026-2.pdf)
 
 El repaso cubre mínimos cuadrados, interpolación, cuadratura, ecuaciones
 diferenciales, optimización sin restricciones y programación lineal. El
